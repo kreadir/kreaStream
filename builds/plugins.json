@@ -15,7 +15,7 @@
         "version": 2,
         "internalName": "CanliDizi",
         "description": "Canl\u0131 Dizi i\u00e7in Cloudstream eklentisi",
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/CanliDizi.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/builds/CanliDizi.cs3",
         "name": "CanliDizi"
     },
     {
@@ -34,7 +34,7 @@
         "version": 22,
         "internalName": "DiziMom",
         "description": "Binlerce yerli yabanc\u0131 dizi ar\u015fivi, t\u00fcm sezonlar, kesintisiz b\u00f6l\u00fcmler. Sadece dizi izle, Dizimom heryerde seninle!",
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziMom.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/builds/DiziMom.cs3",
         "name": "DiziMom"
     },
     {
@@ -55,7 +55,7 @@
         "version": 22,
         "internalName": "DiziPal",
         "description": "en yeni dizileri g\u00fcvenli ve h\u0131zl\u0131 \u015fekilde sunar.",
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPal.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/builds/DiziPal.cs3",
         "name": "DiziPal"
     },
     {
@@ -76,7 +76,7 @@
         "version": 21,
         "internalName": "HDFilmCehennemi",
         "description": "T\u00fcrkiye'nin en h\u0131zl\u0131 hd film izleme sitesi",
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/HDFilmCehennemi.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/builds/HDFilmCehennemi.cs3",
         "name": "HDFilmCehennemi"
     },
     {
@@ -98,7 +98,7 @@
         "version": 23,
         "internalName": "InatBox",
         "description": "\u0130natBox cloudstream eklentisidir. Sevdi\u011finiz yay\u0131n platformlar\u0131n\u0131 ve canl\u0131 ma\u00e7lar\u0131 burada bulabilirsiniz.",
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/InatBox.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/builds/InatBox.cs3",
         "name": "InatBox"
     }
 ]
