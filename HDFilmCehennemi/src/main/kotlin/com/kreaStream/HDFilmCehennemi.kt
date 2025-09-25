@@ -293,7 +293,9 @@ override suspend fun loadLinks(
             var iframe = Regex("""data-src=\\"([^"]+)""").find(apiGet)?.groupValues?.get(1)!!.replace("\\", "")
             Log.d("HDCH", "$iframe » $iframe")
             if (iframe.contains("rapidrame")) {
-                iframe = "${mainUrl}/rplayer/" + iframe.substringAfter("?rapidrame_id=")
+                //iframe = "${mainUrl}/rplayer/" + iframe.substringAfter("?rapidrame_id=")
+				val iframeDoc = Jsoup.parse(apiGet)
+				iframe = fixUrlNull(iframeDoc.selectFirst("iframe")?.attr("data-src")) ?: return@forEach
             } else if (iframe.contains("mobi")) {
                 val iframeDoc = Jsoup.parse(apiGet)
                 iframe = fixUrlNull(iframeDoc.selectFirst("iframe")?.attr("data-src")) ?: return@forEach
