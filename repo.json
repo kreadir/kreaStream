@@ -1,6 +1,6 @@
 {
   "name": "kreaStream",
-  "description": "Canlı Dizi Eklentisi - kreaStream",
+  "description": "kreaStream",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/kreadir/kreaStream/builds/plugins.json"
