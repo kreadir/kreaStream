@@ -75,8 +75,8 @@ class HDFilmCehennemi : MainAPI() {
     override val mainPage = mainPageOf(
         "${mainUrl}/load/page/sayfano/home/"                                       to "Yeni Eklenen Filmler",
         //"${mainUrl}/load/page/sayfano/categories/nette-ilk-filmler/"               to "Nette İlk Filmler",
-        "${mainUrl}/load/page/sayfano/yabancidiziizle-5/"                                to "Yeni Eklenen Diziler",
-        "${mainUrl}/load/page/sayfano/categories/tavsiye-filmler-izle2/"           to "Tavsiye Filmler",
+        "${mainUrl}/load/page/sayfano/home-series/"                                to "Yeni Eklenen Diziler",
+        "${mainUrl}/load/page/sayfano/categories/tavsiye-filmler-izle3/"           to "Tavsiye Filmler",
         "${mainUrl}/load/page/sayfano/imdb7/"                                      to "IMDB 7+ Filmler",
         //"${mainUrl}/load/page/sayfano/mostCommented/"                              to "En Çok Yorumlananlar",
         "${mainUrl}/load/page/sayfano/mostLiked/"                                  to "En Çok Beğenilenler",
