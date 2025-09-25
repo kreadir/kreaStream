@@ -75,7 +75,7 @@ class HDFilmCehennemi : MainAPI() {
     override val mainPage = mainPageOf(
         "${mainUrl}/load/page/sayfano/home/"                                       to "Yeni Eklenen Filmler",
         //"${mainUrl}/load/page/sayfano/categories/nette-ilk-filmler/"               to "Nette İlk Filmler",
-        "${mainUrl}/load/page/sayfano/home-series/"                                to "Yeni Eklenen Diziler",
+        "${mainUrl}/load/page/sayfano/yabancidiziizle-5/"                                to "Yeni Eklenen Diziler",
         "${mainUrl}/load/page/sayfano/categories/tavsiye-filmler-izle2/"           to "Tavsiye Filmler",
         "${mainUrl}/load/page/sayfano/imdb7/"                                      to "IMDB 7+ Filmler",
         //"${mainUrl}/load/page/sayfano/mostCommented/"                              to "En Çok Yorumlananlar",
@@ -83,11 +83,11 @@ class HDFilmCehennemi : MainAPI() {
         "${mainUrl}/load/page/sayfano/genres/aile-filmleri-izleyin-7/"             to "Aile Filmleri",
         "${mainUrl}/load/page/sayfano/genres/aksiyon-filmleri-izleyin-6/"          to "Aksiyon Filmleri",
         "${mainUrl}/load/page/sayfano/genres/animasyon-filmlerini-izleyin-5/"      to "Animasyon Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/belgesel-filmlerini-izle-2/"          to "Belgesel Filmleri",
+        //"${mainUrl}/load/page/sayfano/genres/belgesel-filmlerini-izle-2/"          to "Belgesel Filmleri",
         "${mainUrl}/load/page/sayfano/genres/bilim-kurgu-filmlerini-izleyin-4/"    to "Bilim Kurgu Filmleri",
         "${mainUrl}/load/page/sayfano/genres/komedi-filmlerini-izleyin-2/"         to "Komedi Filmleri",
         //"${mainUrl}/load/page/sayfano/genres/korku-filmlerini-izle-4/"             to "Korku Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/romantik-filmleri-izle-3/"            to "Romantik Filmleri"
+        "${mainUrl}/load/page/sayfano/genres/romantik-filmleri-izle-3/"            to "Romantik Filmler"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
