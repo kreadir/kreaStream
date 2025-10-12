@@ -5,6 +5,10 @@ concurrency:
   cancel-in-progress: true
 
 on:
+  workflow_run:
+    workflows: ["Domain Değişiklik Kontrolü"]
+    types:
+      - completed
   workflow_dispatch:
   push:
     branches:
