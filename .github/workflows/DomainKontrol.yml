@@ -61,7 +61,7 @@ jobs:
 
           git commit -m "♻️ Domain Değişikliği" \
             -m "🔄 Otomatik domain güncellemeleri yapıldı."
-          BRANCH="domain-degisikligi"
+          BRANCH="main"
 
           git checkout -B $BRANCH
           git push origin $BRANCH --force
