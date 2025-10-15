@@ -9,7 +9,7 @@ concurrency:
 on:
   workflow_dispatch:
   schedule:
-    - cron: 11 */9 * * *
+    - cron: 0 0 * * *
 
 jobs:
   DomainKontrol:
