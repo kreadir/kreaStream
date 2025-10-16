@@ -56,8 +56,8 @@ jobs:
           cp **/build/*.cs3 $GITHUB_WORKSPACE/builds
           cp build/plugins.json $GITHUB_WORKSPACE/builds
 
-      - name: jq Araçlarını Kur (GolgeTV ve AnimeciX eklemeleri için)
-        run: sudo apt-get update && sudo apt-get install -y jq
+      #- name: jq Araçlarını Kur (GolgeTV ve AnimeciX eklemeleri için)
+        #run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: YerelDiziler Eklentisini plugins.json'a Elle Ekle
         run: |
@@ -81,55 +81,55 @@ jobs:
             echo "YerelDiziler zaten plugins.json'da mevcut, eklenmedi."
           fi
           
-          - name: DiziPalOrijinal Eklentisini plugins.json'a Elle Ekle
-            run: |
-              cd $GITHUB_WORKSPACE/builds
-              if ! jq -e '.[] | select(.internalName == "DiziPalOrijinal")' plugins.json > /dev/null; then
-                jq '. += [{
-                  "repositoryUrl": "https://github.com/kreadir/kreaStream",
-                  "apiVersion": 3,
-                  "status": 1,
-                  "language": "tr",
-                  "authors": ["kreadir"],
-                  "tvTypes": [
-                                "TvSeries",
-                                "Movie"
-                              ],
-                  "version": 2,
-                  "internalName": "DiziPalOrijinal",
-                  "description": "DiziPalOrijinal için CloudStream eklentisi",
-                  "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/DiziPalOrijinal.cs3",
-                  "name": "DiziPal Orijinal",
-                  "iconUrl": "https://www.google.com/s2/favicons?domain=www.dzipal1503.com&sz=%size%"
-                }]' plugins.json > plugins-new.json && mv plugins-new.json plugins.json
-              else
-                echo "DiziPalOrijinal zaten plugins.json'da mevcut, eklenmedi."
-              fi
+      - name: DiziPalOrijinal Eklentisini plugins.json'a Elle Ekle
+        run: |
+          cd $GITHUB_WORKSPACE/builds
+          if ! jq -e '.[] | select(.internalName == "DiziPalOrijinal")' plugins.json > /dev/null; then
+            jq '. += [{
+              "repositoryUrl": "https://github.com/kreadir/kreaStream",
+              "apiVersion": 3,
+              "status": 1,
+              "language": "tr",
+              "authors": ["kreadir"],
+              "tvTypes": [
+                            "TvSeries",
+                            "Movie"
+                          ],
+              "version": 2,
+              "internalName": "DiziPalOrijinal",
+              "description": "DiziPalOrijinal için CloudStream eklentisi",
+              "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/DiziPalOrijinal.cs3",
+              "name": "DiziPal Orijinal",
+              "iconUrl": "https://www.google.com/s2/favicons?domain=www.dzipal1503.com&sz=%size%"
+            }]' plugins.json > plugins-new.json && mv plugins-new.json plugins.json
+          else
+            echo "DiziPalOrijinal zaten plugins.json'da mevcut, eklenmedi."
+          fi
 
-          - name: Puhu Eklentisini plugins.json'a Elle Ekle
-            run: |
-              cd $GITHUB_WORKSPACE/builds
-              if ! jq -e '.[] | select(.internalName == "Puhu")' plugins.json > /dev/null; then
-                jq '. += [{
-                  "repositoryUrl": "https://github.com/kreadir/kreaStream",
-                  "apiVersion": 3,
-                  "status": 1,
-                  "language": "tr",
-                  "authors": ["kreadir"],
-                 "tvTypes": [
-                              "TvSeries",
-                              "Movie"
-                            ],
-                  "version": 2,
-                  "internalName": "Puhu",
-                  "description": "Puhu için CloudStream eklentisi",
-                  "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/DiziPalOrijinal.cs3",
-                  "name": "Puhu",
-                  "iconUrl": "https://www.google.com/s2/favicons?domain=www.puhutv.com&sz=%size%"
-                }]' plugins.json > plugins-new.json && mv plugins-new.json plugins.json
-              else
-                echo "PuhuTV zaten plugins.json'da mevcut, eklenmedi."
-              fi
+      - name: Puhu Eklentisini plugins.json'a Elle Ekle
+        run: |
+          cd $GITHUB_WORKSPACE/builds
+          if ! jq -e '.[] | select(.internalName == "Puhu")' plugins.json > /dev/null; then
+            jq '. += [{
+              "repositoryUrl": "https://github.com/kreadir/kreaStream",
+              "apiVersion": 3,
+              "status": 1,
+              "language": "tr",
+              "authors": ["kreadir"],
+             "tvTypes": [
+                          "TvSeries",
+                          "Movie"
+                        ],
+              "version": 2,
+              "internalName": "Puhu",
+              "description": "Puhu için CloudStream eklentisi",
+              "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/DiziPalOrijinal.cs3",
+              "name": "Puhu",
+              "iconUrl": "https://www.google.com/s2/favicons?domain=www.puhutv.com&sz=%size%"
+            }]' plugins.json > plugins-new.json && mv plugins-new.json plugins.json
+          else
+            echo "PuhuTV zaten plugins.json'da mevcut, eklenmedi."
+          fi
           
       - name: Derlemeleri Yükle
         run: |
