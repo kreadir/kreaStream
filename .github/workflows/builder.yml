@@ -35,7 +35,7 @@ jobs:
           ref: "builds"
           path: "builds"
 
-      - name: Eski Derlemeleri Temizle
+      #- name: Eski Derlemeleri Temizle
         #run: rm $GITHUB_WORKSPACE/builds/*.cs3 || true
         #run: find $GITHUB_WORKSPACE/builds -name '*.cs3' -delete
 
