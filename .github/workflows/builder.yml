@@ -123,8 +123,8 @@ jobs:
               "version": 2,
               "internalName": "Puhu",
               "description": "Puhu için CloudStream eklentisi",
-              "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/DiziPalOrijinal.cs3",
-              "name": "Puhu",
+              "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/Puhu.cs3",
+              "name": "Puhu TV",
               "iconUrl": "https://www.google.com/s2/favicons?domain=www.puhutv.com&sz=%size%"
             }]' plugins.json > plugins-new.json && mv plugins-new.json plugins.json
           else
