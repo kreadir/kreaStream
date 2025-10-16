@@ -1,0 +1,221 @@
+[
+    {
+        "iconUrl": "https://www.canlidizi14.com/favicon.ico",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 13233,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "KreaStream"
+        ],
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "version": 2,
+        "internalName": "CanliDizi",
+        "description": "Canl\u0131 Dizi i\u00e7in Cloudstream eklentisi",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/CanliDizi.cs3",
+        "name": "CanliDizi"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizimom.plus&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 30880,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "keyiflerolsun"
+        ],
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "version": 27,
+        "internalName": "DiziMom",
+        "description": "Binlerce yerli yabanc\u0131 dizi ar\u015fivi, t\u00fcm sezonlar, kesintisiz b\u00f6l\u00fcmler. Sadece dizi izle, Dizimom heryerde seninle!",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziMom.cs3",
+        "name": "DiziMom"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=https://dizipal1205.com&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 19403,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "keyiflerolsun",
+            "muratcesmecioglu"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 24,
+        "internalName": "DiziPal",
+        "description": "en yeni dizileri g\u00fcvenli ve h\u0131zl\u0131 \u015fekilde sunar.",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPal.cs3",
+        "name": "DiziPal"
+    },
+    {
+        "iconUrl": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh3vCp6N1K4bECoYRQD-cisJF2_6V_Hk01ZhDmoPR2JuM8O5qr4MqrPO1munM9cRlleBBSK6odYhLtDBWv4E3vhPhynlmS5hVVtJZShHoGA5REQ8_3v8SIlccTEqzVQu2UJyNYQdJNrKIfWy66RQeT0D-CcmFCbHPz5023H6p2v5fv4NVloZ5Rqo_yGrIY/s320/iNat-Box-App.png",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 30860,
+        "status": 3,
+        "language": "tr",
+        "authors": [
+            "kerimmkirac"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Live"
+        ],
+        "version": 9,
+        "internalName": "InatBox",
+        "description": "\u0130natBox cloudstream eklentisidir. Sevdi\u011finiz yay\u0131n platformlar\u0131n\u0131 ve canl\u0131 ma\u00e7lar\u0131 burada bulabilirsiniz.",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/InatBox.cs3",
+        "name": "InatBox"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=colorhunt.co&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 18712,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "sarapcanagii"
+        ],
+        "tvTypes": [
+            "Live"
+        ],
+        "version": 9,
+        "internalName": "NeonSpor",
+        "description": "(A\u00e7\u0131lmayan Spor Kanallar \u0130\u00e7in VPN Gerekebilir.) NeonSpor eklentisinde BeIN Sports, Tabii Spor, S Sports, Exxen Spor, Smart Spor, Tivibu Spor ve Di\u011fer kanallar mevcuttur.",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/NeonSpor.cs3",
+        "name": "NeonSpor"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.setfilmizle.nl&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 19210,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "keyiflerolsun"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 23,
+        "internalName": "SetFilmIzle",
+        "description": "Setfilmizle sitemizde, donma ya\u015famadan T\u00fcrk\u00e7e dublaj ve altyaz\u0131l\u0131 filmleri ile dizileri muhte\u015fem 1080p full HD kalitesinde izleyebilirsiniz.",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/SetFilmIzle.cs3",
+        "name": "SetFilmIzle"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.hdfilmcehennemi.la&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 19210,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "keyiflerolsun"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 23,
+        "internalName": "HdfilmCehennemi",
+        "description": "HdfilmCehennemi sitemizde, donma ya\u015famadan T\u00fcrk\u00e7e dublaj ve altyaz\u0131l\u0131 filmleri ile dizileri muhte\u015fem 1080p full HD kalitesinde izleyebilirsiniz.",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/HdfilmCehennemi.cs3",
+        "name": "HdfilmCehennemi"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.hdfilmcehennemi.la&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 19210,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "keyiflerolsun"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 23,
+        "internalName": "HdfilmCehennemi_2",
+        "description": "HdfilmCehennemi sitemizde, donma ya\u015famadan T\u00fcrk\u00e7e dublaj ve altyaz\u0131l\u0131 filmleri ile dizileri muhte\u015fem 1080p full HD kalitesinde izleyebilirsiniz.",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/HDFilmCehennemi_nikyok.cs3",
+        "name": "HdfilmCehennemi_2"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.hdfilmcehennemi.la&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 19210,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "keyiflerolsun"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 23,
+        "internalName": "YerelDiziler",
+        "description": "YerelDiziler sitemizde, donma ya\u015famadan T\u00fcrk\u00e7e dublaj ve altyaz\u0131l\u0131 filmleri ile dizileri muhte\u015fem 1080p full HD kalitesinde izleyebilirsiniz.",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/YerelDiziler.cs3",
+        "name": "YerelDiziler"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.tabii.com&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 19210,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "keyiflerolsun"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 23,
+        "internalName": "Tabii",
+        "description": "Tabii TRT",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Tabii.cs3",
+        "name": "Tabii"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizipal1502.com&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/kreadir/kreaStream",
+        "fileSize": 19210,
+        "status": 1,
+        "language": "tr",
+        "authors": [
+            "keyiflerolsun"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 23,
+        "internalName": "DiziPalOrijinal",
+        "description": "DiziPalOrijinal Dizi ve Film",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPalOrijinal.cs3",
+        "name": "DiziPalOrijinal"
+    }
+]
