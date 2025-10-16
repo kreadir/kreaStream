@@ -36,7 +36,8 @@ jobs:
           path: "builds"
 
       - name: Eski Derlemeleri Temizle
-        run: rm $GITHUB_WORKSPACE/builds/*.cs3 || true
+        #run: rm $GITHUB_WORKSPACE/builds/*.cs3 || true
+        run: find $GITHUB_WORKSPACE/builds -name '*.cs3' -delete
 
       - name: JDK 17 Ayarla
         uses: actions/setup-java@v4.6.0
