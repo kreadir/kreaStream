@@ -14,28 +14,27 @@ import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.json.JSONObject
 import org.json.JSONArray
-import java.util.regex.Pattern
 
 class CanliDiziProvider : ExtractorApi() {
     override val name = "CanliDizi14"
     override val mainUrl = "https://www.canlidizi14.com"
     override val requiresReferer = false
-    override val supportedTypes = setOf(TvType.Movie, TvType.TVSeries)
+    override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
 
     override suspend fun getUrl(
         id: String,
-        referer: String?,
+        referrer: String?,
         subtitleCallback: (ExtractorSubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
         withContext(Dispatchers.IO) {
-            val doc = Jsoup.parse(app.get(id, referer = referer).text) // Use text and parse to avoid document issues if any
+            val doc = app.get(id, referrer = referrer).document
 
             // Common pattern: iframe embeds from external hosts
             doc.select("iframe[src]").forEach { elem ->
                 val iframe = fixUrl(elem.attr("src"))
-                if (Pattern.compile("(?i)(embed|player|video)").matcher(iframe).find()) {
-                    loadExtractor(iframe, referer = id, subtitleCallback = subtitleCallback, callback = callback)
+                if (Regex("(?i)(embed|player|video)").containsMatchIn(iframe)) {
+                    loadExtractor(iframe, referrer = id, subtitleCallback = subtitleCallback, callback = callback)
                 }
             }
 
@@ -43,38 +42,38 @@ class CanliDiziProvider : ExtractorApi() {
             doc.select("video source[src], video[src]").forEach { elem ->
                 val source = fixUrl(elem.attr("src"))
                 callback(
-                    newExtractorLink(name, name, source, referer = id, quality = Qualities.Unknown.value)
+                    newExtractorLink(name, name, source, referrer = id, quality = Qualities.Unknown.value)
                 )
             }
 
             // Fallback: Direct m3u8 links in anchors or scripts
             doc.select("a[href*=.m3u8], script:contains(.m3u8)").forEach { elem ->
-                val m3u8 = if ("a" == elem.tagName()) {
+                val m3u8 = if (elem.tagName() == "a") {
                     fixUrl(elem.attr("href"))
                 } else {
                     // Simple JS extraction if needed (e.g., var player = {...})
                     val script = elem.data()
-                    val m3u8Match = Pattern.compile("['\"]([^'\"]*\\.m3u8)['\"]").matcher(script).find()
-                    if (m3u8Match) script.substring(m3u8Match.start(1), m3u8Match.end(1)) else null
-                        ?.let { fixUrl(it) }
+                    val m3u8Match = Regex("['\"]([^'\"]*\\.m3u8)['\"]").find(script)
+                    m3u8Match?.groupValues?.getOrNull(1)?.let { fixUrl(it) }
                 }
                 m3u8?.let {
                     callback(
-                        newExtractorLink(name, name, it, referer = id, quality = Qualities.HD.value)
+                        newExtractorLink(name, name, it, referrer = id, quality = Qualities.HD.value)
                     )
                 }
             }
 
             // If JSON config in script (common for players like JWPlayer)
             doc.select("script").forEach { script ->
-                val jsonMatch = Pattern.compile("\\{[^}]*playlist[^}]*\\}").matcher(script.data()).find()
+                val scriptText = script.data()
+                val jsonMatch = Regex("\\{[^}]*playlist[^}]*\\}").find(scriptText)
                 jsonMatch?.let { match ->
-                    val jsonStr = script.data().substring(match.start(), match.end())
+                    val jsonStr = match.value
                     try {
                         val json = parseJson<JSONObject>(jsonStr)
-                        val playlist = json.optJSONArray("playlist")
-                        if (playlist != null && playlist.length() > 0) {
-                            val sources = playlist.optJSONObject(0)?.optJSONArray("sources")
+                        val playlistArray = json.optJSONArray("playlist")
+                        if (playlistArray != null && playlistArray.length() > 0) {
+                            val sources = playlistArray.optJSONObject(0)?.optJSONArray("sources")
                             if (sources != null) {
                                 for (i in 0 until sources.length()) {
                                     val obj = sources.getJSONObject(i)
@@ -83,7 +82,7 @@ class CanliDiziProvider : ExtractorApi() {
                                     if (file.contains(".m3u8") || file.contains(".mp4")) {
                                         callback(
                                             newExtractorLink(
-                                                name, name, fixUrl(file), referer = id,
+                                                name, name, fixUrl(file), referrer = id,
                                                 quality = label.toIntOrNull() ?: Qualities.Unknown.value
                                             )
                                         )

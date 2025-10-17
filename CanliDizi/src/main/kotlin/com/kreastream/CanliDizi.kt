@@ -1,9 +1,7 @@
 package com.kreastream
 
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.Qualities
-import com.lagradost.cloudstream3.utils.getQualityFromString
+import com.lagradost.cloudstream3.utils.*
 import org.jsoup.nodes.Element
 
 class CanliDizi : MainAPI() {
@@ -30,19 +28,19 @@ class CanliDizi : MainAPI() {
             newTvSeriesSearchResponse(title, href) {
                 this.posterUrl = poster
                 this.year = epElem?.text()?.toIntOrNull()
-                this.quality = getQualityFromString(img?.attr("title"))
+                this.quality = getQualityFromString(img?.attr("title") ?: "")
             }
         } else if (isMovie) {
             newMovieSearchResponse(title, href) {
                 this.posterUrl = poster
-                this.quality = getQualityFromString(img?.attr("title"))
+                this.quality = getQualityFromString(img?.attr("title") ?: "")
             }
         } else {
             // Episode treated as movie for simplicity
             val epTitle = "$title ${epElem?.text() ?: ""}".trim()
             newMovieSearchResponse(epTitle, href, TvType.TvSeries) {
                 this.posterUrl = poster
-                this.quality = getQualityFromString(img?.attr("title"))
+                this.quality = getQualityFromString(img?.attr("title") ?: "")
             }
         }
     }
@@ -142,7 +140,7 @@ class CanliDizi : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         // Delegate to the custom extractor for robust parsing (iframes, videos, m3u8, JSON, etc.)
-        CanliDiziProvider().getUrl(data, referer = data, { subtitle -> subtitleCallback(SubtitleFile(subtitle.name, subtitle.url)) }, callback)
+        CanliDiziProvider().getUrl(data, referrer = data, { sub -> subtitleCallback(SubtitleFile(sub.name, sub.url)) }, callback)
         return true
     }
 }
