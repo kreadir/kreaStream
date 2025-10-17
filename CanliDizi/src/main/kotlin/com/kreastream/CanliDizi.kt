@@ -149,13 +149,25 @@ class CanliDizi : MainAPI() {
             partDoc.select("video source[src], video[src]").forEach { elem ->
                 val srcAttr = if (elem.hasAttr("data-wpfc-original-src")) "data-wpfc-original-src" else "src"
                 val source = fixUrl(elem.attr(srcAttr))
-                callback(ExtractorLink(name, name, source, data, Qualities.Unknown.value))
+                callback(ExtractorLink(
+                    source = name, 
+                    name = name, 
+                    url = source, 
+                    referer = data, 
+                    quality = 100
+                ))
             }
 
             // 3. Direct m3u8 links
             partDoc.select("a[href*=.m3u8]").forEach { elem ->
                 val m3u8 = fixUrl(elem.attr("href"))
-                callback(ExtractorLink(name, name, m3u8, data, Qualities.HD.value))
+                callback(ExtractorLink(
+                    source = name, 
+                    name = name, 
+                    url = m3u8, 
+                    referer = data, 
+                    quality = 720
+                ))
             }
 
             // 4. m3u8 in scripts
@@ -163,7 +175,13 @@ class CanliDizi : MainAPI() {
                 val scriptText = script.data()
                 Regex("['\"]([^'\"]*\\.m3u8)['\"]").findAll(scriptText).forEach { match ->
                     val m3u8 = fixUrl(match.groupValues[1])
-                    callback(ExtractorLink(name, name, m3u8, data, Qualities.HD.value))
+                    callback(ExtractorLink(
+                        source = name, 
+                        name = name, 
+                        url = m3u8, 
+                        referer = data, 
+                        quality = 720
+                    ))
                 }
             }
         }
