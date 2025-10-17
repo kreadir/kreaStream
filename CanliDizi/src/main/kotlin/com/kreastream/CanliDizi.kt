@@ -1,8 +1,10 @@
 package com.kreastream
 
 import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.extractors.CanliDizi14Extractor
 import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.utils.Qualities
+import com.lagradost.cloudstream3.utils.getQualityFromString
 import org.jsoup.nodes.Element
 
 class CanliDizi : MainAPI() {
@@ -51,22 +53,22 @@ class CanliDizi : MainAPI() {
         val lists = ArrayList<HomePageList>()
 
         // Popüler Diziler
-        val popularItems = doc.select("div.diziler div.owl-item").map { it.toSearchResponse() }
+        val popularItems = doc.select("div.diziler div.owl-item").mapNotNull { it.toSearchResponse() }
         if (popularItems.isNotEmpty()) lists.add(HomePageList("Popüler Diziler", popularItems))
 
         // Yerli Diziler
         val yerliSection = doc.select("div.episodes.episode").getOrNull(0)
-        val yerliItems = yerliSection?.select("div.list-episodes")?.map { it.selectFirst("div.episode-box")?.toSearchResponse()!! } ?: emptyList()
+        val yerliItems = yerliSection?.select("div.list-episodes div.episode-box")?.map { it.toSearchResponse() } ?: emptyList()
         if (yerliItems.isNotEmpty()) lists.add(HomePageList("Yerli Diziler", yerliItems))
 
         // Dijital Diziler
         val digitalSection = doc.select("div.episodes.episode").getOrNull(1)
-        val digitalItems = digitalSection?.select("div.list-episodes")?.map { it.selectFirst("div.episode-box")?.toSearchResponse()!! } ?: emptyList()
+        val digitalItems = digitalSection?.select("div.list-episodes div.episode-box")?.map { it.toSearchResponse() } ?: emptyList()
         if (digitalItems.isNotEmpty()) lists.add(HomePageList("Dijital Diziler", digitalItems))
 
         // Filmler
         val filmsSection = doc.select("div.episodes.episode").getOrNull(2)
-        val filmsItems = filmsSection?.select("div.list-episodes")?.map { it.selectFirst("div.episode-box")?.toSearchResponse()!! } ?: emptyList()
+        val filmsItems = filmsSection?.select("div.list-episodes div.episode-box")?.map { it.toSearchResponse() } ?: emptyList()
         if (filmsItems.isNotEmpty()) lists.add(HomePageList("Filmler", filmsItems))
 
         return newHomePageResponse(lists)
@@ -75,30 +77,32 @@ class CanliDizi : MainAPI() {
     override suspend fun search(query: String): List<SearchResponse> {
         val searchUrl = "$mainUrl/?s=${query.replace(" ", "+")}"
         val doc = app.get(searchUrl).document
-        return doc.select("div.episodes.episode div.list-episodes div.episode-box").map { it.toSearchResponse() }
+        return doc.select("div.episodes.episode div.list-episodes div.episode-box").mapNotNull { it.toSearchResponse() }
     }
 
-    override suspend fun load(url: String): LoadResponse {
+    override suspend fun load(url: String): LoadResponse? {
         val doc = app.get(url).document
 
         if (url.contains("kategori")) {
             // Series page
-            val title = doc.selectFirst("div.title-border")?.text() ?: doc.selectFirst("title")?.text()?.split(" | ")?.get(0) ?: ""
+            val title = doc.selectFirst("div.title-border")?.text()?.trim() ?: doc.selectFirst("title")?.text()?.split(" | ")?.getOrNull(0)?.trim() ?: ""
             val posterElem = doc.selectFirst("div.poster img")
             val posterAttr = if (posterElem?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
             val poster = fixUrl(posterElem?.attr(posterAttr) ?: "")
-            val description = doc.selectFirst("div.synopsis")?.text() // Assuming there's a synopsis div
+            val description = doc.selectFirst("div.synopsis")?.text()?.trim()
             val ratingStr = doc.selectFirst("div.episode-date")?.text()?.replace("IMDb: ", "")?.replace(",", ".")?.toFloatOrNull()
             val rating = (ratingStr?.times(10))?.toInt()
+
             val episodes = doc.select("div.episodes.episode div.list-episodes div.episode-box").mapIndexedNotNull { index, el ->
                 val a = el.selectFirst("a") ?: return@mapIndexedNotNull null
-                val epName = el.selectFirst("div.episode-name")?.text() ?: ""
-                val epNum = epName.replace(".Bölüm", "").trim().toIntOrNull() ?: (index + 1)
+                val epName = el.selectFirst("div.episode-name")?.text()?.trim() ?: ""
+                val epNum = epName.replace(Regex("\\.Bölüm"), "").trim().toIntOrNull() ?: (index + 1)
                 val epUrl = fixUrl(a.attr("href"))
                 val epImg = el.selectFirst("img")
                 val epPosterAttr = if (epImg?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
                 val epPoster = fixUrl(epImg?.attr(epPosterAttr) ?: "")
-                val epDate = el.selectFirst("div.episode-date")?.text()
+                val epDate = el.selectFirst("div.episode-date")?.text()?.trim()
+
                 newEpisode(epUrl) {
                     this.name = epName
                     this.season = 1
@@ -106,7 +110,7 @@ class CanliDizi : MainAPI() {
                     this.posterUrl = epPoster
                     this.description = epDate
                 }
-            }.reversed() // Newest first?
+            }.reversed() // Newest first
 
             return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
                 this.posterUrl = poster
@@ -115,11 +119,11 @@ class CanliDizi : MainAPI() {
             }
         } else {
             // Movie or Episode
-            val title = doc.selectFirst("title")?.text()?.split(" | ")?.get(0) ?: ""
+            val title = doc.selectFirst("title")?.text()?.split(" | ")?.getOrNull(0)?.trim() ?: ""
             val posterElem = doc.selectFirst("div.poster img")
             val posterAttr = if (posterElem?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
             val poster = fixUrl(posterElem?.attr(posterAttr) ?: "")
-            val description = doc.selectFirst("div.synopsis")?.text()
+            val description = doc.selectFirst("div.synopsis")?.text()?.trim()
             val ratingStr = doc.selectFirst("div.episode-date")?.text()?.replace("IMDb: ", "")?.replace(",", ".")?.toFloatOrNull()
             val rating = (ratingStr?.times(10))?.toInt()
             val type = if (url.contains("bolum")) TvType.TvSeries else TvType.Movie
@@ -138,23 +142,8 @@ class CanliDizi : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val doc = app.get(data).document
-
-        // Find all part links like /2, /3 etc.
-        val partLinks = doc.select("a[href*=\"$data/\"]").map { fixUrl(it.attr("href")) }.toMutableList()
-        if (partLinks.isEmpty()) partLinks.add(data) else partLinks.add(0, data) // Include the main page if parts exist
-
-        partLinks.apmap { partUrl ->
-            val partDoc = app.get(partUrl).document
-            val iframe = partDoc.selectFirst("iframe")
-            val iframeAttr = if (iframe?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
-            val iframeSrc = iframe?.attr(iframeAttr)
-                ?: partDoc.selectFirst("div.player embed")?.attr("src")
-                ?: return@apmap
-
-            loadExtractor(iframeSrc, mainUrl, subtitleCallback, callback)
-        }
-
+        // Delegate to the custom extractor for robust parsing (iframes, videos, m3u8, JSON, etc.)
+        CanliDizi14Extractor().getUrl(data, referer = data, subtitleCallback, callback)
         return true
     }
 }
