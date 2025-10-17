@@ -139,42 +139,24 @@ class CanliDizi : MainAPI() {
         partLinks.forEach { partUrl ->
             val partDoc = app.get(partUrl).document
             
-            // 1. IFRAME embeds (most common) - DIRECT CALLBACK
+            // 1. IFRAME embeds (most common)
             partDoc.select("iframe[src]").forEach { elem ->
                 val iframeAttr = if (elem.hasAttr("data-wpfc-original-src")) "data-wpfc-original-src" else "src"
                 val iframeSrc = fixUrl(elem.attr(iframeAttr))
-                callback(newExtractorLink(
-                    source = name,
-                    name = name,
-                    url = iframeSrc,
-                    referer = data,
-                    quality = 100
-                ))
+                callback(newExtractorLink(name, name, iframeSrc))
             }
 
             // 2. Direct video sources
             partDoc.select("video source[src], video[src]").forEach { elem ->
                 val srcAttr = if (elem.hasAttr("data-wpfc-original-src")) "data-wpfc-original-src" else "src"
                 val source = fixUrl(elem.attr(srcAttr))
-                callback(newExtractorLink(
-                    source = name,
-                    name = name,
-                    url = source,
-                    referer = data,
-                    quality = 100
-                ))
+                callback(newExtractorLink(name, name, source))
             }
 
             // 3. Direct m3u8 links
             partDoc.select("a[href*=.m3u8]").forEach { elem ->
                 val m3u8 = fixUrl(elem.attr("href"))
-                callback(newExtractorLink(
-                    source = name,
-                    name = name,
-                    url = m3u8,
-                    referer = data,
-                    quality = 720
-                ))
+                callback(newExtractorLink(name, name, m3u8))
             }
 
             // 4. m3u8 in scripts
@@ -182,13 +164,7 @@ class CanliDizi : MainAPI() {
                 val scriptText = script.data()
                 Regex("['\"]([^'\"]*\\.m3u8)['\"]").findAll(scriptText).forEach { match ->
                     val m3u8 = fixUrl(match.groupValues[1])
-                    callback(newExtractorLink(
-                        source = name,
-                        name = name,
-                        url = m3u8,
-                        referer = data,
-                        quality = 720
-                    ))
+                    callback(newExtractorLink(name, name, m3u8))
                 }
             }
         }
