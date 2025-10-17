@@ -2,6 +2,7 @@ package com.kreastream
 
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.nodes.Element
 
 class CanliDizi : MainAPI() {
@@ -138,22 +139,28 @@ class CanliDizi : MainAPI() {
         partLinks.forEach { partUrl ->
             val partDoc = app.get(partUrl).document
             
-            // 1. IFRAME embeds (most common)
+            // 1. IFRAME embeds (most common) - DIRECT CALLBACK
             partDoc.select("iframe[src]").forEach { elem ->
                 val iframeAttr = if (elem.hasAttr("data-wpfc-original-src")) "data-wpfc-original-src" else "src"
                 val iframeSrc = fixUrl(elem.attr(iframeAttr))
-                loadExtractor(iframeSrc, data, subtitleCallback, callback)
+                callback(newExtractorLink(
+                    source = name,
+                    name = name,
+                    url = iframeSrc,
+                    referer = data,
+                    quality = 100
+                ))
             }
 
             // 2. Direct video sources
             partDoc.select("video source[src], video[src]").forEach { elem ->
                 val srcAttr = if (elem.hasAttr("data-wpfc-original-src")) "data-wpfc-original-src" else "src"
                 val source = fixUrl(elem.attr(srcAttr))
-                callback(ExtractorLink(
-                    source = name, 
-                    name = name, 
-                    url = source, 
-                    referer = data, 
+                callback(newExtractorLink(
+                    source = name,
+                    name = name,
+                    url = source,
+                    referer = data,
                     quality = 100
                 ))
             }
@@ -161,11 +168,11 @@ class CanliDizi : MainAPI() {
             // 3. Direct m3u8 links
             partDoc.select("a[href*=.m3u8]").forEach { elem ->
                 val m3u8 = fixUrl(elem.attr("href"))
-                callback(ExtractorLink(
-                    source = name, 
-                    name = name, 
-                    url = m3u8, 
-                    referer = data, 
+                callback(newExtractorLink(
+                    source = name,
+                    name = name,
+                    url = m3u8,
+                    referer = data,
                     quality = 720
                 ))
             }
@@ -175,11 +182,11 @@ class CanliDizi : MainAPI() {
                 val scriptText = script.data()
                 Regex("['\"]([^'\"]*\\.m3u8)['\"]").findAll(scriptText).forEach { match ->
                     val m3u8 = fixUrl(match.groupValues[1])
-                    callback(ExtractorLink(
-                        source = name, 
-                        name = name, 
-                        url = m3u8, 
-                        referer = data, 
+                    callback(newExtractorLink(
+                        source = name,
+                        name = name,
+                        url = m3u8,
+                        referer = data,
                         quality = 720
                     ))
                 }
