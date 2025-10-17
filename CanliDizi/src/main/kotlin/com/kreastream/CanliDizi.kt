@@ -1,7 +1,6 @@
 package com.kreastream
 
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.nodes.Element
 
 class CanliDizi : MainAPI() {
@@ -138,41 +137,11 @@ class CanliDizi : MainAPI() {
         partLinks.forEach { partUrl ->
             val partDoc = app.get(partUrl).document
             
-            // 1. IFRAME embeds (most common) - BETAPLAYER FIX
-            partDoc.select("iframe[src]").forEach { elem ->
-                val iframeAttr = if (elem.hasAttr("data-wpfc-original-src")) "data-wpfc-original-src" else "src"
-                val iframeSrc = fixUrl(elem.attr(iframeAttr))
-                
-                if (iframeSrc.contains("betaplayer.site")) {
-                    // Extract video ID: rbsdbFJrIbLeIt9
-                    val videoId = iframeSrc.substringAfterLast("/").replace("\"", "")
-                    val betaUrl = "https://betaplayer.site/embed/$videoId"
-                    callback(newExtractorLink(name, name, betaUrl))
-                } else {
-                    callback(newExtractorLink(name, name, iframeSrc))
-                }
-            }
-
-            // 2. Direct video sources
-            partDoc.select("video source[src], video[src]").forEach { elem ->
-                val srcAttr = if (elem.hasAttr("data-wpfc-original-src")) "data-wpfc-original-src" else "src"
-                val source = fixUrl(elem.attr(srcAttr))
-                callback(newExtractorLink(name, name, source))
-            }
-
-            // 3. Direct m3u8 links
-            partDoc.select("a[href*=.m3u8]").forEach { elem ->
-                val m3u8 = fixUrl(elem.attr("href"))
-                callback(newExtractorLink(name, name, m3u8))
-            }
-
-            // 4. m3u8 in scripts
-            partDoc.select("script").forEach { script ->
-                val scriptText = script.data()
-                Regex("['\"]([^'\"]*\\.m3u8)['\"]").findAll(scriptText).forEach { match ->
-                    val m3u8 = fixUrl(match.groupValues[1])
-                    callback(newExtractorLink(name, name, m3u8))
-                }
+            // 🔥 BETAPLAYER FIX - 1 LINE!
+            partDoc.select("iframe[data-wpfc-original-src*=betaplayer]").forEach { elem ->
+                val videoId = elem.attr("data-wpfc-original-src").substringAfterLast("/")
+                val betaUrl = "https://betaplayer.site/embed/$videoId"
+                callback(newExtractorLink(name, name, betaUrl))
             }
         }
 
