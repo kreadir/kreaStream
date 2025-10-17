@@ -89,10 +89,10 @@ class HDFilmCehennemi : MainAPI() {
         "${mainUrl}/load/page/sayfano/genres/aksiyon-filmleri-izleyin-6/" to "Aksiyon Filmleri",
         "${mainUrl}/load/page/sayfano/genres/animasyon-filmlerini-izleyin-5/" to "Animasyon Filmleri",
         //"${mainUrl}/load/page/sayfano/genres/belgesel-filmlerini-izle-1/" to "Belgesel Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/bilim-kurgu-filmlerini-izleyin-3/" to "Bilim Kurgu Filmleri",
+        "${mainUrl}/load/page/sayfano/genres/bilim-kurgu-filmlerini-izleyin-4/" to "Bilim Kurgu Filmleri",
         "${mainUrl}/load/page/sayfano/genres/komedi-filmlerini-izleyin-2/" to "Komedi Filmleri",
         //"${mainUrl}/load/page/sayfano/genres/korku-filmlerini-izle-4/" to "Korku Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/romantik-filmleri-izle-2/" to "Romantik Filmleri",
+        "${mainUrl}/load/page/sayfano/genres/romantik-filmleri-izle-3/" to "Romantik Filmleri",
         "${mainUrl}/load/page/sayfano/genres/suc-filmleri-izle-3/" to "Suç Filmleri",
         //"${mainUrl}/load/page/sayfano/genres/tarih-filmleri-izle-4/" to "Tarih Filmleri"
     )
