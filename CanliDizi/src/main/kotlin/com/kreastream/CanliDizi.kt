@@ -85,55 +85,65 @@ class CanliDizi : MainAPI() {
     }
 
     override suspend fun load(url: String): LoadResponse? {
-    val doc = app.get(url).document
-    val title = doc.selectFirst("div.title-border")?.text()?.trim()
-        ?: doc.selectFirst("title")?.text()?.split(" | ")?.getOrNull(0)?.trim()
-        ?: ""
-    val posterElem = doc.selectFirst("div.poster img")
-    val posterAttr = if (posterElem?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
-    val poster = posterElem?.attr(posterAttr)?.let { fixUrl(it) }
-    val description = doc.selectFirst("div.synopsis")?.text()?.trim()
+        val doc = app.get(url).document
+        val title = doc.selectFirst("div.title-border")?.text()?.trim()
+            ?: doc.selectFirst("title")?.text()?.split(" | ")?.getOrNull(0)?.trim()
+            ?: ""
+        val posterElem = doc.selectFirst("div.poster img")
+        val posterAttr = if (posterElem?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
+        val poster = posterElem?.attr(posterAttr)?.let { fixUrl(it) }
+        val description = doc.selectFirst("div.synopsis")?.text()?.trim()
 
-    return if (url.contains("kategori")) {
-        val episodes = doc.select("div.episodes.episode div.list-episodes div.episode-box").mapIndexedNotNull { index, el ->
-            val a = el.selectFirst("a") ?: return@mapIndexedNotNull null
-            val epName = el.selectFirst("div.episode-name")?.text()?.trim() ?: ""
-            val epNum = Regex("(\\d+)\\.\\s*Bölüm").find(epName)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: (index + 1)
-            val epUrl = fixUrl(a.attr("href"))
-            val epImg = el.selectFirst("img")
-            val epPosterAttr = if (epImg?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
-            val epPoster = epImg?.attr(epPosterAttr)?.let { fixUrl(it) }
-            val epDate = el.selectFirst("div.episode-date")?.text()?.trim()
+        return if (url.contains("kategori")) {
+            val episodes = doc.select("div.episodes.episode div.list-episodes div.episode-box").mapIndexedNotNull { index, el ->
+                val a = el.selectFirst("a") ?: return@mapIndexedNotNull null
+                val epName = el.selectFirst("div.episode-name")?.text()?.trim() ?: ""
+                val epNum = Regex("(\\d+)\\.\\s*Bölüm").find(epName)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: (index + 1)
+                val epUrl = fixUrl(a.attr("href"))
+                val epImg = el.selectFirst("img")
+                val epPosterAttr = if (epImg?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
+                val epPoster = epImg?.attr(epPosterAttr)?.let { fixUrl(it) }
+                val epDate = el.selectFirst("div.episode-date")?.text()?.trim()
 
-            newEpisode(epUrl) {
-                this.name = epName
-                this.season = 1
-                this.episode = epNum
-                this.posterUrl = epPoster
-                this.description = epDate
+                newEpisode(epUrl) {
+                    this.name = epName
+                    this.season = 1
+                    this.episode = epNum
+                    this.posterUrl = epPoster
+                    this.description = epDate
+                }
+            }
+
+            newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
+                this.posterUrl = poster
+                this.plot = description
+            }
+        } else {
+            val type = if (url.contains("bolum")) TvType.TvSeries else TvType.Movie
+
+            // 🔥 Extract raw iframe URLs for extractor routing
+            val iframeUrls = doc.select("iframe[data-wpfc-original-src], iframe[src]").mapNotNull { iframe ->
+                val rawSrc = iframe.attr("data-wpfc-original-src").ifEmpty { iframe.attr("src") }
+                fixUrl(rawSrc)
+            }
+
+            if (iframeUrls.isEmpty()) throw ErrorLoadingException("No playable iframe found")
+
+            val extractorLinks = iframeUrls.map { link ->
+                ExtractorLink(
+                    name = this.name,
+                    source = this.name,
+                    url = link,
+                    referer = url,
+                    quality = Qualities.Unknown.value,
+                    isM3u8 = link.endsWith(".m3u8")
+                )
+            }
+
+            return newMovieLoadResponse(title, url, type, extractorLinks) {
+                this.posterUrl = poster
+                this.plot = description
             }
         }
-
-        newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
-            this.posterUrl = poster
-            this.plot = description
-        }
-    } else {
-        val type = if (url.contains("bolum")) TvType.TvSeries else TvType.Movie
-
-        // 🔥 Extract raw iframe URLs for extractor routing
-        val iframeUrls = doc.select("iframe[data-wpfc-original-src], iframe[src]").mapNotNull { iframe ->
-            val rawSrc = iframe.attr("data-wpfc-original-src").ifEmpty { iframe.attr("src") }
-            fixUrl(rawSrc)
-        }
-
-        val streamUrl = iframeUrls.firstOrNull() ?: throw ErrorLoadingException("No playable iframe found")
-
-        newMovieLoadResponse(title, url, type, streamUrl) {
-            this.posterUrl = poster
-            this.plot = description
-        }
     }
-}
-
 }
