@@ -109,22 +109,17 @@ class CanliDizi : MainAPI() {
             val description = doc.selectFirst("div.synopsis")?.text()?.trim()
             val type = if (url.contains("bolum")) TvType.TvSeries else TvType.Movie
 
-            return newMovieLoadResponse(title, url, type, url) {
+            // 🔥 BETAPLAYER LINKS - DIRECT IN LOAD!
+            val iframe = doc.selectFirst("iframe[data-wpfc-original-src*=betaplayer]")
+            val links = if (iframe != null) {
+                val videoId = iframe.attr("data-wpfc-original-src").substringAfterLast("/")
+                listOf("https://betaplayer.site/embed/$videoId")
+            } else emptyList()
+
+            return newMovieLoadResponse(title, url, type, links.joinToString(",")) {
                 this.posterUrl = poster
                 this.plot = description
             }
         }
-    }
-
-    override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
-        val doc = app.get(data).document
-        
-        // 🔥 BETAPLAYER - 1 LINE MAGIC!
-        doc.select("iframe[data-wpfc-original-src*=betaplayer]").forEach { elem ->
-            val videoId = elem.attr("data-wpfc-original-src").substringAfterLast("/")
-            callback(newExtractorLink(name, name, "https://betaplayer.site/embed/$videoId"))
-        }
-        
-        return true
     }
 }
