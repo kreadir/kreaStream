@@ -1,8 +1,11 @@
 package com.kreastream
-import com.lagradost.cloudstream3.extractors.ExtractorApi
+import com.lagradost.cloudstream3.ExtractorApi
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.app
+import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.utils.fixUrl
+
 import org.jsoup.Jsoup
 
 class BetaplayerExtractor : ExtractorApi() {
@@ -15,7 +18,7 @@ class BetaplayerExtractor : ExtractorApi() {
         val videoUrl = doc.selectFirst("video source")?.attr("src") ?: return emptyList()
 
         return listOf(
-            ExtractorLink(
+            newExtractorLink(
                 name = name,
                 source = name,
                 url = fixUrl(videoUrl),
