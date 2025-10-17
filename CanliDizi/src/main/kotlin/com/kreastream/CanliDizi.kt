@@ -140,7 +140,7 @@ class CanliDizi : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         // Delegate to the custom extractor for robust parsing (iframes, videos, m3u8, JSON, etc.)
-        CanliDiziProvider().getUrl(data, referer = data, { sub -> subtitleCallback(SubtitleFile(sub.name, sub.url)) }, callback)
+        CanliDiziProvider().getUrl(data, referer = data, { sub -> subtitleCallback(SubtitleFile(sub.lang, sub.url)) }, callback)
         return true
     }
 }
