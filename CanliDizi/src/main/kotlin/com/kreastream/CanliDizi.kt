@@ -44,21 +44,17 @@ class CanliDizi : MainAPI() {
         val doc = app.get(mainUrl).document
         val lists = ArrayList<HomePageList>()
 
-        // Popüler Diziler
         val popularItems = doc.select("div.diziler div.owl-item").mapNotNull { it.toSearchResponse() }
         if (popularItems.isNotEmpty()) lists.add(HomePageList("Popüler Diziler", popularItems))
 
-        // Yerli Diziler
         val yerliSection = doc.select("div.episodes.episode").getOrNull(0)
         val yerliItems = yerliSection?.select("div.list-episodes div.episode-box")?.map { it.toSearchResponse() } ?: emptyList()
         if (yerliItems.isNotEmpty()) lists.add(HomePageList("Yerli Diziler", yerliItems))
 
-        // Dijital Diziler
         val digitalSection = doc.select("div.episodes.episode").getOrNull(1)
         val digitalItems = digitalSection?.select("div.list-episodes div.episode-box")?.map { it.toSearchResponse() } ?: emptyList()
         if (digitalItems.isNotEmpty()) lists.add(HomePageList("Dijital Diziler", digitalItems))
 
-        // Filmler
         val filmsSection = doc.select("div.episodes.episode").getOrNull(2)
         val filmsItems = filmsSection?.select("div.list-episodes div.episode-box")?.map { it.toSearchResponse() } ?: emptyList()
         if (filmsItems.isNotEmpty()) lists.add(HomePageList("Filmler", filmsItems))
@@ -76,7 +72,6 @@ class CanliDizi : MainAPI() {
         val doc = app.get(url).document
 
         if (url.contains("kategori")) {
-            // Series page
             val title = doc.selectFirst("div.title-border")?.text()?.trim() ?: doc.selectFirst("title")?.text()?.split(" | ")?.getOrNull(0)?.trim() ?: ""
             val posterElem = doc.selectFirst("div.poster img")
             val posterAttr = if (posterElem?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
@@ -107,7 +102,6 @@ class CanliDizi : MainAPI() {
                 this.plot = description
             }
         } else {
-            // Movie or Episode
             val title = doc.selectFirst("title")?.text()?.split(" | ")?.getOrNull(0)?.trim() ?: ""
             val posterElem = doc.selectFirst("div.poster img")
             val posterAttr = if (posterElem?.hasAttr("data-wpfc-original-src") == true) "data-wpfc-original-src" else "src"
@@ -122,29 +116,15 @@ class CanliDizi : MainAPI() {
         }
     }
 
-    override suspend fun loadLinks(
-        data: String,
-        isCasting: Boolean,
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
+    override suspend fun loadLinks(data: String, isCasting: Boolean, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit): Boolean {
         val doc = app.get(data).document
-
-        // Handle parts like /2, /3 if exist
-        val partLinks = doc.select("a[href*=\"$data/\"]").map { fixUrl(it.attr("href")) }.toMutableList()
-        if (partLinks.isEmpty()) partLinks.add(data) else partLinks.add(0, data)
-
-        partLinks.forEach { partUrl ->
-            val partDoc = app.get(partUrl).document
-            
-            // 🔥 BETAPLAYER FIX - 1 LINE!
-            partDoc.select("iframe[data-wpfc-original-src*=betaplayer]").forEach { elem ->
-                val videoId = elem.attr("data-wpfc-original-src").substringAfterLast("/")
-                val betaUrl = "https://betaplayer.site/embed/$videoId"
-                callback(newExtractorLink(name, name, betaUrl))
-            }
+        
+        // 🔥 BETAPLAYER - 1 LINE MAGIC!
+        doc.select("iframe[data-wpfc-original-src*=betaplayer]").forEach { elem ->
+            val videoId = elem.attr("data-wpfc-original-src").substringAfterLast("/")
+            callback(newExtractorLink(name, name, "https://betaplayer.site/embed/$videoId"))
         }
-
+        
         return true
     }
 }
