@@ -109,14 +109,31 @@ class CanliDizi : MainAPI() {
             val description = doc.selectFirst("div.synopsis")?.text()?.trim()
             val type = if (url.contains("bolum")) TvType.TvSeries else TvType.Movie
 
-            // 🔥 BETAPLAYER LINKS - DIRECT IN LOAD!
-            val iframe = doc.selectFirst("iframe[data-wpfc-original-src*=betaplayer]")
-            val links = if (iframe != null) {
-                val videoId = iframe.attr("data-wpfc-original-src").substringAfterLast("/")
-                listOf("https://betaplayer.site/embed/$videoId")
-            } else emptyList()
+            // 🔥 FIX: FIND ALL IFRAMES - ANY PLAYER!
+            val iframeLinks = mutableListOf<String>()
+            
+            // 1. Betaplayer
+            doc.select("iframe[data-wpfc-original-src*=betaplayer]").forEach { elem ->
+                val videoId = elem.attr("data-wpfc-original-src").substringAfterLast("/")
+                iframeLinks.add("https://betaplayer.site/embed/$videoId")
+            }
+            
+            // 2. ANY OTHER IFRAME - DIRECT URL
+            doc.select("iframe[src], iframe[data-wpfc-original-src]").forEach { elem ->
+                val attr = if (elem.hasAttr("data-wpfc-original-src")) "data-wpfc-original-src" else "src"
+                val iframeUrl = fixUrl(elem.attr(attr))
+                if (!iframeUrl.contains("betaplayer.site")) {
+                    iframeLinks.add(iframeUrl)
+                }
+            }
 
-            return newMovieLoadResponse(title, url, type, links.joinToString(",")) {
+            val links = if (iframeLinks.isNotEmpty()) {
+                iframeLinks.joinToString(",")
+            } else {
+                "" // Empty = "Soon" message
+            }
+
+            return newMovieLoadResponse(title, url, type, links) {
                 this.posterUrl = poster
                 this.plot = description
             }
