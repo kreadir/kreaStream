@@ -1,7 +1,9 @@
-package com.kreastream.extractors
+package com.kreastream
 
-import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.extractors.*
+import com.lagradost.cloudstream3.extractors.ExtractorApi
+import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.Qualities
+import com.lagradost.cloudstream3.app
 import org.jsoup.Jsoup
 
 class CanliplayerExtractor : ExtractorApi() {
@@ -18,8 +20,8 @@ class CanliplayerExtractor : ExtractorApi() {
 
         return listOf(
             ExtractorLink(
-                name = this.name,
-                source = this.name,
+                name = name,
+                source = name,
                 url = fixUrl(videoUrl),
                 referer = url,
                 quality = Qualities.Unknown.value,

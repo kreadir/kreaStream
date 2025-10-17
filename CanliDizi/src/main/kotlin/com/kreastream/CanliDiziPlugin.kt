@@ -3,8 +3,9 @@ package com.kreastream
 import android.content.Context
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import com.lagradost.cloudstream3.plugins.Plugin
-import com.kreastream.extractors.BetaplayerExtractor
-import com.kreastream.extractors.CanliplayerExtractor
+import com.kreastream.BetaplayerExtractor
+import com.kreastream.CanliplayerExtractor
+import com.lagradost.cloudstream3.extractors.ExtractorApi
 
 @CloudstreamPlugin
 class CanliDiziPlugin : Plugin() {
@@ -13,8 +14,9 @@ class CanliDiziPlugin : Plugin() {
         registerMainAPI(CanliDizi())
 
         // Register extractors
-        registerExtractorAPI(BetaplayerExtractor())
-        registerExtractorAPI(CanliplayerExtractor())
+        registerExtractorAPI(BetaplayerExtractor() as ExtractorApi)
+        registerExtractorAPI(CanliplayerExtractor() as ExtractorApi)
+
     }
 }
 
