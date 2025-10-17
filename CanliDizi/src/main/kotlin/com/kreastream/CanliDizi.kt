@@ -109,28 +109,32 @@ class CanliDizi : MainAPI() {
             val description = doc.selectFirst("div.synopsis")?.text()?.trim()
             val type = if (url.contains("bolum")) TvType.TvSeries else TvType.Movie
 
-            // 🔥 FIX: FIND ALL IFRAMES - ANY PLAYER!
+            // 🔥 FIX: BOTH PLAYERS!
             val iframeLinks = mutableListOf<String>()
             
-            // 1. Betaplayer
-            doc.select("iframe[data-wpfc-original-src*=betaplayer]").forEach { elem ->
-                val videoId = elem.attr("data-wpfc-original-src").substringAfterLast("/")
-                iframeLinks.add("https://betaplayer.site/embed/$videoId")
-            }
-            
-            // 2. ANY OTHER IFRAME - DIRECT URL
-            doc.select("iframe[src], iframe[data-wpfc-original-src]").forEach { elem ->
-                val attr = if (elem.hasAttr("data-wpfc-original-src")) "data-wpfc-original-src" else "src"
-                val iframeUrl = fixUrl(elem.attr(attr))
-                if (!iframeUrl.contains("betaplayer.site")) {
-                    iframeLinks.add(iframeUrl)
+            doc.select("iframe[data-wpfc-original-src]").forEach { elem ->
+                val src = elem.attr("data-wpfc-original-src")
+                
+                when {
+                    src.contains("betaplayer.site") -> {
+                        val videoId = src.substringAfterLast("/")
+                        iframeLinks.add("https://betaplayer.site/embed/$videoId")
+                    }
+                    src.contains("canliplayer.com") -> {
+                        // FIX canliplayer URL
+                        val videoId = src.substringAfterLast("/")
+                        iframeLinks.add("https://canliplayer.com/fireplayer/video/$videoId")
+                    }
+                    else -> {
+                        iframeLinks.add(fixUrl(src))
+                    }
                 }
             }
 
             val links = if (iframeLinks.isNotEmpty()) {
                 iframeLinks.joinToString(",")
             } else {
-                "" // Empty = "Soon" message
+                ""
             }
 
             return newMovieLoadResponse(title, url, type, links) {
