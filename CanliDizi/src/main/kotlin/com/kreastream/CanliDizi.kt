@@ -1,7 +1,6 @@
 package com.kreastream
 
 import com.lagradost.cloudstream3.*
-import com.lagradost.cloudstream3.extractors.CanliDiziExtractor
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.getQualityFromString
@@ -143,7 +142,7 @@ class CanliDizi : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         // Delegate to the custom extractor for robust parsing (iframes, videos, m3u8, JSON, etc.)
-        CanliDiziExtractor().getUrl(data, referer = data, subtitleCallback, callback)
+        CanliDiziProvider().getUrl(data, referer = data, { subtitle -> subtitleCallback(SubtitleFile(subtitle.name, subtitle.url)) }, callback)
         return true
     }
 }
