@@ -90,7 +90,11 @@ class CanliDizi : MainAPI() {
             }
 
             val links = iframeUrls.map {
-                ExtractorLink(name, name, it, url, Qualities.Unknown.value, it.endsWith(".m3u8"))
+                newExtractorLink(name, name, it) {
+                    this.referer = url
+                    this.quality = Qualities.Unknown.value
+                    this.isM3u8 = it.endsWith(".m3u8")
+                }
             }
 
             newMovieLoadResponse(title, url, TvType.Movie, links) {
