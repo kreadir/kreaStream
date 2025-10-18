@@ -48,7 +48,7 @@ class CanliDizi : MainAPI() {
         return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
             this.posterUrl = poster
             this.year = year
-            this.score = Score.from10(rating)
+            this.rating = rating
         }
     }
 
@@ -98,17 +98,17 @@ class CanliDizi : MainAPI() {
         if (videoElement != null) {
             val videoUrl = videoElement.attr("src")?.let { fixUrl(it) } ?: return false
             val quality = determineQuality(videoUrl)
-            val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+            val isM3u8 = videoUrl.contains(".m3u8")
 
             callback.invoke(
                 newExtractorLink(
-                    source = "$name - Iframe",
-                    name = name,
-                    url = videoUrl,
-                    referer = url,
-                    quality = quality,
-                    type = type,
-                    headers = mapOf("User-Agent" to USER_AGENT, "Referer" to url)
+                    "$name - Direct",
+                    name,
+                    videoUrl,
+                    data,
+                    quality,
+                    isM3u8,
+                    headers = mapOf("User-Agent" to USER_AGENT, "Referer" to data)
                 )
             )
             return true
@@ -256,16 +256,16 @@ class CanliDizi : MainAPI() {
         sourceName: String
     ): Boolean {
         val quality = determineQuality(videoUrl)
-        val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+        val isM3u8 = videoUrl.contains(".m3u8")
 
         callback.invoke(
-            ExtractorLink(
-                source = sourceName,
-                name = name,
-                url = videoUrl,
-                referer = referer,
-                quality = quality,
-                type = type,
+            newExtractorLink(
+                sourceName,
+                name,
+                videoUrl,
+                referer,
+                quality,
+                isM3u8,
                 headers = mapOf(
                     "User-Agent" to USER_AGENT,
                     "Referer" to referer
