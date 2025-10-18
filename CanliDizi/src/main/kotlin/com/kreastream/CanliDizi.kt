@@ -23,7 +23,7 @@ class CanliDizi : MainAPI() {
         val all = ArrayList<HomePageList>()
         
         // Parse popular series from the main slider
-        val popularSeries = document.select("div.diziler div.owl-item div.episode-box").mapNotNull {
+        val popularSeries = document.select("div.diziler div.list-series div.episode-box").mapNotNull {
             parseSeriesItem(it)
         }
 
@@ -31,60 +31,74 @@ class CanliDizi : MainAPI() {
             all.add(HomePageList("Popüler Diziler", popularSeries, isHorizontalImages = true))
         }
 
-        // Parse latest episodes
-        val latestEpisodes = document.select("div.episodes.episode div.episode-box").mapNotNull {
+        // Parse local series (Yerli Diziler)
+        val localSeries = document.select("div.episodes.episode div.list-episodes div.episode-box").mapNotNull {
             parseEpisodeItem(it)
         }
 
-        if (latestEpisodes.isNotEmpty()) {
-            all.add(HomePageList("Yeni Diziler", latestEpisodes))
+        if (localSeries.isNotEmpty()) {
+            all.add(HomePageList("Yerli Diziler", localSeries))
         }
 
-        // Parse series list from other sections
-        val seriesList = document.select("div.episodes.episode div.episode-box").mapNotNull {
-            parseSeriesItem(it)
+        // Parse digital series (Dijital Diziler)
+        val digitalSeries = document.select("div.episodes.episode").let { sections ->
+            // Get the second episodes section (Dijital Diziler)
+            if (sections.size > 1) {
+                sections[1].select("div.list-episodes div.episode-box").mapNotNull {
+                    parseEpisodeItem(it)
+                }
+            } else {
+                emptyList()
+            }
         }
 
-        if (seriesList.isNotEmpty()) {
-            all.add(HomePageList("Tüm Diziler", seriesList))
+        if (digitalSeries.isNotEmpty()) {
+            all.add(HomePageList("Dijital Diziler", digitalSeries))
+        }
+
+        // Parse movies
+        val movies = document.select("div.episodes.episode").let { sections ->
+            // Get the third episodes section (Filmler)
+            if (sections.size > 2) {
+                sections[2].select("div.list-episodes div.episode-box").mapNotNull {
+                    parseMovieItem(it)
+                }
+            } else {
+                emptyList()
+            }
+        }
+
+        if (movies.isNotEmpty()) {
+            all.add(HomePageList("Filmler", movies))
         }
         
         return if (all.isEmpty()) null else newHomePageResponse(all)
     }
 
     private fun parseSeriesItem(element: Element): TvSeriesSearchResponse? {
-        // Try multiple possible selectors for link
-        val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } 
-            ?: element.selectFirst(".serie-name a, .title a, h3 a, h4 a")?.attr("href")?.let { fixUrl(it) }
-            ?: return null
-
-        // Try multiple possible selectors for title
-        val title = element.selectFirst(".serie-name, .title, h3, h4")?.text()?.trim()
+        val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
+        val title = element.selectFirst(".serie-name a")?.text()?.trim()
             ?: element.selectFirst("img")?.attr("title")?.trim()
-            ?: element.selectFirst("img")?.attr("alt")?.trim()
             ?: return null
 
-        // Try multiple possible selectors for poster
-        val poster = element.selectFirst("img")?.attr("src")?.let { fixUrl(it) }
-            ?: element.selectFirst("img")?.attr("data-src")?.let { fixUrl(it) }
+        // Handle lazy-loaded images with data-wpfc-original-src
+        val poster = element.selectFirst("img")?.let { img ->
+            img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+                ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+        }
 
-        // Try to extract year from various places
-        val year = element.selectFirst(".episode-name, .year, .date")?.text()?.trim()?.toIntOrNull()
-            ?: element.selectFirst(".serie-name")?.nextElementSibling()?.text()?.trim()?.toIntOrNull()
+        // Extract year from episode-name
+        val year = element.selectFirst(".episode-name")?.text()?.trim()?.toIntOrNull()
 
-        // Try to extract rating and convert to score
-        val ratingText = element.selectFirst(".episode-date, .rating, .imdb")?.text()?.trim()
+        // Extract rating from episode-date
+        val ratingText = element.selectFirst(".episode-date")?.text()?.trim()
         val score = ratingText?.let { text ->
             when {
                 text.contains("IMDb") -> {
                     val ratingValue = text.removePrefix("IMDb:").trim().replace(",", ".").toFloatOrNull()
-                    ratingValue?.times(10)?.toInt() // Convert 0-10 to 0-100
+                    ratingValue?.times(10)?.toInt()
                 }
-                text.contains("/") -> {
-                    val ratingValue = text.substringBefore("/").trim().toFloatOrNull()
-                    ratingValue?.times(10)?.toInt() // Convert 0-10 to 0-100
-                }
-                else -> text.toFloatOrNull()?.times(10)?.toInt() // Convert 0-10 to 0-100
+                else -> null
             }
         }
 
@@ -97,14 +111,34 @@ class CanliDizi : MainAPI() {
 
     private fun parseEpisodeItem(element: Element): TvSeriesSearchResponse? {
         val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
-        val title = element.selectFirst(".serie-name, .title, .episode-title")?.text()?.trim() 
+        val title = element.selectFirst(".serie-name")?.text()?.trim()
             ?: element.selectFirst("img")?.attr("alt")?.trim()
             ?: return null
 
-        val poster = element.selectFirst("img")?.attr("src")?.let { fixUrl(it) }
-            ?: element.selectFirst("img")?.attr("data-src")?.let { fixUrl(it) }
+        // Handle lazy-loaded images with data-wpfc-original-src
+        val poster = element.selectFirst("img")?.let { img ->
+            img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+                ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+        }
 
         return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
+            this.posterUrl = poster
+        }
+    }
+
+    private fun parseMovieItem(element: Element): MovieSearchResponse? {
+        val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
+        val title = element.selectFirst(".episode-name")?.text()?.trim()
+            ?: element.selectFirst("img")?.attr("alt")?.trim()
+            ?: return null
+
+        // Handle lazy-loaded images with data-wpfc-original-src
+        val poster = element.selectFirst("img")?.let { img ->
+            img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+                ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+        }
+
+        return newMovieSearchResponse(title, link, TvType.Movie) {
             this.posterUrl = poster
         }
     }
@@ -113,16 +147,21 @@ class CanliDizi : MainAPI() {
         val document = app.get(url, headers = mapOf("User-Agent" to USER_AGENT)).document
         
         // Try multiple possible selectors for title
-        val title = document.selectFirst("h1.series-title, h1.title, h1.entry-title")?.text()?.trim() 
+        val title = document.selectFirst("h1.series-title, h1.title, h1.entry-title, h1")?.text()?.trim() 
+            ?: document.selectFirst(".series-name, .entry-title")?.text()?.trim()
+            ?: document.selectFirst("meta[property=og:title]")?.attr("content")?.trim()
             ?: throw ErrorLoadingException("Title not found")
         
         // Try multiple possible selectors for poster
         val poster = document.selectFirst("img.poster, .poster img, .series-poster img")?.attr("src")?.let { fixUrl(it) }
             ?: document.selectFirst(".wp-post-image, .attachment-post-thumbnail")?.attr("src")?.let { fixUrl(it) }
+            ?: document.selectFirst("img[data-wpfc-original-src]")?.attr("data-wpfc-original-src")?.let { fixUrl(it) }
+            ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
 
         // Try multiple possible selectors for description
         val description = document.selectFirst("div.description, .plot, .synopsis, .entry-content")?.text()?.trim()
             ?: document.selectFirst("meta[name=description]")?.attr("content")?.trim()
+            ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim()
 
         // Try to extract year
         val year = document.selectFirst(".year, .release-date")?.text()?.trim()?.toIntOrNull()
@@ -134,42 +173,61 @@ class CanliDizi : MainAPI() {
             when {
                 text.contains("IMDb") -> {
                     val ratingValue = text.removePrefix("IMDb:").trim().replace(",", ".").toFloatOrNull()
-                    ratingValue?.times(10)?.toInt() // Convert 0-10 to 0-100
+                    ratingValue?.times(10)?.toInt()
                 }
                 text.contains("/") -> {
                     val ratingValue = text.substringBefore("/").trim().toFloatOrNull()
-                    ratingValue?.times(10)?.toInt() // Convert 0-10 to 0-100
+                    ratingValue?.times(10)?.toInt()
                 }
-                else -> text.toFloatOrNull()?.times(10)?.toInt() // Convert 0-10 to 0-100
+                else -> text.toFloatOrNull()?.times(10)?.toInt()
             }
         }
         
-        val episodes = document.select("div.episode-list div.episode, .episodes li, .season-episodes li").mapNotNull { element ->
-            parseEpisode(element)
-        }
+        // Check if this is a movie or series by URL pattern
+        val isMovie = url.contains("/film") || url.contains("/izle.html")
+        
+        if (isMovie) {
+            return newMovieLoadResponse(title, url, TvType.Movie, url) {
+                this.posterUrl = poster
+                this.plot = description
+                this.year = year
+                this.score = Score.from10(score)
+            }
+        } else {
+            // For series, try to parse episodes
+            val episodes = document.select("div.episode-list div.episode, .episodes li, .season-episodes li, .list-episodes div.episode-box").mapNotNull { element ->
+                parseEpisode(element)
+            }
 
-        return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
-            this.posterUrl = poster
-            this.plot = description
-            this.year = year
-            this.score = Score.from10(score)
+            return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
+                this.posterUrl = poster
+                this.plot = description
+                this.year = year
+                this.score = Score.from10(score)
+            }
         }
     }
 
     private fun parseEpisode(element: Element): Episode? {
-        val epTitle = element.selectFirst("span.episode-title, .title, a")?.text()?.trim() ?: "Episode"
+        val epTitle = element.selectFirst("span.episode-title, .episode-name, .title, a")?.text()?.trim() ?: "Episode"
         val epUrl = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
         
         // Try to extract episode number
         val epNum = element.selectFirst("span.episode-number, .episode-num, .number")?.text()?.toIntOrNull()
+            ?: Regex("""(\d+)\.?Bölüm""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
             ?: Regex("""\b(\d+)\b""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
             ?: 1
 
         // Try to extract season number
         val season = element.selectFirst("span.season-number, .season-num")?.text()?.toIntOrNull()
+            ?: Regex("""(\d+)\.?Sezon""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
             ?: 1
 
-        val poster = element.selectFirst("img")?.attr("src")?.let { fixUrl(it) }
+        // Handle lazy-loaded images
+        val poster = element.selectFirst("img")?.let { img ->
+            img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+                ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+        }
 
         return newEpisode(epUrl) {
             this.name = epTitle
@@ -295,17 +353,6 @@ class CanliDizi : MainAPI() {
                 }
             }
 
-            // Method 5: Check for common video hosting APIs
-            if (url.contains("canliplayer.com")) {
-                val apiMatch = Regex("""["']?(?:video|file)Id["']?\s*:\s*["']([^"']+)["']""").find(html)
-                if (apiMatch != null) {
-                    val videoId = apiMatch.groupValues[1]
-                    // Try to construct direct URL (this might need adjustment based on the actual API)
-                    val constructedUrl = "https://canliplayer.com/stream/$videoId"
-                    return createExtractorLink(constructedUrl, url, callback, "$name - API")
-                }
-            }
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -387,8 +434,8 @@ class CanliDizi : MainAPI() {
         val searchUrl = "$mainUrl/search?q=${query.encodeToUrl()}"
         val document = app.get(searchUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
         
-        return document.select("div.search-results div.result, div.series-item, .dizi-item").mapNotNull { element ->
-            parseSeriesItem(element)
+        return document.select("div.search-results div.result, div.series-item, .dizi-item, div.episode-box").mapNotNull { element ->
+            parseSeriesItem(element) ?: parseEpisodeItem(element)
         }
     }
 
