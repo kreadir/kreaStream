@@ -91,7 +91,7 @@ class CanliDizi : MainAPI() {
         return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
             this.posterUrl = poster
             this.year = year
-            this.score = score
+            this.score = Score.from10(score)
         }
     }
 
@@ -152,7 +152,7 @@ class CanliDizi : MainAPI() {
             this.posterUrl = poster
             this.plot = description
             this.year = year
-            this.score = score
+            this.score = Score.from10(score)
         }
     }
 
