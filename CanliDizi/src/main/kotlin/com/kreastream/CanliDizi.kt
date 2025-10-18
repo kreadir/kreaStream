@@ -628,15 +628,6 @@ override suspend fun loadLinks(
             !url.contains("base64")
     }
 
-    private fun isVideoUrl(url: String): Boolean {
-        return url.contains(".mp4") || 
-               url.contains(".m3u8") || 
-               url.contains(".webm") || 
-               url.contains(".mkv") ||
-               url.contains("video") ||
-               url.contains("stream")
-    }
-
     private suspend fun createExtractorLink(
         videoUrl: String,
         referer: String,
