@@ -219,13 +219,13 @@ class CanliDizi : MainAPI() {
             ?: 1
 
         // Extract release date from tarih div
-        val releaseDate = element.selectFirst("div.tarih")?.text()?.trim()
+        //val releaseDate = element.selectFirst("div.tarih")?.text()?.trim()
 
         return newEpisode(epUrl) {
             this.name = epTitle
             this.episode = epNum
             this.season = 1 // Default to season 1 since it's not specified in the HTML
-            this.year = releaseDate
+            //this.year = releaseDate
         }
     }
 
