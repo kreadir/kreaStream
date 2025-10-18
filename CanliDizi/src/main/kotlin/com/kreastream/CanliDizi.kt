@@ -102,12 +102,12 @@ class CanliDizi : MainAPI() {
 
             callback.invoke(
                 newExtractorLink(
-                    source = name,
-                    name = name,
-                    url = videoUrl,
-                    referer = mainUrl,
-                    quality = quality,
-                    type = type,
+                    this.source = name,
+                    this.name = name,
+                    this.url = videoUrl,
+                    this.referer = mainUrl,
+                    this.quality = quality,
+                    this.type = type,
                     headers = mapOf("User-Agent" to USER_AGENT)
                 )
             )
