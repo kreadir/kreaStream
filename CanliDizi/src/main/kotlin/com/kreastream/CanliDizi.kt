@@ -225,7 +225,7 @@ class CanliDizi : MainAPI() {
             this.name = epTitle
             this.episode = epNum
             this.season = 1 // Default to season 1 since it's not specified in the HTML
-            this.releaseDate = releaseDate
+            this.year = releaseDate
         }
     }
 
