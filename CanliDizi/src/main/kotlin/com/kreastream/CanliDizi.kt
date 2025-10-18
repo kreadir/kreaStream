@@ -142,9 +142,94 @@ class CanliDizi : MainAPI() {
         }
     }
 
-    override suspend fun load(url: String): LoadResponse {
+        override suspend fun load(url: String): LoadResponse {
         val document = app.get(url, headers = mapOf("User-Agent" to USER_AGENT)).document
         
+        // Check if this is the new series page structure with incontentx
+        val isNewStructure = document.selectFirst("div.incontentx") != null
+        
+        if (isNewStructure) {
+            return loadNewSeriesStructure(document, url)
+        } else {
+            return loadOldStructure(document, url)
+        }
+    }
+
+    private suspend fun loadNewSeriesStructure(document: Element, url: String): LoadResponse {
+        // Extract title from h1.title-border
+        val title = document.selectFirst("h1.title-border")?.text()?.trim()
+            ?.replace("son bölüm izle", "")?.trim()
+            ?: document.selectFirst("meta[property=og:title]")?.attr("content")?.trim()
+            ?: throw ErrorLoadingException("Title not found")
+        
+        // Extract poster from cat-img img
+        val poster = document.selectFirst("div.cat-img img")?.attr("src")?.let { fixUrl(it) }
+            ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
+
+        // Extract description from cat_ozet
+        val description = document.selectFirst("div.cat_ozet")?.text()?.trim()
+            ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim()
+
+        // Extract year from dizimeta with "Yapım Yılı"
+        val year = document.select("div.cat-container-in div").mapNotNull { div ->
+            val text = div.text().trim()
+            if (text.contains("Yapım Yılı")) {
+                Regex("""(\d{4})""").find(text)?.value?.toIntOrNull()
+            } else {
+                null
+            }
+        }.firstOrNull()
+
+        // Extract rating from dizimeta with "IMDB"
+        val ratingText = document.select("div.cat-container-in div").mapNotNull { div ->
+            val text = div.text().trim()
+            if (text.contains("IMDB")) {
+                Regex("""IMDB\s*:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
+            } else {
+                null
+            }
+        }.firstOrNull()
+        
+        val score = ratingText?.replace(",", ".")?.toFloatOrNull()?.times(10)?.toInt()
+
+        // Parse episodes from the new structure
+        val episodes = document.select("div.bolumust a").mapNotNull { element ->
+            parseNewEpisodeItem(element)
+        }
+
+        return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
+            this.posterUrl = poster
+            this.plot = description
+            this.year = year
+            this.score = Score.from10(score)
+        }
+    }
+
+    private fun parseNewEpisodeItem(element: Element): Episode? {
+        val epUrl = element.attr("href")?.let { fixUrl(it) } ?: return null
+        
+        // Extract episode title from baslik div or title attribute
+        val epTitle = element.selectFirst("div.baslik")?.text()?.trim()
+            ?: element.attr("title")?.trim()
+            ?: "Episode"
+
+        // Extract episode number from title
+        val epNum = Regex("""(\d+)\.?Bölüm""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
+            ?: Regex("""\b(\d+)\b""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
+            ?: 1
+
+        // Extract release date from tarih div
+        val releaseDate = element.selectFirst("div.tarih")?.text()?.trim()
+
+        return newEpisode(epUrl) {
+            this.name = epTitle
+            this.episode = epNum
+            this.season = 1 // Default to season 1 since it's not specified in the HTML
+            this.releaseDate = releaseDate
+        }
+    }
+
+    private suspend fun loadOldStructure(document: Element, url: String): LoadResponse {
         // Try multiple possible selectors for title
         val title = document.selectFirst("h1.series-title, h1.title, h1.entry-title, h1")?.text()?.trim() 
             ?: document.selectFirst(".series-name, .entry-title")?.text()?.trim()
@@ -184,9 +269,9 @@ class CanliDizi : MainAPI() {
         
         // Better detection for movie vs series
         val isMovie = url.contains("/film") || 
-                     url.contains("/izle.html") && 
-                     !url.contains("-bolum-") &&
-                     !url.contains("/kategori/")
+                    url.contains("/izle.html") && 
+                    !url.contains("-bolum-") &&
+                    !url.contains("/kategori/")
 
         if (isMovie) {
             return newMovieLoadResponse(title, url, TvType.Movie, url) {
