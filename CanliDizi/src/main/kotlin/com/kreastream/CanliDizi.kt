@@ -48,7 +48,7 @@ class CanliDizi : MainAPI() {
         return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
             this.posterUrl = poster
             this.year = year
-            this.rating = rating
+            this.score = Score.from10(rating)
         }
     }
 
