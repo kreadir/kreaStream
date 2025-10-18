@@ -2,6 +2,7 @@ package com.kreastream
 
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.utils.fixUrl
 
 class BetaplayerExtractor {
     suspend fun extract(url: String): List<ExtractorLink> {
