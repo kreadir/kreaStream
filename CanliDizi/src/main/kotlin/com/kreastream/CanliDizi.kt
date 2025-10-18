@@ -19,11 +19,13 @@ class CanliDizi : MainAPI() {
     }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
-        val document = app.get(mainUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
         val all = ArrayList<HomePageList>()
         
+        // Get main page for popular content
+        val mainDocument = app.get(mainUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+        
         // Parse popular series from the main slider
-        val popularSeries = document.select("div.diziler div.list-series div.episode-box").mapNotNull {
+        val popularSeries = mainDocument.select("div.diziler div.list-series div.episode-box").mapNotNull {
             parseSeriesItem(it)
         }
 
@@ -31,8 +33,8 @@ class CanliDizi : MainAPI() {
             all.add(HomePageList("Popüler Diziler", popularSeries, isHorizontalImages = true))
         }
 
-        // Parse local series (Yerli Diziler)
-        val localSeries = document.select("div.episodes.episode").let { sections ->
+        // Parse local series (Yerli Diziler) from main page
+        val localSeries = mainDocument.select("div.episodes.episode").let { sections ->
             if (sections.isNotEmpty()) {
                 sections[0].select("div.list-episodes div.episode-box").mapNotNull {
                     parseEpisodeItem(it)
@@ -46,8 +48,8 @@ class CanliDizi : MainAPI() {
             all.add(HomePageList("Yerli Diziler", localSeries))
         }
 
-        // Parse digital series (Dijital Diziler)
-        val digitalSeries = document.select("div.episodes.episode").let { sections ->
+        // Parse digital series (Dijital Diziler) from main page
+        val digitalSeries = mainDocument.select("div.episodes.episode").let { sections ->
             if (sections.size > 1) {
                 sections[1].select("div.list-episodes div.episode-box").mapNotNull {
                     parseEpisodeItem(it)
@@ -61,8 +63,8 @@ class CanliDizi : MainAPI() {
             all.add(HomePageList("Dijital Diziler", digitalSeries))
         }
 
-        // Parse movies
-        val movies = document.select("div.episodes.episode").let { sections ->
+        // Parse movies from main page
+        val movies = mainDocument.select("div.episodes.episode").let { sections ->
             if (sections.size > 2) {
                 sections[2].select("div.list-episodes div.episode-box").mapNotNull {
                     parseMovieItem(it)
@@ -75,14 +77,73 @@ class CanliDizi : MainAPI() {
         if (movies.isNotEmpty()) {
             all.add(HomePageList("Filmler", movies))
         }
+
+        // ADDITIONAL SECTIONS FROM OTHER PAGES
+        
+        // Yerli Diziler from dedicated page
+        try {
+            val yerliDocument = app.get("$mainUrl/diziler", headers = mapOf("User-Agent" to USER_AGENT)).document
+            val yerliDiziler = yerliDocument.select("div.episodes.episode div.list-episodes div.episode-box, div.diziler div.list-series div.episode-box").mapNotNull {
+                parseSeriesItem(it) ?: parseEpisodeItem(it)
+            }.take(20) // Limit to 20 items
+            
+            if (yerliDiziler.isNotEmpty()) {
+                all.add(HomePageList("Yerli Diziler (Tümü)", yerliDiziler))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // Dijital Diziler from dedicated page
+        try {
+            val dijitalDocument = app.get("$mainUrl/dijital-diziler-izle", headers = mapOf("User-Agent" to USER_AGENT)).document
+            val dijitalDiziler = dijitalDocument.select("div.episodes.episode div.list-episodes div.episode-box, div.diziler div.list-series div.episode-box").mapNotNull {
+                parseSeriesItem(it) ?: parseEpisodeItem(it)
+            }.take(20)
+            
+            if (dijitalDiziler.isNotEmpty()) {
+                all.add(HomePageList("Dijital Diziler (Tümü)", dijitalDiziler))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // Filmler from dedicated page
+        try {
+            val filmDocument = app.get("$mainUrl/film-izle", headers = mapOf("User-Agent" to USER_AGENT)).document
+            val filmler = filmDocument.select("div.episodes.episode div.list-episodes div.episode-box, div.diziler div.list-series div.episode-box").mapNotNull {
+                parseMovieItem(it) ?: parseSeriesItem(it)
+            }.take(20)
+            
+            if (filmler.isNotEmpty()) {
+                all.add(HomePageList("Filmler (Tümü)", filmler))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // Dizi Arşivi from dedicated page
+        try {
+            val arsivDocument = app.get("$mainUrl/dizi-arsivi", headers = mapOf("User-Agent" to USER_AGENT)).document
+            val diziArsivi = arsivDocument.select("div.episodes.episode div.list-episodes div.episode-box, div.diziler div.list-series div.episode-box").mapNotNull {
+                parseSeriesItem(it) ?: parseEpisodeItem(it)
+            }.take(20)
+            
+            if (diziArsivi.isNotEmpty()) {
+                all.add(HomePageList("Dizi Arşivi", diziArsivi))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         
         return if (all.isEmpty()) null else newHomePageResponse(all)
     }
 
     private fun parseSeriesItem(element: Element): TvSeriesSearchResponse? {
         val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
-        val title = element.selectFirst(".serie-name a")?.text()?.trim()
+        val title = element.selectFirst(".serie-name a, .serie-name")?.text()?.trim()
             ?: element.selectFirst("img")?.attr("title")?.trim()
+            ?: element.selectFirst("img")?.attr("alt")?.trim()
             ?: return null
 
         // Handle lazy-loaded images with data-wpfc-original-src
@@ -133,6 +194,7 @@ class CanliDizi : MainAPI() {
     private fun parseMovieItem(element: Element): MovieSearchResponse? {
         val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
         val title = element.selectFirst(".episode-name")?.text()?.trim()
+            ?: element.selectFirst(".serie-name")?.text()?.trim()
             ?: element.selectFirst("img")?.attr("alt")?.trim()
             ?: return null
 
