@@ -98,16 +98,16 @@ class CanliDizi : MainAPI() {
         if (videoElement != null) {
             val videoUrl = videoElement.attr("src")?.let { fixUrl(it) } ?: return false
             val quality = determineQuality(videoUrl)
-            val isM3u8 = videoUrl.contains(".m3u8")
+            val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
             callback.invoke(
-                newExtractorLink(
-                    "$name - Direct",
-                    name,
-                    videoUrl,
-                    data,
-                    quality,
-                    isM3u8,
+                ExtractorLink(
+                    source = "$name - Direct",
+                    name = name,
+                    url = videoUrl,
+                    referer = data,
+                    quality = quality,
+                    type = type,
                     headers = mapOf("User-Agent" to USER_AGENT, "Referer" to data)
                 )
             )
@@ -256,16 +256,16 @@ class CanliDizi : MainAPI() {
         sourceName: String
     ): Boolean {
         val quality = determineQuality(videoUrl)
-        val isM3u8 = videoUrl.contains(".m3u8")
+        val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
         callback.invoke(
-            newExtractorLink(
-                sourceName,
-                name,
-                videoUrl,
-                referer,
-                quality,
-                isM3u8,
+            ExtractorLink(
+                source = sourceName,
+                name = name,
+                url = videoUrl,
+                referer = referer,
+                quality = quality,
+                type = type,
                 headers = mapOf(
                     "User-Agent" to USER_AGENT,
                     "Referer" to referer
