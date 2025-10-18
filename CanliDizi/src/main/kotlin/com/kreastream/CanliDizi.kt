@@ -102,13 +102,13 @@ class CanliDizi : MainAPI() {
 
             callback.invoke(
                 newExtractorLink(
-                    this.source = name,
-                    this.name = name,
-                    this.url = videoUrl,
-                    this.referer = mainUrl,
-                    this.quality = quality,
-                    this.type = type,
-                    headers = mapOf("User-Agent" to USER_AGENT)
+                    source = "$name - Iframe",
+                    name = name,
+                    url = videoUrl,
+                    referer = url,
+                    quality = quality,
+                    type = type,
+                    headers = mapOf("User-Agent" to USER_AGENT, "Referer" to url)
                 )
             )
             return true
