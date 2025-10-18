@@ -72,20 +72,26 @@ class CanliDizi : MainAPI() {
         val year = element.selectFirst(".episode-name, .year, .date")?.text()?.trim()?.toIntOrNull()
             ?: element.selectFirst(".serie-name")?.nextElementSibling()?.text()?.trim()?.toIntOrNull()
 
-        // Try to extract rating
+        // Try to extract rating and convert to score
         val ratingText = element.selectFirst(".episode-date, .rating, .imdb")?.text()?.trim()
-        val rating = ratingText?.let { text ->
+        val score = ratingText?.let { text ->
             when {
-                text.contains("IMDb") -> text.removePrefix("IMDb:").trim().replace(",", ".").toFloatOrNull()
-                text.contains("/") -> text.substringBefore("/").trim().toFloatOrNull()
-                else -> text.toFloatOrNull()
+                text.contains("IMDb") -> {
+                    val ratingValue = text.removePrefix("IMDb:").trim().replace(",", ".").toFloatOrNull()
+                    ratingValue?.times(10)?.toInt() // Convert 0-10 to 0-100
+                }
+                text.contains("/") -> {
+                    val ratingValue = text.substringBefore("/").trim().toFloatOrNull()
+                    ratingValue?.times(10)?.toInt() // Convert 0-10 to 0-100
+                }
+                else -> text.toFloatOrNull()?.times(10)?.toInt() // Convert 0-10 to 0-100
             }
         }
 
         return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
             this.posterUrl = poster
             this.year = year
-            this.score = Score.from10(rating)
+            this.score = score
         }
     }
 
@@ -98,18 +104,9 @@ class CanliDizi : MainAPI() {
         val poster = element.selectFirst("img")?.attr("src")?.let { fixUrl(it) }
             ?: element.selectFirst("img")?.attr("data-src")?.let { fixUrl(it) }
 
-        // Extract episode info from title or other elements
-        val episodeInfo = element.selectFirst(".episode-name, .episode-number")?.text()?.trim()
-
         return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
             this.posterUrl = poster
-            this.episode = parseEpisodeNumber(episodeInfo)
         }
-    }
-
-    private fun parseEpisodeNumber(text: String?): Int? {
-        if (text == null) return null
-        return Regex("""\d+""").find(text)?.value?.toIntOrNull()
     }
 
     override suspend fun load(url: String): LoadResponse {
@@ -131,13 +128,19 @@ class CanliDizi : MainAPI() {
         val year = document.selectFirst(".year, .release-date")?.text()?.trim()?.toIntOrNull()
             ?: Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
 
-        // Try to extract rating
+        // Try to extract rating and convert to score
         val ratingText = document.selectFirst(".rating, .imdb-rating, .score")?.text()?.trim()
-        val rating = ratingText?.let { text ->
+        val score = ratingText?.let { text ->
             when {
-                text.contains("IMDb") -> text.removePrefix("IMDb:").trim().replace(",", ".").toFloatOrNull()
-                text.contains("/") -> text.substringBefore("/").trim().toFloatOrNull()
-                else -> text.toFloatOrNull()
+                text.contains("IMDb") -> {
+                    val ratingValue = text.removePrefix("IMDb:").trim().replace(",", ".").toFloatOrNull()
+                    ratingValue?.times(10)?.toInt() // Convert 0-10 to 0-100
+                }
+                text.contains("/") -> {
+                    val ratingValue = text.substringBefore("/").trim().toFloatOrNull()
+                    ratingValue?.times(10)?.toInt() // Convert 0-10 to 0-100
+                }
+                else -> text.toFloatOrNull()?.times(10)?.toInt() // Convert 0-10 to 0-100
             }
         }
         
@@ -149,7 +152,7 @@ class CanliDizi : MainAPI() {
             this.posterUrl = poster
             this.plot = description
             this.year = year
-            this.score = Score.from10(rating)
+            this.score = score
         }
     }
 
@@ -196,11 +199,12 @@ class CanliDizi : MainAPI() {
                     "$name - Direct",
                     name,
                     videoUrl,
-                    data,
-                    quality,
-                    type,
-                    headers = mapOf("User-Agent" to USER_AGENT, "Referer" to data)
-                )
+                    type
+                ) {
+                    this.referer = data
+                    this.quality = quality
+                    this.headers = mapOf("User-Agent" to USER_AGENT, "Referer" to data)
+                }
             )
             return true
         }
@@ -340,7 +344,7 @@ class CanliDizi : MainAPI() {
                url.contains("stream")
     }
 
-    private fun createExtractorLink(
+    private suspend fun createExtractorLink(
         videoUrl: String,
         referer: String,
         callback: (ExtractorLink) -> Unit,
@@ -350,18 +354,19 @@ class CanliDizi : MainAPI() {
         val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
         callback.invoke(
-            ExtractorLink(
-                source = sourceName,
-                name = name,
-                url = videoUrl,
-                referer = referer,
-                quality = quality,
-                type = type,
-                headers = mapOf(
+            newExtractorLink(
+                sourceName,
+                name,
+                videoUrl,
+                type
+            ) {
+                this.referer = referer
+                this.quality = quality
+                this.headers = mapOf(
                     "User-Agent" to USER_AGENT,
                     "Referer" to referer
                 )
-            )
+            }
         )
         return true
     }
