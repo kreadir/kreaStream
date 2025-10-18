@@ -21,17 +21,53 @@ class CanliDizi : MainAPI() {
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
         val all = ArrayList<HomePageList>()
         
-        // Get Yerli Diziler from dedicated page
+        // Get Yerli Diziler from dedicated page with dynamic pagination
         try {
-            val yerliDocument = app.get("$mainUrl/diziler", headers = mapOf("User-Agent" to USER_AGENT)).document
+            val yerliDiziler = mutableListOf<TvSeriesSearchResponse>()
             
-            // Parse series from the new structure - single-item elements
-            val yerliDiziler = yerliDocument.select("div.seriescontent div.single-item").mapNotNull {
-                parseDizilerItem(it)
+            // Start with page 1
+            var currentPage = 1
+            var hasNextPage = true
+            val maxPages = 10 // Safety limit to prevent infinite loops
+            
+            while (hasNextPage && currentPage <= maxPages) {
+                val pageUrl = if (currentPage == 1) "$mainUrl/diziler" else "$mainUrl/diziler/page/$currentPage"
+                try {
+                    val yerliDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                    
+                    // Parse series from the new structure - single-item elements
+                    val pageItems = yerliDocument.select("div.seriescontent div.single-item").mapNotNull {
+                        parseDizilerItem(it)
+                    }
+                    
+                    if (pageItems.isNotEmpty()) {
+                        yerliDiziler.addAll(pageItems)
+                        println("Parsed ${pageItems.size} items from page $currentPage")
+                        
+                        // Check if there's a next page by looking for pagination links
+                        val pagination = yerliDocument.select("div.paginate-links")
+                        val nextPageLink = pagination.select("a.next, a.page-numbers").lastOrNull()
+                        
+                        hasNextPage = nextPageLink != null && 
+                                    (nextPageLink.text().contains("»") || 
+                                    nextPageLink.attr("href").contains("/page/${currentPage + 1}"))
+                        
+                        currentPage++
+                    } else {
+                        // No items on this page, stop pagination
+                        hasNextPage = false
+                    }
+                    
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    // Stop pagination on error
+                    hasNextPage = false
+                }
             }
             
             if (yerliDiziler.isNotEmpty()) {
-                all.add(HomePageList("Yerli Diziler", yerliDiziler))
+                val pageCount = currentPage - 1
+                all.add(HomePageList("Yerli Diziler ($pageCount Sayfa)", yerliDiziler))
             }
         } catch (e: Exception) {
             e.printStackTrace()
