@@ -18,30 +18,38 @@ class CanliDizi : MainAPI() {
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val doc = app.get(mainUrl).document
-        val lists = ArrayList<HomePageList>()
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
+        val document = app.get(mainUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+        val all = ArrayList<HomePageList>()
+        
+        // Parse popular series from the main slider
+        val popularSeries = document.select("div.diziler div.owl-item div.episode-box").mapNotNull {
+            parseSeriesItem(it)
+        }
 
-        // Popüler Diziler
-        val popularItems = doc.select("div.diziler div.owl-item").map { it.toSearchResponse() }
-        if (popularItems.isNotEmpty()) lists.add(HomePageList("Popüler Diziler", popularItems))
+        if (popularSeries.isNotEmpty()) {
+            all.add(HomePageList("Popüler Diziler", popularSeries, isHorizontalImages = true))
+        }
 
-        // Yerli Diziler
-        val yerliSection = doc.select("div.episodes.episode").getOrNull(0)
-        val yerliItems = yerliSection?.select("div.list-episodes")?.map { it.selectFirst("div.episode-box")?.toSearchResponse()!! } ?: emptyList()
-        if (yerliItems.isNotEmpty()) lists.add(HomePageList("Yerli Diziler", yerliItems))
+        // Parse latest episodes
+        val latestEpisodes = document.select("div.episodes.episode div.episode-box").mapNotNull {
+            parseEpisodeItem(it)
+        }
 
-        // Dijital Diziler
-        val digitalSection = doc.select("div.episodes.episode").getOrNull(1)
-        val digitalItems = digitalSection?.select("div.list-episodes")?.map { it.selectFirst("div.episode-box")?.toSearchResponse()!! } ?: emptyList()
-        if (digitalItems.isNotEmpty()) lists.add(HomePageList("Dijital Diziler", digitalItems))
+        if (latestEpisodes.isNotEmpty()) {
+            all.add(HomePageList("Yeni Diziler", latestEpisodes))
+        }
 
-        // Filmler
-        val filmsSection = doc.select("div.episodes.episode").getOrNull(2)
-        val filmsItems = filmsSection?.select("div.list-episodes")?.map { it.selectFirst("div.episode-box")?.toSearchResponse()!! } ?: emptyList()
-        if (filmsItems.isNotEmpty()) lists.add(HomePageList("Filmler", filmsItems))
+        // Parse series list from other sections
+        val seriesList = document.select("div.episodes.episode div.episode-box").mapNotNull {
+            parseSeriesItem(it)
+        }
 
-        return newHomePageResponse(lists)
+        if (seriesList.isNotEmpty()) {
+            all.add(HomePageList("Tüm Diziler", seriesList))
+        }
+        
+        return if (all.isEmpty()) null else newHomePageResponse(all)
     }
 
     private fun parseSeriesItem(element: Element): TvSeriesSearchResponse? {
