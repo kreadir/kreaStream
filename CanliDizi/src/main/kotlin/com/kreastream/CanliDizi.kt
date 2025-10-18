@@ -21,53 +21,63 @@ class CanliDizi : MainAPI() {
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
         val all = ArrayList<HomePageList>()
         
-        // Get Yerli Diziler from dedicated page with dynamic pagination
+        // Get Yerli Diziler from dedicated page with smart pagination
         try {
             val yerliDiziler = mutableListOf<TvSeriesSearchResponse>()
             
-            // Start with page 1
-            var currentPage = 1
-            var hasNextPage = true
-            val maxPages = 10 // Safety limit to prevent infinite loops
+            // Parse first page to get pagination info
+            val firstPageUrl = "$mainUrl/diziler"
+            val firstPageDocument = app.get(firstPageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
             
-            while (hasNextPage && currentPage <= maxPages) {
-                val pageUrl = if (currentPage == 1) "$mainUrl/diziler" else "$mainUrl/diziler/page/$currentPage"
+            // Get all page numbers from pagination
+            val pageLinks = firstPageDocument.select("div.paginate-links a.page-numbers, div.paginate-links span.page-numbers")
+            val pageNumbers = mutableSetOf<Int>()
+            
+            // Add page 1
+            pageNumbers.add(1)
+            
+            // Extract page numbers from links
+            pageLinks.forEach { element ->
+                when {
+                    element.attr("href").contains("/page/") -> {
+                        val pageNum = Regex("""/page/(\d+)""").find(element.attr("href"))?.groupValues?.get(1)?.toIntOrNull()
+                        pageNum?.let { pageNumbers.add(it) }
+                    }
+                    element.hasClass("current") -> {
+                        val pageNum = element.text().toIntOrNull()
+                        pageNum?.let { pageNumbers.add(it) }
+                    }
+                }
+            }
+            
+            // If no pagination found, just use first page
+            val pagesToParse = if (pageNumbers.isNotEmpty()) pageNumbers.sorted() else listOf(1)
+            
+            println("Found pages: $pagesToParse")
+            
+            // Parse all detected pages
+            for (pageNum in pagesToParse) {
+                val pageUrl = if (pageNum == 1) firstPageUrl else "$mainUrl/diziler/page/$pageNum"
                 try {
-                    val yerliDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                    val pageDocument = if (pageNum == 1) firstPageDocument 
+                        else app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
                     
-                    // Parse series from the new structure - single-item elements
-                    val pageItems = yerliDocument.select("div.seriescontent div.single-item").mapNotNull {
+                    val pageItems = pageDocument.select("div.seriescontent div.single-item").mapNotNull {
                         parseDizilerItem(it)
                     }
                     
-                    if (pageItems.isNotEmpty()) {
-                        yerliDiziler.addAll(pageItems)
-                        println("Parsed ${pageItems.size} items from page $currentPage")
-                        
-                        // Check if there's a next page by looking for pagination links
-                        val pagination = yerliDocument.select("div.paginate-links")
-                        val nextPageLink = pagination.select("a.next, a.page-numbers").lastOrNull()
-                        
-                        hasNextPage = nextPageLink != null && 
-                                    (nextPageLink.text().contains("»") || 
-                                    nextPageLink.attr("href").contains("/page/${currentPage + 1}"))
-                        
-                        currentPage++
-                    } else {
-                        // No items on this page, stop pagination
-                        hasNextPage = false
-                    }
+                    yerliDiziler.addAll(pageItems)
+                    println("Parsed ${pageItems.size} items from page $pageNum")
                     
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    // Stop pagination on error
-                    hasNextPage = false
+                    // Continue with next page even if one fails
+                    continue
                 }
             }
             
             if (yerliDiziler.isNotEmpty()) {
-                val pageCount = currentPage - 1
-                all.add(HomePageList("Yerli Diziler ($pageCount Sayfa)", yerliDiziler))
+                all.add(HomePageList("Yerli Diziler (${pagesToParse.size} Sayfa)", yerliDiziler))
             }
         } catch (e: Exception) {
             e.printStackTrace()
