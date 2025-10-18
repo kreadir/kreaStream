@@ -32,8 +32,14 @@ class CanliDizi : MainAPI() {
         }
 
         // Parse local series (Yerli Diziler)
-        val localSeries = document.select("div.episodes.episode div.list-episodes div.episode-box").mapNotNull {
-            parseEpisodeItem(it)
+        val localSeries = document.select("div.episodes.episode").let { sections ->
+            if (sections.isNotEmpty()) {
+                sections[0].select("div.list-episodes div.episode-box").mapNotNull {
+                    parseEpisodeItem(it)
+                }
+            } else {
+                emptyList()
+            }
         }
 
         if (localSeries.isNotEmpty()) {
@@ -42,7 +48,6 @@ class CanliDizi : MainAPI() {
 
         // Parse digital series (Dijital Diziler)
         val digitalSeries = document.select("div.episodes.episode").let { sections ->
-            // Get the second episodes section (Dijital Diziler)
             if (sections.size > 1) {
                 sections[1].select("div.list-episodes div.episode-box").mapNotNull {
                     parseEpisodeItem(it)
@@ -58,7 +63,6 @@ class CanliDizi : MainAPI() {
 
         // Parse movies
         val movies = document.select("div.episodes.episode").let { sections ->
-            // Get the third episodes section (Filmler)
             if (sections.size > 2) {
                 sections[2].select("div.list-episodes div.episode-box").mapNotNull {
                     parseMovieItem(it)
@@ -183,9 +187,12 @@ class CanliDizi : MainAPI() {
             }
         }
         
-        // Check if this is a movie or series by URL pattern
-        val isMovie = url.contains("/film") || url.contains("/izle.html")
-        
+        // Better detection for movie vs series
+        val isMovie = url.contains("/film") || 
+                     url.contains("/izle.html") && 
+                     !url.contains("-bolum-") &&
+                     !url.contains("/kategori/")
+
         if (isMovie) {
             return newMovieLoadResponse(title, url, TvType.Movie, url) {
                 this.posterUrl = poster
@@ -194,9 +201,33 @@ class CanliDizi : MainAPI() {
                 this.score = Score.from10(score)
             }
         } else {
-            // For series, try to parse episodes
-            val episodes = document.select("div.episode-list div.episode, .episodes li, .season-episodes li, .list-episodes div.episode-box").mapNotNull { element ->
+            // For series, try to parse episodes from multiple possible locations
+            val episodes = mutableListOf<Episode>()
+            
+            // Method 1: Check if this is a series category page that lists episodes
+            val categoryEpisodes = document.select("div.episodes.episode div.list-episodes div.episode-box, div.episode-list div.episode, .season-episodes li").mapNotNull { element ->
                 parseEpisode(element)
+            }
+            episodes.addAll(categoryEpisodes)
+            
+            // Method 2: If no episodes found in category, check if this is a single episode page
+            if (episodes.isEmpty() && (url.contains("-bolum-") || url.contains("/bolum-"))) {
+                // This is likely a single episode page, create one episode
+                val episode = parseSingleEpisode(document, url, title)
+                if (episode != null) {
+                    episodes.add(episode)
+                }
+            }
+            
+            // Method 3: Check for video player directly on the page (for single episodes)
+            if (episodes.isEmpty()) {
+                val hasVideoPlayer = document.select("video, iframe[src*='video'], iframe[data-wpfc-original-src*='video']").isNotEmpty()
+                if (hasVideoPlayer) {
+                    val episode = parseSingleEpisode(document, url, title)
+                    if (episode != null) {
+                        episodes.add(episode)
+                    }
+                }
             }
 
             return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
@@ -208,8 +239,34 @@ class CanliDizi : MainAPI() {
         }
     }
 
+    private fun parseSingleEpisode(document: Element, url: String, seriesTitle: String): Episode? {
+        // Extract episode number from URL or title
+        val epNum = Regex("""(\d+)\.?Bölüm""").find(url)?.groupValues?.get(1)?.toIntOrNull()
+            ?: Regex("""\b(\d+)\b""").find(url)?.groupValues?.get(1)?.toIntOrNull()
+            ?: 1
+
+        // Try to extract season number
+        val season = Regex("""(\d+)\.?Sezon""").find(url)?.groupValues?.get(1)?.toIntOrNull()
+            ?: 1
+
+        // Get episode title
+        val epTitle = document.selectFirst("h1, h2, .episode-title, .entry-title")?.text()?.trim()
+            ?: "$seriesTitle Bölüm $epNum"
+
+        return newEpisode(url) {
+            this.name = epTitle
+            this.episode = epNum
+            this.season = season
+            this.posterUrl = document.selectFirst("img")?.attr("src")?.let { fixUrl(it) }
+                ?: document.selectFirst("img[data-wpfc-original-src]")?.attr("data-wpfc-original-src")?.let { fixUrl(it) }
+        }
+    }
+
     private fun parseEpisode(element: Element): Episode? {
-        val epTitle = element.selectFirst("span.episode-title, .episode-name, .title, a")?.text()?.trim() ?: "Episode"
+        val epTitle = element.selectFirst("span.episode-title, .episode-name, .title, a")?.text()?.trim() 
+            ?: element.selectFirst("img")?.attr("alt")?.trim()
+            ?: "Episode"
+        
         val epUrl = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
         
         // Try to extract episode number
@@ -435,7 +492,7 @@ class CanliDizi : MainAPI() {
         val document = app.get(searchUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
         
         return document.select("div.search-results div.result, div.series-item, .dizi-item, div.episode-box").mapNotNull { element ->
-            parseSeriesItem(element) ?: parseEpisodeItem(element)
+            parseSeriesItem(element) ?: parseEpisodeItem(element) ?: parseMovieItem(element)
         }
     }
 
