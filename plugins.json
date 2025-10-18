@@ -3,7 +3,7 @@
     "iconUrl": "https://www.canlidizi14.com/favicon.ico",
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "fileSize": 11684,
+    "fileSize": 14663,
     "status": 1,
     "language": "tr",
     "authors": [
@@ -41,7 +41,7 @@
     "iconUrl": "https://www.google.com/s2/favicons?domain=https://dizipal1205.com&sz=%size%",
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "fileSize": 19403,
+    "fileSize": 19399,
     "status": 1,
     "language": "tr",
     "authors": [
@@ -52,7 +52,7 @@
       "TvSeries",
       "Movie"
     ],
-    "version": 24,
+    "version": 25,
     "internalName": "DiziPal",
     "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPal.cs3",
