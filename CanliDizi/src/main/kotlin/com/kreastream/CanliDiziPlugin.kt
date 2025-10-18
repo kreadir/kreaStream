@@ -4,7 +4,7 @@ import android.content.Context
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import com.lagradost.cloudstream3.plugins.Plugin
 import com.kreastream.BetaplayerExtractor
-import com.lagradost.cloudstream3.extractors.ExtractorApi
+import com.lagradost.cloudstream3.ExtractorApi
 
 
 @CloudstreamPlugin

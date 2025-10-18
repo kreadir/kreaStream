@@ -1,6 +1,6 @@
 package com.kreastream
 
-import com.lagradost.cloudstream3.extractors.ExtractorApi
+import com.lagradost.cloudstream3.ExtractorApi
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.utils.*
 
