@@ -101,7 +101,7 @@ class CanliDizi : MainAPI() {
             val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
             callback.invoke(
-                ExtractorLink(
+                newExtractorLink(
                     source = name,
                     name = name,
                     url = videoUrl,
@@ -126,227 +126,153 @@ class CanliDizi : MainAPI() {
             
             if (iframeSrc.isNotBlank()) {
                 val fixedIframeUrl = fixUrl(iframeSrc)
-                
-                // Handle different iframe hosts
-                when {
-                    fixedIframeUrl.contains("betaplayer.site") -> {
-                        foundLinks = foundLinks || handleBetaPlayer(fixedIframeUrl, callback, subtitleCallback)
-                    }
-                    fixedIframeUrl.contains("canliplayer.com") -> {
-                        foundLinks = foundLinks || handleCanliPlayer(fixedIframeUrl, callback, subtitleCallback)
-                    }
-                    else -> {
-                        // Generic iframe handling
-                        foundLinks = foundLinks || handleGenericIframe(fixedIframeUrl, callback, subtitleCallback)
-                    }
-                }
+                foundLinks = foundLinks || extractFromIframe(fixedIframeUrl, callback, subtitleCallback)
             }
         }
 
         return foundLinks
     }
 
-    private suspend fun handleBetaPlayer(
+    private suspend fun extractFromIframe(
         url: String,
         callback: (ExtractorLink) -> Unit,
         subtitleCallback: (SubtitleFile) -> Unit
     ): Boolean {
         try {
-            val document = app.get(url, headers = mapOf(
+            val response = app.get(url, headers = mapOf(
                 "User-Agent" to USER_AGENT,
-                "Referer" to mainUrl
-            )).document
+                "Referer" to mainUrl,
+                "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language" to "en-US,en;q=0.5",
+                "Accept-Encoding" to "gzip, deflate, br",
+                "DNT" to "1",
+                "Connection" to "keep-alive",
+                "Upgrade-Insecure-Requests" to "1"
+            ))
 
-            // Look for video sources in the iframe
-            val videoSources = document.select("video source")
+            val document = response.document
+            val html = response.text
+
+            // Method 1: Direct video sources
+            val videoSources = document.select("video source, video[src]")
             for (source in videoSources) {
                 val videoUrl = source.attr("src").let { fixUrl(it) }
-                if (videoUrl.isNotBlank()) {
-                    val quality = determineQuality(videoUrl)
-                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-                    callback.invoke(
-                        ExtractorLink(
-                            source = "$name - BetaPlayer",
-                            name = name,
-                            url = videoUrl,
-                            referer = url,
-                            quality = quality,
-                            type = type,
-                            headers = mapOf(
-                                "User-Agent" to USER_AGENT,
-                                "Referer" to url
-                            )
-                        )
-                    )
-                    return true
+                if (videoUrl.isNotBlank() && isVideoUrl(videoUrl)) {
+                    return createExtractorLink(videoUrl, url, callback, "$name - Direct")
                 }
             }
 
-            // Look for JavaScript variables that might contain video URLs
-            val scripts = document.select("script")
-            for (script in scripts) {
-                val scriptContent = script.html()
-                // Look for common video URL patterns in JavaScript
-                val videoPatterns = listOf(
-                    """src\s*[:=]\s*["']([^"']+\.(mp4|m3u8|webm|mkv))["']""",
-                    """file\s*[:=]\s*["']([^"']+\.(mp4|m3u8|webm|mkv))["']""",
-                    """video\s*[:=]\s*["']([^"']+\.(mp4|m3u8|webm|mkv))["']"""
-                )
-                
-                for (pattern in videoPatterns) {
-                    val regex = Regex(pattern)
-                    val match = regex.find(scriptContent)
-                    if (match != null) {
-                        val videoUrl = fixUrl(match.groupValues[1])
-                        val quality = determineQuality(videoUrl)
-                        val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+            // Method 2: JavaScript variable extraction
+            val jsVideoUrls = extractVideoUrlsFromJavaScript(html)
+            for (videoUrl in jsVideoUrls) {
+                if (isVideoUrl(videoUrl)) {
+                    return createExtractorLink(videoUrl, url, callback, "$name - JS")
+                }
+            }
 
-                        callback.invoke(
-                            ExtractorLink(
-                                source = "$name - BetaPlayer",
-                                name = name,
-                                url = videoUrl,
-                                referer = url,
-                                quality = quality,
-                                type = type,
-                                headers = mapOf(
-                                    "User-Agent" to USER_AGENT,
-                                    "Referer" to url
-                                )
-                            )
-                        )
-                        return true
+            // Method 3: Data attribute extraction
+            val dataVideoUrls = document.select("[data-video-src], [data-src]").mapNotNull {
+                it.attr("data-video-src").ifBlank { it.attr("data-src") }
+            }
+            for (videoUrl in dataVideoUrls) {
+                val fixedUrl = fixUrl(videoUrl)
+                if (isVideoUrl(fixedUrl)) {
+                    return createExtractorLink(fixedUrl, url, callback, "$name - Data")
+                }
+            }
+
+            // Method 4: Regex pattern matching in entire HTML
+            val regexPatterns = listOf(
+                """(?:src|file|video|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["']""",
+                """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["']\s*\)""",
+                """["'](https?://[^"']+\.(?:mp4|m3u8|webm|mkv))["']""",
+                """(https?://[^\s<>"']+\.(?:mp4|m3u8|webm|mkv))"""
+            )
+
+            for (pattern in regexPatterns) {
+                val regex = Regex(pattern, RegexOption.IGNORE_CASE)
+                val matches = regex.findAll(html)
+                for (match in matches) {
+                    val videoUrl = fixUrl(match.groupValues[1])
+                    if (isVideoUrl(videoUrl)) {
+                        return createExtractorLink(videoUrl, url, callback, "$name - Regex")
                     }
                 }
             }
+
+            // Method 5: Check for common video hosting APIs
+            if (url.contains("canliplayer.com")) {
+                val apiMatch = Regex("""["']?(?:video|file)Id["']?\s*:\s*["']([^"']+)["']""").find(html)
+                if (apiMatch != null) {
+                    val videoId = apiMatch.groupValues[1]
+                    // Try to construct direct URL (this might need adjustment based on the actual API)
+                    val constructedUrl = "https://canliplayer.com/stream/$videoId"
+                    return createExtractorLink(constructedUrl, url, callback, "$name - API")
+                }
+            }
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
         return false
     }
 
-    private suspend fun handleCanliPlayer(
-        url: String,
-        callback: (ExtractorLink) -> Unit,
-        subtitleCallback: (SubtitleFile) -> Unit
-    ): Boolean {
-        try {
-            val document = app.get(url, headers = mapOf(
-                "User-Agent" to USER_AGENT,
-                "Referer" to mainUrl
-            )).document
+    private fun extractVideoUrlsFromJavaScript(html: String): List<String> {
+        val videoUrls = mutableListOf<String>()
+        
+        // Common video URL patterns in JavaScript
+        val patterns = listOf(
+            """(?:src|file|videoUrl|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["']""",
+            """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["']\s*\)""",
+            """(?:hls|m3u8)Url\s*[:=]\s*["']([^"']+\.m3u8)["']""",
+            """(?:mp4|video)Url\s*[:=]\s*["']([^"']+\.mp4)["']""",
+            """(?:file|src)\s*:\s*\[[^\]]*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["'][^\]]*\]"""
+        )
 
-            // Look for video sources
-            val videoSources = document.select("video source, video[src]")
-            for (source in videoSources) {
-                val videoUrl = source.attr("src").let { fixUrl(it) }
-                if (videoUrl.isNotBlank()) {
-                    val quality = determineQuality(videoUrl)
-                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-                    callback.invoke(
-                        ExtractorLink(
-                            source = "$name - CanliPlayer",
-                            name = name,
-                            url = videoUrl,
-                            referer = url,
-                            quality = quality,
-                            type = type,
-                            headers = mapOf(
-                                "User-Agent" to USER_AGENT,
-                                "Referer" to url
-                            )
-                        )
-                    )
-                    return true
-                }
+        for (pattern in patterns) {
+            val regex = Regex(pattern, RegexOption.IGNORE_CASE)
+            val matches = regex.findAll(html)
+            matches.forEach { match ->
+                videoUrls.add(fixUrl(match.groupValues[1]))
             }
-
-            // Extract from JavaScript
-            val scripts = document.select("script")
-            for (script in scripts) {
-                val scriptContent = script.html()
-                // Look for video URLs in JavaScript
-                val patterns = listOf(
-                    """["'](https?://[^"']+\.(mp4|m3u8|webm|mkv))["']""",
-                    """(https?://[^\s<>"']+\.(mp4|m3u8|webm|mkv))"""
-                )
-                
-                for (pattern in patterns) {
-                    val regex = Regex(pattern)
-                    val matches = regex.findAll(scriptContent)
-                    for (match in matches) {
-                        val videoUrl = fixUrl(match.groupValues[1])
-                        if (videoUrl.contains("video") || videoUrl.contains("stream")) {
-                            val quality = determineQuality(videoUrl)
-                            val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-                            callback.invoke(
-                                ExtractorLink(
-                                    source = "$name - CanliPlayer",
-                                    name = name,
-                                    url = videoUrl,
-                                    referer = url,
-                                    quality = quality,
-                                    type = type,
-                                    headers = mapOf(
-                                        "User-Agent" to USER_AGENT,
-                                        "Referer" to url
-                                    )
-                                )
-                            )
-                            return true
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
-        return false
+
+        return videoUrls.distinct()
     }
 
-    private suspend fun handleGenericIframe(
-        url: String,
+    private fun isVideoUrl(url: String): Boolean {
+        return url.contains(".mp4") || 
+               url.contains(".m3u8") || 
+               url.contains(".webm") || 
+               url.contains(".mkv") ||
+               url.contains("video") ||
+               url.contains("stream")
+    }
+
+    private fun createExtractorLink(
+        videoUrl: String,
+        referer: String,
         callback: (ExtractorLink) -> Unit,
-        subtitleCallback: (SubtitleFile) -> Unit
+        sourceName: String
     ): Boolean {
-        try {
-            val document = app.get(url, headers = mapOf(
-                "User-Agent" to USER_AGENT,
-                "Referer" to mainUrl
-            )).document
+        val quality = determineQuality(videoUrl)
+        val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
-            // Look for any video sources
-            val videoSources = document.select("video source, video[src]")
-            for (source in videoSources) {
-                val videoUrl = source.attr("src").let { fixUrl(it) }
-                if (videoUrl.isNotBlank()) {
-                    val quality = determineQuality(videoUrl)
-                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-                    callback.invoke(
-                        ExtractorLink(
-                            source = "$name - Iframe",
-                            name = name,
-                            url = videoUrl,
-                            referer = url,
-                            quality = quality,
-                            type = type,
-                            headers = mapOf(
-                                "User-Agent" to USER_AGENT,
-                                "Referer" to url
-                            )
-                        )
-                    )
-                    return true
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return false
+        callback.invoke(
+            ExtractorLink(
+                source = sourceName,
+                name = name,
+                url = videoUrl,
+                referer = referer,
+                quality = quality,
+                type = type,
+                headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to referer
+                )
+            )
+        )
+        return true
     }
 
     private fun determineQuality(url: String): Int {
