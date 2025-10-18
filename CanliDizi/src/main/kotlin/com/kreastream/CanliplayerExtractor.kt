@@ -1,12 +1,8 @@
 package com.kreastream
 
-import com.lagradost.cloudstream3.ExtractorApi
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.Qualities
+import com.lagradost.cloudstream3.extractors.ExtractorApi
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.utils.*
-import com.lagradost.cloudstream3.utils.fixUrl
-import org.jsoup.Jsoup
 
 class CanliplayerExtractor : ExtractorApi() {
     override val name = "Canliplayer"
@@ -22,12 +18,12 @@ class CanliplayerExtractor : ExtractorApi() {
 
         return listOf(
             newExtractorLink(
-                name = name,
-                source = name,
-                url = fixUrl(videoUrl),
-                referer = url,
-                quality = Qualities.Unknown.value,
-                isM3u8 = videoUrl.endsWith(".m3u8")
+                this.name,
+                this.name,
+                fixUrl(videoUrl),
+                url,
+                Qualities.Unknown.value,
+                videoUrl.endsWith(".m3u8")
             )
         )
     }
