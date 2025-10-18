@@ -31,7 +31,7 @@ class CanliDizi : MainAPI() {
             all.add(HomePageList("Popular Series", series, isHorizontalImages = true))
         }
         
-        return HomePageResponse(all)
+        return newHomePageResponse(all)
     }
 
     private fun parseSeriesItem(element: Element): TvSeriesSearchResponse? {
@@ -98,7 +98,7 @@ class CanliDizi : MainAPI() {
         if (videoElement != null) {
             val videoUrl = videoElement.attr("src")?.let { fixUrl(it) } ?: return false
             val quality = determineQuality(videoUrl)
-            val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.HLS else ExtractorLinkType.VIDEO
+            val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
             callback.invoke(
                 ExtractorLink(
@@ -163,7 +163,7 @@ class CanliDizi : MainAPI() {
                 val videoUrl = source.attr("src").let { fixUrl(it) }
                 if (videoUrl.isNotBlank()) {
                     val quality = determineQuality(videoUrl)
-                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.HLS else ExtractorLinkType.VIDEO
+                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
                     callback.invoke(
                         ExtractorLink(
@@ -200,7 +200,7 @@ class CanliDizi : MainAPI() {
                     if (match != null) {
                         val videoUrl = fixUrl(match.groupValues[1])
                         val quality = determineQuality(videoUrl)
-                        val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.HLS else ExtractorLinkType.VIDEO
+                        val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
                         callback.invoke(
                             ExtractorLink(
@@ -243,7 +243,7 @@ class CanliDizi : MainAPI() {
                 val videoUrl = source.attr("src").let { fixUrl(it) }
                 if (videoUrl.isNotBlank()) {
                     val quality = determineQuality(videoUrl)
-                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.HLS else ExtractorLinkType.VIDEO
+                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
                     callback.invoke(
                         ExtractorLink(
@@ -280,7 +280,7 @@ class CanliDizi : MainAPI() {
                         val videoUrl = fixUrl(match.groupValues[1])
                         if (videoUrl.contains("video") || videoUrl.contains("stream")) {
                             val quality = determineQuality(videoUrl)
-                            val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.HLS else ExtractorLinkType.VIDEO
+                            val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
                             callback.invoke(
                                 ExtractorLink(
@@ -324,7 +324,7 @@ class CanliDizi : MainAPI() {
                 val videoUrl = source.attr("src").let { fixUrl(it) }
                 if (videoUrl.isNotBlank()) {
                     val quality = determineQuality(videoUrl)
-                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.HLS else ExtractorLinkType.VIDEO
+                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
 
                     callback.invoke(
                         ExtractorLink(
