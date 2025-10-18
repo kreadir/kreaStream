@@ -25,9 +25,9 @@ class CanliDizi : MainAPI() {
         try {
             val yerliDocument = app.get("$mainUrl/diziler", headers = mapOf("User-Agent" to USER_AGENT)).document
             
-            // Parse series from the diziler page
-            val yerliDiziler = yerliDocument.select("div.episodes.episode div.list-episodes div.episode-box, div.diziler div.list-series div.episode-box").mapNotNull {
-                parseSeriesItem(it) ?: parseEpisodeItem(it)
+            // Parse series from the new structure - single-item elements
+            val yerliDiziler = yerliDocument.select("div.seriescontent div.single-item").mapNotNull {
+                parseDizilerItem(it)
             }
             
             if (yerliDiziler.isNotEmpty()) {
@@ -40,6 +40,56 @@ class CanliDizi : MainAPI() {
         return if (all.isEmpty()) null else newHomePageResponse(all)
     }
 
+    private fun parseDizilerItem(element: Element): TvSeriesSearchResponse? {
+        // Get link from cat-img > a
+        val link = element.selectFirst("div.cat-img a")?.attr("href")?.let { fixUrl(it) } ?: return null
+        
+        // Get title from categorytitle > a
+        val title = element.selectFirst("div.categorytitle a")?.text()?.trim()
+            ?: element.selectFirst("div.cat-img img")?.attr("alt")?.trim()
+            ?: element.selectFirst("div.cat-img img")?.attr("title")?.trim()
+            ?: return null
+
+        // Handle lazy-loaded images with data-wpfc-original-src
+        val poster = element.selectFirst("div.cat-img img")?.let { img ->
+            img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+                ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+        }
+
+        // Extract year from the dizimeta sections - look for "Yapım Yılı"
+        val year = element.select("div.cat-container-in div").mapNotNull { div ->
+            val text = div.text().trim()
+            if (text.contains("Yapım Yılı")) {
+                Regex("""(\d{4})""").find(text)?.value?.toIntOrNull()
+            } else {
+                null
+            }
+        }.firstOrNull()
+
+        // Extract rating from imdbp div
+        val ratingText = element.selectFirst("div.imdbp")?.text()?.trim()
+        val score = ratingText?.let { text ->
+            when {
+                text.contains("IMDb") -> {
+                    val ratingValue = Regex("""IMDb:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
+                        ?.replace(",", ".")?.toFloatOrNull()
+                    ratingValue?.times(10)?.toInt()
+                }
+                else -> null
+            }
+        }
+
+        // Extract description from cat_ozet div
+        val description = element.selectFirst("div.cat_ozet")?.text()?.trim()
+
+        return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
+            this.posterUrl = poster
+            this.year = year
+            this.score = Score.from10(score)
+        }
+    }
+
+    // Keep the old parseSeriesItem for other pages that might use the old structure
     private fun parseSeriesItem(element: Element): TvSeriesSearchResponse? {
         val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
         val title = element.selectFirst(".serie-name a, .serie-name")?.text()?.trim()
