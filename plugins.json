@@ -3,7 +3,7 @@
     "iconUrl": "https://www.canlidizi14.com/favicon.ico",
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "fileSize": 19436,
+    "fileSize": 20591,
     "status": 1,
     "language": "tr",
     "authors": [
@@ -22,7 +22,7 @@
     "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizimom.plus&sz=%size%",
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "fileSize": 30881,
+    "fileSize": 30980,
     "status": 1,
     "language": "tr",
     "authors": [
@@ -41,7 +41,7 @@
     "iconUrl": "https://www.google.com/s2/favicons?domain=https://dizipal1205.com&sz=%size%",
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "fileSize": 19399,
+    "fileSize": 19469,
     "status": 1,
     "language": "tr",
     "authors": [
@@ -52,7 +52,7 @@
       "TvSeries",
       "Movie"
     ],
-    "version": 25,
+    "version": 24,
     "internalName": "DiziPal",
     "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPal.cs3",
@@ -124,7 +124,7 @@
     "iconUrl": "https://www.google.com/s2/favicons?domain=www.setfilmizle.nl&sz=%size%",
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "fileSize": 19210,
+    "fileSize": 19311,
     "status": 1,
     "language": "tr",
     "authors": [
