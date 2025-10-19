@@ -18,82 +18,51 @@ class CanliDizi : MainAPI() {
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
+override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
     val all = ArrayList<HomePageList>()
     
     // Helper function to parse category with pagination
     suspend fun parseCategoryWithPagination(baseUrl: String, categoryName: String): List<TvSeriesSearchResponse> {
         val items = mutableListOf<TvSeriesSearchResponse>()
         
-        // Parse first page to get pagination info
+        // Parse first page
         val firstPageDocument = app.get(baseUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
         
-        // Get all page numbers from pagination - handle ellipsis and limited page display
-        val pageLinks = firstPageDocument.select("div.paginate-links a.page-numbers, div.paginate-links span.page-numbers")
-        val pageNumbers = mutableSetOf<Int>()
-        
-        // Add page 1
-        pageNumbers.add(1)
-        
-        // Extract page numbers from visible links
-        pageLinks.forEach { element ->
-            when {
-                element.attr("href").contains("/page/") -> {
-                    val pageNum = Regex("""/page/(\d+)""").find(element.attr("href"))?.groupValues?.get(1)?.toIntOrNull()
-                    pageNum?.let { pageNumbers.add(it) }
-                }
-                element.hasClass("current") -> {
-                    val pageNum = element.text().toIntOrNull()
-                    pageNum?.let { pageNumbers.add(it) }
-                }
-                element.text().matches(Regex("""\d+""")) -> {
-                    val pageNum = element.text().toIntOrNull()
-                    pageNum?.let { pageNumbers.add(it) }
-                }
-            }
+        // Parse items from first page
+        val firstPageItems = firstPageDocument.select("div.seriescontent div.single-item").mapNotNull {
+            parseDizilerItem(it)
         }
+        items.addAll(firstPageItems)
+        println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
         
-        // Try to find the last page number by checking the highest number in pagination
-        val maxVisiblePage = pageNumbers.maxOrNull() ?: 1
-        
-        // If we see a high number like 70, it's likely the last page
-        val lastPage = if (maxVisiblePage > 10) {
-            // Check if there's a direct last page link or infer from the highest number
-            val lastPageLink = firstPageDocument.select("div.paginate-links a.page-numbers").lastOrNull()
-            lastPageLink?.text()?.toIntOrNull() ?: maxVisiblePage
-        } else {
-            maxVisiblePage
-        }
-        
-        // Generate all page numbers from 1 to lastPage, but limit to reasonable number
-        val totalPages = min(lastPage, 20) // Limit to 20 pages max to avoid too many requests
-        val allPages = (1..totalPages).toList()
-        
-        println("$categoryName: Detected $lastPage total pages, parsing first $totalPages pages")
-        
-        // Parse all pages
-        for (pageNum in allPages) {
-            val pageUrl = if (pageNum == 1) baseUrl else "$baseUrl/page/$pageNum"
+        // Try to parse additional pages by checking if they exist
+        // We'll try up to page 20, but stop when we get an error or no items
+        for (pageNum in 2..20) {
+            val pageUrl = "$baseUrl/page/$pageNum"
             try {
-                val pageDocument = if (pageNum == 1) firstPageDocument 
-                    else app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
                 
+                // Check if the page actually has content (not a 404 or empty page)
                 val pageItems = pageDocument.select("div.seriescontent div.single-item").mapNotNull {
                     parseDizilerItem(it)
+                }
+                
+                if (pageItems.isEmpty()) {
+                    // No items on this page, stop pagination
+                    println("$categoryName: No items found on page $pageNum, stopping pagination")
+                    break
                 }
                 
                 items.addAll(pageItems)
                 println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
                 
-                // Small delay between requests to be respectful to the server
-                if (pageNum != allPages.last()) {
-                    kotlinx.coroutines.delay(100)
-                }
+                // Small delay between requests
+                kotlinx.coroutines.delay(100)
                 
             } catch (e: Exception) {
-                e.printStackTrace()
-                // Continue with next page even if one fails
-                continue
+                // Page doesn't exist or error occurred, stop pagination
+                println("$categoryName: Error parsing page $pageNum: ${e.message}, stopping pagination")
+                break
             }
         }
         
