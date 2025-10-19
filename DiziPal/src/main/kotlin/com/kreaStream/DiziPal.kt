@@ -229,7 +229,7 @@ class DiziPal : MainAPI() {
                     val subUrl  = it.replace("[${subLang}]", "")
 
                     subtitleCallback.invoke(
-                        SubtitleFile(
+                        newSubtitleFile(
                             lang = subLang,
                             url  = fixUrl(subUrl)
                         )
@@ -240,7 +240,7 @@ class DiziPal : MainAPI() {
                 val subUrl  = subtitles.replace("[${subLang}]", "")
 
                 subtitleCallback.invoke(
-                    SubtitleFile(
+                    newSubtitleFile(
                         lang = subLang,
                         url  = fixUrl(subUrl)
                     )

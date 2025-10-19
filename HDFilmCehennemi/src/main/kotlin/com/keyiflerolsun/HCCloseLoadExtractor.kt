@@ -43,7 +43,7 @@ open class HCCloseLoadExtractor : ExtractorApi() {
     ) {
         iSource.document.select("track").forEach {
             subtitleCallback.invoke(
-                SubtitleFile(
+                newSubtitleFile(
                     lang = it.attr("label"),
                     url = mainUrl + it.attr("src")
                 )
@@ -58,7 +58,7 @@ open class HCCloseLoadExtractor : ExtractorApi() {
             Log.d("Kekik_${this.name}", "tracks -> $tracks")
             tracks.forEach { it ->
                 subtitleCallback.invoke(
-                    SubtitleFile(
+                    newSubtitleFile(
                         lang = it.label.toString(),
                         url = mainUrl + it.file.toString()
                     )
