@@ -69,7 +69,7 @@ jobs:
               "status": 1,
               "language": "tr",
               "authors": ["kreadir"],
-              "tvTypes": ["TvSeries"],
+              "tvTypes": ["Tv"],
               "version": 2,
               "internalName": "YerelDiziler",
               "description": "YerelDiziler için CloudStream eklentisi",
