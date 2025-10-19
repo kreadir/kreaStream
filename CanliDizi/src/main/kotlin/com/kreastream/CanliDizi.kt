@@ -322,19 +322,6 @@ class CanliDizi : MainAPI() {
         }
     }
 
-        override suspend fun load(url: String): LoadResponse {
-        val document = app.get(url, headers = mapOf("User-Agent" to USER_AGENT)).document
-        
-        // Check if this is the new series page structure with incontentx
-        val isNewStructure = document.selectFirst("div.incontentx") != null
-        
-        if (isNewStructure) {
-            return loadNewSeriesStructure(document, url)
-        } else {
-            return loadOldStructure(document, url)
-        }
-    }
-
     private suspend fun loadNewSeriesStructure(document: Element, url: String): LoadResponse {
         // Extract title from h1.title-border
         val title = document.selectFirst("h1.title-border")?.text()?.trim()
