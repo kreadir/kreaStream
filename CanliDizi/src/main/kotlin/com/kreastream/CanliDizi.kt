@@ -45,7 +45,7 @@ class CanliDizi : MainAPI() {
         return if (all.isEmpty()) null else newHomePageResponse(all)
     }
 
-        // ===== SEARCH =====
+    // ===== SEARCH =====
     override suspend fun search(query: String): List<SearchResponse> {
         if (query.isBlank()) return emptyList()
         
@@ -56,77 +56,10 @@ class CanliDizi : MainAPI() {
         
         // Each div.single-item is one search result
         document.select("div.single-item").forEach { element ->
-            parseSearchResultItem(element)?.let { results.add(it) }
+            parseSearchResultItem(element)?.let { result -> results.add(result) }
         }
         
         return results
-    }
-
-    // ===== SEARCH RESULT PARSER =====
-    private fun parseSearchResultItem(element: Element): SearchResponse? {
-        try {
-            // Get link from cat-img > a
-            val link = element.selectFirst("div.cat-img a")?.attr("href")?.let { fixUrl(it) } 
-                ?: return null
-            
-            // Get title from categorytitle > a
-            val title = element.selectFirst("div.categorytitle a")?.text()?.trim()
-                ?: element.selectFirst("div.cat-img img")?.attr("alt")?.trim()
-                    ?.replace("son bölüm izle", "")?.trim()
-                    ?.replace("izle", "")?.trim()
-                ?: element.selectFirst("div.cat-img img")?.attr("title")?.trim()
-                    ?.replace("son bölüm izle", "")?.trim()
-                    ?.replace("izle", "")?.trim()
-                ?: return null
-
-            // Handle lazy-loaded images
-            val poster = element.selectFirst("div.cat-img img")?.let { img ->
-                img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-                    ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-            }
-
-            // Extract year from dizimeta with "Yapım Yılı"
-            val year = element.select("div.cat-container-in div").mapNotNull { div ->
-                val text = div.text().trim()
-                if (text.contains("Yapım Yılı")) {
-                    Regex("""(\d{4})""").find(text)?.value?.toIntOrNull()
-                } else {
-                    null
-                }
-            }.firstOrNull()
-
-            // Extract rating from imdbp div
-            val ratingText = element.selectFirst("div.imdbp")?.text()?.trim()
-            val score = ratingText?.let { text ->
-                Regex("""IMDb:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
-                    ?.replace(",", ".")?.toFloatOrNull()?.times(10)?.toInt()
-            }
-
-            // Extract description from cat_ozet div
-            val description = element.selectFirst("div.cat_ozet")?.text()?.trim()
-
-            // Determine if it's a movie or series based on URL and content
-            val isMovie = link.contains("/film") || 
-                        description?.contains("film") == true ||
-                        title.contains("film", ignoreCase = true)
-
-            return if (isMovie) {
-                newMovieSearchResponse(title, link, TvType.Movie) {
-                    this.posterUrl = poster
-                    this.year = year
-                    this.score = Score.from10(score)
-                }
-            } else {
-                newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
-                    this.posterUrl = poster
-                    this.year = year
-                    this.score = Score.from10(score)
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return null
-        }
     }
 
     // ===== LOAD CONTENT =====
@@ -217,32 +150,70 @@ class CanliDizi : MainAPI() {
 
     // ===== PARSER FUNCTIONS =====
     
-    // Search result parser
+    // Search result parser - SINGLE VERSION (remove duplicates)
     private fun parseSearchResultItem(element: Element): SearchResponse? {
-        val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } 
-            ?: element.selectFirst(".cat-img a, .poster a, .image a")?.attr("href")?.let { fixUrl(it) }
-            ?: return null
+        try {
+            // Get link from cat-img > a
+            val link = element.selectFirst("div.cat-img a")?.attr("href")?.let { fixUrl(it) } 
+                ?: return null
+            
+            // Get title from categorytitle > a
+            val title = element.selectFirst("div.categorytitle a")?.text()?.trim()
+                ?: element.selectFirst("div.cat-img img")?.attr("alt")?.trim()
+                    ?.replace("son bölüm izle", "")?.trim()
+                    ?.replace("izle", "")?.trim()
+                ?: element.selectFirst("div.cat-img img")?.attr("title")?.trim()
+                    ?.replace("son bölüm izle", "")?.trim()
+                    ?.replace("izle", "")?.trim()
+                ?: return null
 
-        val title = element.selectFirst(".serie-name, .categorytitle, .title, .film-title, .entry-title")?.text()?.trim()
-            ?: element.selectFirst("img")?.attr("alt")?.trim()
-            ?: element.selectFirst("img")?.attr("title")?.trim()
-            ?: return null
-
-        val poster = element.selectFirst("img")?.let { img ->
-            img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-                ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-        }
-
-        val isMovie = link.contains("/film") || element.selectFirst(".film-label, .movie-label") != null
-
-        return if (isMovie) {
-            newMovieSearchResponse(title, link, TvType.Movie) {
-                this.posterUrl = poster
+            // Handle lazy-loaded images
+            val poster = element.selectFirst("div.cat-img img")?.let { img ->
+                img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+                    ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
             }
-        } else {
-            newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
-                this.posterUrl = poster
+
+            // Extract year from dizimeta with "Yapım Yılı"
+            val year = element.select("div.cat-container-in div").mapNotNull { div ->
+                val text = div.text().trim()
+                if (text.contains("Yapım Yılı")) {
+                    Regex("""(\d{4})""").find(text)?.value?.toIntOrNull()
+                } else {
+                    null
+                }
+            }.firstOrNull()
+
+            // Extract rating from imdbp div
+            val ratingText = element.selectFirst("div.imdbp")?.text()?.trim()
+            val score = ratingText?.let { text ->
+                Regex("""IMDb:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
+                    ?.replace(",", ".")?.toFloatOrNull()?.times(10)?.toInt()
             }
+
+            // Extract description from cat_ozet div
+            val description = element.selectFirst("div.cat_ozet")?.text()?.trim()
+
+            // Determine if it's a movie or series based on URL and content
+            val isMovie = link.contains("/film") || 
+                         description?.contains("film") == true ||
+                         title.contains("film", ignoreCase = true)
+
+            return if (isMovie) {
+                newMovieSearchResponse(title, link, TvType.Movie) {
+                    this.posterUrl = poster
+                    this.year = year
+                    this.score = Score.from10(score)
+                }
+            } else {
+                newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
+                    this.posterUrl = poster
+                    this.year = year
+                    this.score = Score.from10(score)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
         }
     }
 
