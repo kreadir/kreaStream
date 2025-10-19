@@ -378,43 +378,22 @@ class InatBox : MainAPI() {
         val extractorFound =
             loadExtractor(sourceUrl, headers["Referer"], subtitleCallback){
                 callback.invoke(
-                    newExtractorLink(
-                        name,
-                        source,
-                        url,
-                        referer,
-                        quality,
-                        headers,
-                        type
-                    ) {
-                        this.source = it.source,
-                        this.name = contentToProcess.chName,
-                        this.url = it.url,
-                        this.referer = it.referer,
-                        this.quality = it.quality,
-                        this.headers = it.headers,
-                        this.type = it.type
-                    }
+                    ExtractorLink(source = it.source,name = contentToProcess.chName, url = it.url, referer = it.referer, quality = it.quality, headers = it.headers, type = it.type)
                 )
             }
 
         //When no extractor found, try to load as generic
         if (!extractorFound) {
             callback.invoke(
-                newExtractorLink(
-                    name,
-                    source,
-                    url,
-                    referer,
-                    quality,
-                    headers,
-                    type
-                ){
-                    this.referer = headers["Referer"]
-                    this.quality = determineQuality(sourceUrl)
-                    this.headers = headers
-                    this.type = if(sourceUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else if(sourceUrl.contains(".mpd")) ExtractorLinkType.DASH else ExtractorLinkType.VIDEO
-                }
+                ExtractorLink(
+                    source = this.name,
+                    name = contentToProcess.chName,
+                    url = sourceUrl,
+                    referer = "",
+                    quality = Qualities.Unknown.value,
+                    headers = headers,
+                    type = if(sourceUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else if(sourceUrl.contains(".mpd")) ExtractorLinkType.DASH else ExtractorLinkType.VIDEO
+                )
             )
         }
     }
