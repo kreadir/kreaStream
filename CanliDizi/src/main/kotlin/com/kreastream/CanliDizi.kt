@@ -21,13 +21,12 @@ class CanliDizi : MainAPI() {
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
         val all = ArrayList<HomePageList>()
         
-        // Get Yerli Diziler from dedicated page with smart pagination
-        try {
-            val yerliDiziler = mutableListOf<TvSeriesSearchResponse>()
+        // Helper function to parse category with pagination
+        suspend fun parseCategoryWithPagination(baseUrl: String, categoryName: String): List<TvSeriesSearchResponse> {
+            val items = mutableListOf<TvSeriesSearchResponse>()
             
             // Parse first page to get pagination info
-            val firstPageUrl = "$mainUrl/diziler"
-            val firstPageDocument = app.get(firstPageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+            val firstPageDocument = app.get(baseUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
             
             // Get all page numbers from pagination
             val pageLinks = firstPageDocument.select("div.paginate-links a.page-numbers, div.paginate-links span.page-numbers")
@@ -47,17 +46,21 @@ class CanliDizi : MainAPI() {
                         val pageNum = element.text().toIntOrNull()
                         pageNum?.let { pageNumbers.add(it) }
                     }
+                    element.text().matches(Regex("""\d+""")) -> {
+                        val pageNum = element.text().toIntOrNull()
+                        pageNum?.let { pageNumbers.add(it) }
+                    }
                 }
             }
             
             // If no pagination found, just use first page
             val pagesToParse = if (pageNumbers.isNotEmpty()) pageNumbers.sorted() else listOf(1)
             
-            println("Found pages: $pagesToParse")
+            println("$categoryName: Found pages: $pagesToParse")
             
             // Parse all detected pages
             for (pageNum in pagesToParse) {
-                val pageUrl = if (pageNum == 1) firstPageUrl else "$mainUrl/diziler/page/$pageNum"
+                val pageUrl = if (pageNum == 1) baseUrl else "$baseUrl/page/$pageNum"
                 try {
                     val pageDocument = if (pageNum == 1) firstPageDocument 
                         else app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
@@ -66,8 +69,8 @@ class CanliDizi : MainAPI() {
                         parseDizilerItem(it)
                     }
                     
-                    yerliDiziler.addAll(pageItems)
-                    println("Parsed ${pageItems.size} items from page $pageNum")
+                    items.addAll(pageItems)
+                    println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
                     
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -76,8 +79,24 @@ class CanliDizi : MainAPI() {
                 }
             }
             
+            return items
+        }
+        
+        // Parse Yerli Diziler
+        try {
+            val yerliDiziler = parseCategoryWithPagination("$mainUrl/diziler", "Yerli Diziler")
             if (yerliDiziler.isNotEmpty()) {
-                all.add(HomePageList("Yerli Diziler (${pagesToParse.size} Sayfa)", yerliDiziler))
+                all.add(HomePageList("Yerli Diziler", yerliDiziler))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        
+        // Parse Dijital Diziler
+        try {
+            val dijitalDiziler = parseCategoryWithPagination("$mainUrl/dijital-diziler-izle", "Dijital Diziler")
+            if (dijitalDiziler.isNotEmpty()) {
+                all.add(HomePageList("Dijital Diziler", dijitalDiziler))
             }
         } catch (e: Exception) {
             e.printStackTrace()
