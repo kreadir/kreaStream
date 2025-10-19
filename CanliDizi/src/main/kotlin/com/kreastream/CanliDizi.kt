@@ -22,7 +22,7 @@ class CanliDizi : MainAPI() {
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
     val all = ArrayList<HomePageList>()
     
-    // Helper function to parse category with pagination
+    // Helper function to parse category with pagination for series
     suspend fun parseCategoryWithPagination(baseUrl: String, categoryName: String): List<TvSeriesSearchResponse> {
         val items = mutableListOf<TvSeriesSearchResponse>()
         
@@ -37,20 +37,17 @@ class CanliDizi : MainAPI() {
         println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
         
         // Try to parse additional pages by checking if they exist
-        // We'll try up to page 10, but stop when we get an error or no items
         for (pageNum in 2..10) {
             val pageUrl = "$baseUrl/page/$pageNum"
             try {
                 val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
                 
-                // Check if the page actually has content (not a 404 or empty page)
+                // Check if the page actually has content
                 val pageItems = pageDocument.select("div.seriescontent div.single-item").mapNotNull {
                     parseDizilerItem(it)
                 }
                 
                 if (pageItems.isEmpty()) {
-                    // No items on this page, stop pagination
-                    println("$categoryName: No items found on page $pageNum, stopping pagination")
                     break
                 }
                 
@@ -58,8 +55,65 @@ class CanliDizi : MainAPI() {
                 println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
                 
             } catch (e: Exception) {
-                // Page doesn't exist or error occurred, stop pagination
-                println("$categoryName: Error parsing page $pageNum: ${e.message}, stopping pagination")
+                break
+            }
+        }
+        
+        return items
+    }
+    
+    // Helper function to parse movies with pagination
+    suspend fun parseMoviesWithPagination(baseUrl: String, categoryName: String): List<MovieSearchResponse> {
+        val items = mutableListOf<MovieSearchResponse>()
+        
+        // Parse first page
+        val firstPageDocument = app.get(baseUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+        
+        // Try different selectors for movie items
+        val movieSelectors = listOf(
+            "div.seriescontent div.single-item",
+            "div.episodes.episode div.list-episodes div.episode-box",
+            "div.film-list div.film-item",
+            "div.movie-list div.movie-item"
+        )
+        
+        var firstPageItems = emptyList<MovieSearchResponse>()
+        
+        for (selector in movieSelectors) {
+            firstPageItems = firstPageDocument.select(selector).mapNotNull {
+                parseMovieItem(it)
+            }
+            if (firstPageItems.isNotEmpty()) {
+                println("$categoryName: Using selector '$selector'")
+                break
+            }
+        }
+        
+        items.addAll(firstPageItems)
+        println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
+        
+        // Try to parse additional pages
+        for (pageNum in 2..10) {
+            val pageUrl = "$baseUrl/page/$pageNum"
+            try {
+                val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                
+                var pageItems = emptyList<MovieSearchResponse>()
+                for (selector in movieSelectors) {
+                    pageItems = pageDocument.select(selector).mapNotNull {
+                        parseMovieItem(it)
+                    }
+                    if (pageItems.isNotEmpty()) break
+                }
+                
+                if (pageItems.isEmpty()) {
+                    break
+                }
+                
+                items.addAll(pageItems)
+                println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
+                
+            } catch (e: Exception) {
                 break
             }
         }
@@ -87,7 +141,60 @@ class CanliDizi : MainAPI() {
         e.printStackTrace()
     }
     
+    // Parse Filmler
+    try {
+        val filmler = parseMoviesWithPagination("$mainUrl/film-izle", "Filmler")
+        if (filmler.isNotEmpty()) {
+            all.add(HomePageList("Filmler", filmler))
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    
     return if (all.isEmpty()) null else newHomePageResponse(all)
+}
+
+// Update the parseMovieItem function to handle different movie structures
+private fun parseMovieItem(element: Element): MovieSearchResponse? {
+    // Try multiple possible link locations
+    val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } 
+        ?: element.selectFirst(".cat-img a, .poster a, .image a")?.attr("href")?.let { fixUrl(it) }
+        ?: return null
+
+    // Try multiple possible title locations
+    val title = element.selectFirst(".serie-name, .episode-name, .categorytitle, .title, .film-title")?.text()?.trim()
+        ?: element.selectFirst("img")?.attr("alt")?.trim()
+        ?: element.selectFirst("img")?.attr("title")?.trim()
+        ?: return null
+
+    // Handle lazy-loaded images with data-wpfc-original-src
+    val poster = element.selectFirst("img")?.let { img ->
+        img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+            ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+    }
+
+    // Try to extract year from various locations
+    val year = element.selectFirst(".episode-name, .year, .release-date")?.text()?.trim()?.toIntOrNull()
+        ?: Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
+
+    // Try to extract rating
+    val ratingText = element.selectFirst(".episode-date, .rating, .imdb, .imdbp")?.text()?.trim()
+    val score = ratingText?.let { text ->
+        when {
+            text.contains("IMDb") -> {
+                val ratingValue = Regex("""IMDb\s*:?\s*([\d,]+)""").find(text)?.groupValues?.get(1)
+                    ?.replace(",", ".")?.toFloatOrNull()
+                ratingValue?.times(10)?.toInt()
+            }
+            else -> null
+        }
+    }
+
+    return newMovieSearchResponse(title, link, TvType.Movie) {
+        this.posterUrl = poster
+        this.year = year
+        this.score = Score.from10(score)
+    }
 }
 
     private fun parseDizilerItem(element: Element): TvSeriesSearchResponse? {
