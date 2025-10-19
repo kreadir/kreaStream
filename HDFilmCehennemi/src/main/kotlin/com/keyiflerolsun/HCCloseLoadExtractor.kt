@@ -44,9 +44,12 @@ open class HCCloseLoadExtractor : ExtractorApi() {
         iSource.document.select("track").forEach {
             subtitleCallback.invoke(
                 newSubtitleFile(
-                    lang = it.attr("label"),
-                    url = mainUrl + it.attr("src")
-                )
+                    lang,
+                    url
+                ){
+                    this.lang = it.attr("label")
+                    this.url = mainUrl + it.attr("src")
+                }
             )
         }
         val track = obfuscatedScript?.substringAfter("tracks: ")?.substringBefore("]") + "]"
@@ -59,9 +62,12 @@ open class HCCloseLoadExtractor : ExtractorApi() {
             tracks.forEach { it ->
                 subtitleCallback.invoke(
                     newSubtitleFile(
-                        lang = it.label.toString(),
-                        url = mainUrl + it.file.toString()
-                    )
+                        lang,
+                        url
+                    ){
+                        this.lang = it.label.toString()
+                        this.url = mainUrl + it.file.toString()
+                    }
                 )
             }
         }
