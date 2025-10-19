@@ -29,7 +29,7 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 
 class DiziPalOrijinal : MainAPI() {
     override var mainUrl = "https://dizipal1506.com"
-    override var name = "DiziPalOrijinal"
+    override var name = "DiziPal Orijinal"
     override val hasMainPage = true
     override var lang = "tr"
     override val hasQuickSearch = false
