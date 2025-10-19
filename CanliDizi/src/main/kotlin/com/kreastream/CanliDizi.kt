@@ -5,7 +5,6 @@ import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.*
 import org.jsoup.nodes.Element
 
-
 class CanliDizi : MainAPI() {
     override var mainUrl = "https://www.canlidizi14.com"
     override var name = "Canlı Dizi"
@@ -19,248 +18,201 @@ class CanliDizi : MainAPI() {
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
+    // ===== MAIN PAGE =====
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
         val all = ArrayList<HomePageList>()
         
-        // Helper function to parse category with pagination for series
-        suspend fun parseCategoryWithPagination(baseUrl: String, categoryName: String): List<TvSeriesSearchResponse> {
-            val items = mutableListOf<TvSeriesSearchResponse>()
-            
-            // Parse first page
-            val firstPageDocument = app.get(baseUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
-            
-            // Parse items from first page
-            val firstPageItems = firstPageDocument.select("div.seriescontent div.single-item").mapNotNull {
-                parseDizilerItem(it)
-            }
-            items.addAll(firstPageItems)
-            println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
-            
-            // Try to parse additional pages by checking if they exist
-            for (pageNum in 2..10) {
-                val pageUrl = "$baseUrl/page/$pageNum"
-                try {
-                    val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
-                    
-                    // Check if the page actually has content
-                    val pageItems = pageDocument.select("div.seriescontent div.single-item").mapNotNull {
-                        parseDizilerItem(it)
-                    }
-                    
-                    if (pageItems.isEmpty()) {
-                        break
-                    }
-                    
-                    items.addAll(pageItems)
-                    println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
-                    
-                } catch (e: Exception) {
-                    break
+        // Parse different categories
+        listOf(
+            Triple("$mainUrl/diziler", "Yerli Diziler", true),
+            Triple("$mainUrl/dijital-diziler-izle", "Dijital Diziler", true),
+            Triple("$mainUrl/film-izle", "Filmler", false)
+        ).forEach { (url, categoryName, isSeries) ->
+            try {
+                val items = if (isSeries) {
+                    parseCategoryWithPagination(url, categoryName)
+                } else {
+                    parseMoviesWithPagination(url, categoryName)
                 }
-            }
-            
-            return items
-        }
-        
-        // Helper function to parse movies with pagination
-        suspend fun parseMoviesWithPagination(baseUrl: String, categoryName: String): List<MovieSearchResponse> {
-            val items = mutableListOf<MovieSearchResponse>()
-            
-            // Parse first page
-            val firstPageDocument = app.get(baseUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
-            
-            // Try different selectors for movie items
-            val movieSelectors = listOf(
-                "div.seriescontent div.single-item",
-                "div.episodes.episode div.list-episodes div.episode-box",
-                "div.film-list div.film-item",
-                "div.movie-list div.movie-item"
-            )
-            
-            var firstPageItems = emptyList<MovieSearchResponse>()
-            
-            for (selector in movieSelectors) {
-                firstPageItems = firstPageDocument.select(selector).mapNotNull {
-                    parseMovieItem(it)
+                if (items.isNotEmpty()) {
+                    all.add(HomePageList(categoryName, items))
                 }
-                if (firstPageItems.isNotEmpty()) {
-                    println("$categoryName: Using selector '$selector'")
-                    break
-                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            
-            items.addAll(firstPageItems)
-            println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
-            
-            // Try to parse additional pages
-            for (pageNum in 2..10) {
-                val pageUrl = "$baseUrl/page/$pageNum"
-                try {
-                    val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
-                    
-                    var pageItems = emptyList<MovieSearchResponse>()
-                    for (selector in movieSelectors) {
-                        pageItems = pageDocument.select(selector).mapNotNull {
-                            parseMovieItem(it)
-                        }
-                        if (pageItems.isNotEmpty()) break
-                    }
-                    
-                    if (pageItems.isEmpty()) {
-                        break
-                    }
-                    
-                    items.addAll(pageItems)
-                    println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
-                    
-                } catch (e: Exception) {
-                    break
-                }
-            }
-            
-            return items
-        }
-        
-        // Parse Yerli Diziler
-        try {
-            val yerliDiziler = parseCategoryWithPagination("$mainUrl/diziler", "Yerli Diziler")
-            if (yerliDiziler.isNotEmpty()) {
-                all.add(HomePageList("Yerli Diziler", yerliDiziler))
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        
-        // Parse Dijital Diziler
-        try {
-            val dijitalDiziler = parseCategoryWithPagination("$mainUrl/dijital-diziler-izle", "Dijital Diziler")
-            if (dijitalDiziler.isNotEmpty()) {
-                all.add(HomePageList("Dijital Diziler", dijitalDiziler))
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        
-        // Parse Filmler
-        try {
-            val filmler = parseMoviesWithPagination("$mainUrl/film-izle", "Filmler")
-            if (filmler.isNotEmpty()) {
-                all.add(HomePageList("Filmler", filmler))
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
         
         return if (all.isEmpty()) null else newHomePageResponse(all)
     }
 
+    // ===== SEARCH =====
+    override suspend fun search(query: String): List<SearchResponse> {
+        if (query.isBlank()) return emptyList()
+        
+        val searchUrl = "$mainUrl/?s=${query.encodeToUrl()}"
+        val document = app.get(searchUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+        
+        val results = mutableListOf<SearchResponse>()
+        
+        // Try different selectors for search results
+        val searchSelectors = listOf(
+            "div.seriescontent div.single-item",
+            "div.search-result, div.result-item",
+            "div.dizi-item, div.film-item",
+            "article.post, div.post"
+        )
+        
+        searchSelectors.forEach { selector ->
+            document.select(selector).forEach { element ->
+                parseSearchResultItem(element)?.let { results.add(it) }
+            }
+        }
+        
+        return results.distinctBy { it.url }
+    }
+
+    // ===== LOAD CONTENT =====
     override suspend fun load(url: String): LoadResponse {
         val document = app.get(url, headers = mapOf("User-Agent" to USER_AGENT)).document
         
-        // Check if this is the new series page structure with incontentx
-        val isNewStructure = document.selectFirst("div.incontentx") != null
-        
-        if (isNewStructure) {
-            return loadNewSeriesStructure(document, url)
-        } else {
-            // Check if this is a movie page
-            val isMovie = url.contains("/film") || 
-                        url.contains("/izle.html") || 
-                        document.selectFirst("div.incontentx") == null && 
-                        document.selectFirst("div.bolumust") == null
-            
-            if (isMovie) {
-                return loadMovieStructure(document, url)
-            } else {
-                return loadOldStructure(document, url)
-            }
+        return when {
+            document.selectFirst("div.incontentx") != null -> 
+                loadNewSeriesStructure(document, url)
+            url.contains("/film") || document.selectFirst("div.bolumust") == null -> 
+                loadMovieStructure(document, url)
+            else -> 
+                loadOldStructure(document, url)
         }
     }
 
-// Update the parseMovieItem function to handle different movie structures
-    private fun parseMovieItem(element: Element): MovieSearchResponse? {
-        // Try multiple possible link locations
+    // ===== LOAD LINKS =====
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        val document = app.get(data, headers = mapOf("User-Agent" to USER_AGENT)).document
+        val html = document.html()
+        
+        var foundLinks = false
+
+        // Method 1: Direct video elements
+        document.select("video source, video[src], audio source, audio[src]").forEach { videoElement ->
+            videoElement.attr("src").let { fixUrl(it) }.takeIf { it.isNotBlank() && isVideoUrl(it) }?.let { videoUrl ->
+                createVideoLink(videoUrl, data, callback, "Direct Video")
+                foundLinks = true
+            }
+        }
+
+        // Method 2: Iframe extraction
+        document.select("iframe[src], embed[src]").forEach { iframe ->
+            iframe.attr("src").takeIf { it.isNotBlank() }?.let { iframeSrc ->
+                if (extractFromIframe(fixUrl(iframeSrc), callback, subtitleCallback)) {
+                    foundLinks = true
+                }
+            }
+        }
+
+        // Method 3: Data attributes
+        document.select("[data-video-src], [data-src], [data-file], [data-url]").forEach { element ->
+            listOf("data-video-src", "data-src", "data-file", "data-url").forEach { attr ->
+                element.attr(attr).takeIf { it.isNotBlank() }?.let { fixUrl(it) }?.let { videoUrl ->
+                    if (isVideoUrl(videoUrl)) {
+                        createVideoLink(videoUrl, data, callback, "Data Attribute")
+                        foundLinks = true
+                    }
+                }
+            }
+        }
+
+        // Method 4: JavaScript extraction
+        document.select("script").forEach { script ->
+            extractVideoUrlsFromJavaScript(script.html()).forEach { videoUrl ->
+                if (isVideoUrl(videoUrl)) {
+                    createVideoLink(videoUrl, data, callback, "JavaScript")
+                    foundLinks = true
+                }
+            }
+        }
+
+        // Method 5: Regex patterns
+        val regexPatterns = listOf(
+            """(?:src|file|videoUrl|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']""",
+            """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']\s*\)""",
+            """["'](https?://[^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']""",
+            """file:\s*["']([^"']+\.m3u8)["']""",
+            """hlsUrl\s*[:=]\s*["']([^"']+\.m3u8)["']"""
+        )
+
+        regexPatterns.forEach { pattern ->
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                match.groupValues[1].let { fixUrl(it) }.takeIf { isVideoUrl(it) }?.let { videoUrl ->
+                    createVideoLink(videoUrl, data, callback, "Regex")
+                    foundLinks = true
+                }
+            }
+        }
+
+        return foundLinks
+    }
+
+    // ===== PARSER FUNCTIONS =====
+    
+    // Search result parser
+    private fun parseSearchResultItem(element: Element): SearchResponse? {
         val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } 
             ?: element.selectFirst(".cat-img a, .poster a, .image a")?.attr("href")?.let { fixUrl(it) }
             ?: return null
 
-        // Try multiple possible title locations
-        val title = element.selectFirst(".serie-name, .episode-name, .categorytitle, .title, .film-title")?.text()?.trim()
+        val title = element.selectFirst(".serie-name, .categorytitle, .title, .film-title, .entry-title")?.text()?.trim()
             ?: element.selectFirst("img")?.attr("alt")?.trim()
             ?: element.selectFirst("img")?.attr("title")?.trim()
             ?: return null
 
-        // Handle lazy-loaded images with data-wpfc-original-src
         val poster = element.selectFirst("img")?.let { img ->
             img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
                 ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
         }
 
-        // Try to extract year from various locations
-        val year = element.selectFirst(".episode-name, .year, .release-date")?.text()?.trim()?.toIntOrNull()
-            ?: Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
+        val isMovie = link.contains("/film") || element.selectFirst(".film-label, .movie-label") != null
 
-        // Try to extract rating
-        val ratingText = element.selectFirst(".episode-date, .rating, .imdb, .imdbp")?.text()?.trim()
-        val score = ratingText?.let { text ->
-            when {
-                text.contains("IMDb") -> {
-                    val ratingValue = Regex("""IMDb\s*:?\s*([\d,]+)""").find(text)?.groupValues?.get(1)
-                        ?.replace(",", ".")?.toFloatOrNull()
-                    ratingValue?.times(10)?.toInt()
-                }
-                else -> null
+        return if (isMovie) {
+            newMovieSearchResponse(title, link, TvType.Movie) {
+                this.posterUrl = poster
             }
-        }
-
-        return newMovieSearchResponse(title, link, TvType.Movie) {
-            this.posterUrl = poster
-            this.year = year
-            this.score = Score.from10(score)
+        } else {
+            newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
+                this.posterUrl = poster
+            }
         }
     }
 
+    // Series item parser
     private fun parseDizilerItem(element: Element): TvSeriesSearchResponse? {
-        // Get link from cat-img > a
         val link = element.selectFirst("div.cat-img a")?.attr("href")?.let { fixUrl(it) } ?: return null
         
-        // Get title from categorytitle > a
         val title = element.selectFirst("div.categorytitle a")?.text()?.trim()
             ?: element.selectFirst("div.cat-img img")?.attr("alt")?.trim()
             ?: element.selectFirst("div.cat-img img")?.attr("title")?.trim()
             ?: return null
 
-        // Handle lazy-loaded images with data-wpfc-original-src
         val poster = element.selectFirst("div.cat-img img")?.let { img ->
             img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
                 ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
         }
 
-        // Extract year from the dizimeta sections - look for "Yapım Yılı"
         val year = element.select("div.cat-container-in div").mapNotNull { div ->
-            val text = div.text().trim()
-            if (text.contains("Yapım Yılı")) {
-                Regex("""(\d{4})""").find(text)?.value?.toIntOrNull()
-            } else {
-                null
+            div.text().trim().takeIf { it.contains("Yapım Yılı") }?.let {
+                Regex("""(\d{4})""").find(it)?.value?.toIntOrNull()
             }
         }.firstOrNull()
 
-        // Extract rating from imdbp div
         val ratingText = element.selectFirst("div.imdbp")?.text()?.trim()
         val score = ratingText?.let { text ->
-            when {
-                text.contains("IMDb") -> {
-                    val ratingValue = Regex("""IMDb:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
-                        ?.replace(",", ".")?.toFloatOrNull()
-                    ratingValue?.times(10)?.toInt()
-                }
-                else -> null
-            }
+            Regex("""IMDb:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
+                ?.replace(",", ".")?.toFloatOrNull()?.times(10)?.toInt()
         }
-
-        // Extract description from cat_ozet div
-        val description = element.selectFirst("div.cat_ozet")?.text()?.trim()
 
         return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
             this.posterUrl = poster
@@ -269,243 +221,183 @@ class CanliDizi : MainAPI() {
         }
     }
 
-    // Keep the old parseSeriesItem for other pages that might use the old structure
-    private fun parseSeriesItem(element: Element): TvSeriesSearchResponse? {
-        val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
-        val title = element.selectFirst(".serie-name a, .serie-name")?.text()?.trim()
+    // Movie item parser
+    private fun parseMovieItem(element: Element): MovieSearchResponse? {
+        val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } 
+            ?: element.selectFirst(".cat-img a, .poster a, .image a")?.attr("href")?.let { fixUrl(it) }
+            ?: return null
+
+        val title = element.selectFirst(".serie-name, .episode-name, .categorytitle, .title, .film-title")?.text()?.trim()
+            ?: element.selectFirst("img")?.attr("alt")?.trim()
             ?: element.selectFirst("img")?.attr("title")?.trim()
-            ?: element.selectFirst("img")?.attr("alt")?.trim()
             ?: return null
 
-        // Handle lazy-loaded images with data-wpfc-original-src
         val poster = element.selectFirst("img")?.let { img ->
             img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
                 ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
         }
 
-        // Extract year from episode-name
-        val year = element.selectFirst(".episode-name")?.text()?.trim()?.toIntOrNull()
+        val year = element.selectFirst(".episode-name, .year, .release-date")?.text()?.trim()?.toIntOrNull()
+            ?: Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
 
-        // Extract rating from episode-date
-        val ratingText = element.selectFirst(".episode-date")?.text()?.trim()
-        val score = ratingText?.let { text ->
-            when {
-                text.contains("IMDb") -> {
-                    val ratingValue = text.removePrefix("IMDb:").trim().replace(",", ".").toFloatOrNull()
-                    ratingValue?.times(10)?.toInt()
-                }
-                else -> null
-            }
-        }
-
-        return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
+        return newMovieSearchResponse(title, link, TvType.Movie) {
             this.posterUrl = poster
             this.year = year
-            this.score = Score.from10(score)
         }
     }
 
-    private fun parseEpisodeItem(element: Element): TvSeriesSearchResponse? {
-        val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
-        val title = element.selectFirst(".serie-name")?.text()?.trim()
-            ?: element.selectFirst("img")?.attr("alt")?.trim()
-            ?: return null
-
-        // Handle lazy-loaded images with data-wpfc-original-src
-        val poster = element.selectFirst("img")?.let { img ->
-            img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-                ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-        }
-
-        return newTvSeriesSearchResponse(title, link, TvType.TvSeries) {
-            this.posterUrl = poster
-        }
-    }
-
+    // ===== LOAD STRUCTURE FUNCTIONS =====
+    
     private suspend fun loadNewSeriesStructure(document: Element, url: String): LoadResponse {
-        // Extract title from h1.title-border
         val title = document.selectFirst("h1.title-border")?.text()?.trim()
             ?.replace("son bölüm izle", "")?.trim()
             ?: document.selectFirst("meta[property=og:title]")?.attr("content")?.trim()
             ?: throw ErrorLoadingException("Title not found")
         
-        // Extract poster from cat-img img
         val poster = document.selectFirst("div.cat-img img")?.attr("src")?.let { fixUrl(it) }
             ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
 
-        // Extract description from cat_ozet
         val description = document.selectFirst("div.cat_ozet")?.text()?.trim()
             ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim()
 
-        // Extract year from dizimeta with "Yapım Yılı"
         val year = document.select("div.cat-container-in div").mapNotNull { div ->
-            val text = div.text().trim()
-            if (text.contains("Yapım Yılı")) {
-                Regex("""(\d{4})""").find(text)?.value?.toIntOrNull()
-            } else {
-                null
+            div.text().trim().takeIf { it.contains("Yapım Yılı") }?.let {
+                Regex("""(\d{4})""").find(it)?.value?.toIntOrNull()
             }
         }.firstOrNull()
 
-        // Extract rating from dizimeta with "IMDB"
-        val ratingText = document.select("div.cat-container-in div").mapNotNull { div ->
-            val text = div.text().trim()
-            if (text.contains("IMDB")) {
-                Regex("""IMDB\s*:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
-            } else {
-                null
-            }
-        }.firstOrNull()
-        
-        val score = ratingText?.replace(",", ".")?.toFloatOrNull()?.times(10)?.toInt()
-
-        // Parse episodes from the new structure
-        val episodes = document.select("div.bolumust a").mapNotNull { element ->
-            parseNewEpisodeItem(element)
-        }
+        val episodes = document.select("div.bolumust a").mapNotNull { parseNewEpisodeItem(it) }
 
         return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
             this.posterUrl = poster
             this.plot = description
             this.year = year
-            this.score = Score.from10(score)
-        }
-    }
-
-    private fun parseNewEpisodeItem(element: Element): Episode? {
-        val epUrl = element.attr("href")?.let { fixUrl(it) } ?: return null
-        
-        // Extract episode title from baslik div or title attribute
-        val epTitle = element.selectFirst("div.baslik")?.text()?.trim()
-            ?: element.attr("title")?.trim()
-            ?: "Episode"
-
-        // Extract episode number from title
-        val epNum = Regex("""(\d+)\.?Bölüm""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
-            ?: Regex("""\b(\d+)\b""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
-            ?: 1
-
-        // Extract release date from tarih div
-        //val releaseDate = element.selectFirst("div.tarih")?.text()?.trim()
-
-        return newEpisode(epUrl) {
-            this.name = epTitle
-            this.episode = epNum
-            this.season = 1 // Default to season 1 since it's not specified in the HTML
-            //this.year = releaseDate
         }
     }
 
     private suspend fun loadOldStructure(document: Element, url: String): LoadResponse {
-        // Try multiple possible selectors for title
         val title = document.selectFirst("h1.series-title, h1.title, h1.entry-title, h1")?.text()?.trim() 
             ?: document.selectFirst(".series-name, .entry-title")?.text()?.trim()
             ?: document.selectFirst("meta[property=og:title]")?.attr("content")?.trim()
             ?: throw ErrorLoadingException("Title not found")
         
-        // Try multiple possible selectors for poster
         val poster = document.selectFirst("img.poster, .poster img, .series-poster img")?.attr("src")?.let { fixUrl(it) }
             ?: document.selectFirst(".wp-post-image, .attachment-post-thumbnail")?.attr("src")?.let { fixUrl(it) }
             ?: document.selectFirst("img[data-wpfc-original-src]")?.attr("data-wpfc-original-src")?.let { fixUrl(it) }
             ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
 
-        // Try multiple possible selectors for description
         val description = document.selectFirst("div.description, .plot, .synopsis, .entry-content")?.text()?.trim()
             ?: document.selectFirst("meta[name=description]")?.attr("content")?.trim()
-            ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim()
 
-        // Try to extract year
-        val year = document.selectFirst(".year, .release-date")?.text()?.trim()?.toIntOrNull()
-            ?: Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
-
-        // Try to extract rating and convert to score
-        val ratingText = document.selectFirst(".rating, .imdb-rating, .score")?.text()?.trim()
-        val score = ratingText?.let { text ->
-            when {
-                text.contains("IMDb") -> {
-                    val ratingValue = text.removePrefix("IMDb:").trim().replace(",", ".").toFloatOrNull()
-                    ratingValue?.times(10)?.toInt()
-                }
-                text.contains("/") -> {
-                    val ratingValue = text.substringBefore("/").trim().toFloatOrNull()
-                    ratingValue?.times(10)?.toInt()
-                }
-                else -> text.toFloatOrNull()?.times(10)?.toInt()
-            }
-        }
-        
-        // Better detection for movie vs series
         val isMovie = url.contains("/film") || 
-                    url.contains("/izle.html") && 
-                    !url.contains("-bolum-") &&
-                    !url.contains("/kategori/")
+                    (url.contains("/izle.html") && !url.contains("-bolum-") && !url.contains("/kategori/"))
 
         if (isMovie) {
             return newMovieLoadResponse(title, url, TvType.Movie, url) {
                 this.posterUrl = poster
                 this.plot = description
-                this.year = year
-                this.score = Score.from10(score)
             }
         } else {
-            // For series, try to parse episodes from multiple possible locations
-            val episodes = mutableListOf<Episode>()
+            val episodes = document.select("div.episodes.episode div.list-episodes div.episode-box, div.episode-list div.episode, .season-episodes li")
+                .mapNotNull { parseEpisode(it) }
             
-            // Method 1: Check if this is a series category page that lists episodes
-            val categoryEpisodes = document.select("div.episodes.episode div.list-episodes div.episode-box, div.episode-list div.episode, .season-episodes li").mapNotNull { element ->
-                parseEpisode(element)
-            }
-            episodes.addAll(categoryEpisodes)
-            
-            // Method 2: If no episodes found in category, check if this is a single episode page
-            if (episodes.isEmpty() && (url.contains("-bolum-") || url.contains("/bolum-"))) {
-                // This is likely a single episode page, create one episode
-                val episode = parseSingleEpisode(document, url, title)
-                if (episode != null) {
-                    episodes.add(episode)
-                }
-            }
-            
-            // Method 3: Check for video player directly on the page (for single episodes)
-            if (episodes.isEmpty()) {
-                val hasVideoPlayer = document.select("video, iframe[src*='video'], iframe[data-wpfc-original-src*='video']").isNotEmpty()
-                if (hasVideoPlayer) {
-                    val episode = parseSingleEpisode(document, url, title)
-                    if (episode != null) {
-                        episodes.add(episode)
-                    }
-                }
-            }
-
             return newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
                 this.posterUrl = poster
                 this.plot = description
-                this.year = year
-                this.score = Score.from10(score)
             }
         }
     }
 
-    private fun parseSingleEpisode(document: Element, url: String, seriesTitle: String): Episode? {
-        // Extract episode number from URL or title
-        val epNum = Regex("""(\d+)\.?Bölüm""").find(url)?.groupValues?.get(1)?.toIntOrNull()
-            ?: Regex("""\b(\d+)\b""").find(url)?.groupValues?.get(1)?.toIntOrNull()
+    private suspend fun loadMovieStructure(document: Element, url: String): LoadResponse {
+        val title = document.selectFirst("h1.title-border, h1, h1.entry-title")?.text()?.trim()
+            ?.replace("son bölüm izle", "")?.trim()
+            ?.replace("izle", "")?.trim()
+            ?: document.selectFirst("meta[property=og:title]")?.attr("content")?.trim()
+            ?: throw ErrorLoadingException("Title not found")
+        
+        val poster = document.selectFirst("div.cat-img img, .poster img, .wp-post-image")?.attr("src")?.let { fixUrl(it) }
+            ?: document.selectFirst("img[data-wpfc-original-src]")?.attr("data-wpfc-original-src")?.let { fixUrl(it) }
+            ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
+
+        val description = document.selectFirst("div.cat_ozet, .plot, .synopsis, .entry-content")?.text()?.trim()
+            ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim()
+
+        return newMovieLoadResponse(title, url, TvType.Movie, url) {
+            this.posterUrl = poster
+            this.plot = description
+        }
+    }
+
+    // ===== HELPER FUNCTIONS =====
+    
+    private suspend fun parseCategoryWithPagination(baseUrl: String, categoryName: String): List<TvSeriesSearchResponse> {
+        val items = mutableListOf<TvSeriesSearchResponse>()
+        
+        for (pageNum in 1..10) {
+            val pageUrl = if (pageNum == 1) baseUrl else "$baseUrl/page/$pageNum"
+            try {
+                val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                val pageItems = pageDocument.select("div.seriescontent div.single-item").mapNotNull {
+                    parseDizilerItem(it)
+                }
+                
+                if (pageItems.isEmpty()) break
+                
+                items.addAll(pageItems)
+                
+            } catch (e: Exception) {
+                break
+            }
+        }
+        
+        return items
+    }
+
+    private suspend fun parseMoviesWithPagination(baseUrl: String, categoryName: String): List<MovieSearchResponse> {
+        val items = mutableListOf<MovieSearchResponse>()
+        
+        for (pageNum in 1..10) {
+            val pageUrl = if (pageNum == 1) baseUrl else "$baseUrl/page/$pageNum"
+            try {
+                val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                
+                val movieSelectors = listOf(
+                    "div.seriescontent div.single-item",
+                    "div.episodes.episode div.list-episodes div.episode-box",
+                    "div.film-list div.film-item"
+                )
+                
+                val pageItems = movieSelectors.flatMap { selector ->
+                    pageDocument.select(selector).mapNotNull { parseMovieItem(it) }
+                }
+                
+                if (pageItems.isEmpty()) break
+                
+                items.addAll(pageItems)
+                
+            } catch (e: Exception) {
+                break
+            }
+        }
+        
+        return items
+    }
+
+    private fun parseNewEpisodeItem(element: Element): Episode? {
+        val epUrl = element.attr("href")?.let { fixUrl(it) } ?: return null
+        
+        val epTitle = element.selectFirst("div.baslik")?.text()?.trim()
+            ?: element.attr("title")?.trim()
+            ?: "Episode"
+
+        val epNum = Regex("""(\d+)\.?Bölüm""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
+            ?: Regex("""\b(\d+)\b""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
             ?: 1
 
-        // Try to extract season number
-        val season = Regex("""(\d+)\.?Sezon""").find(url)?.groupValues?.get(1)?.toIntOrNull()
-            ?: 1
-
-        // Get episode title
-        val epTitle = document.selectFirst("h1, h2, .episode-title, .entry-title")?.text()?.trim()
-            ?: "$seriesTitle Bölüm $epNum"
-
-        return newEpisode(url) {
+        return newEpisode(epUrl) {
             this.name = epTitle
             this.episode = epNum
-            this.season = season
-            this.posterUrl = document.selectFirst("img")?.attr("src")?.let { fixUrl(it) }
-                ?: document.selectFirst("img[data-wpfc-original-src]")?.attr("data-wpfc-original-src")?.let { fixUrl(it) }
+            this.season = 1
         }
     }
 
@@ -516,197 +408,24 @@ class CanliDizi : MainAPI() {
         
         val epUrl = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
         
-        // Try to extract episode number
         val epNum = element.selectFirst("span.episode-number, .episode-num, .number")?.text()?.toIntOrNull()
             ?: Regex("""(\d+)\.?Bölüm""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
             ?: Regex("""\b(\d+)\b""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
             ?: 1
 
-        // Try to extract season number
         val season = element.selectFirst("span.season-number, .season-num")?.text()?.toIntOrNull()
             ?: Regex("""(\d+)\.?Sezon""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
             ?: 1
-
-        // Handle lazy-loaded images
-        val poster = element.selectFirst("img")?.let { img ->
-            img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-                ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-        }
 
         return newEpisode(epUrl) {
             this.name = epTitle
             this.episode = epNum
             this.season = season
-            this.posterUrl = poster
         }
     }
 
-    private suspend fun loadMovieStructure(document: Element, url: String): LoadResponse {
-    // Extract title from h1 or meta tags
-        val title = document.selectFirst("h1.title-border, h1, h1.entry-title")?.text()?.trim()
-            ?.replace("son bölüm izle", "")?.trim()
-            ?.replace("izle", "")?.trim()
-            ?: document.selectFirst("meta[property=og:title]")?.attr("content")?.trim()
-            ?: throw ErrorLoadingException("Title not found")
-        
-        // Extract poster
-        val poster = document.selectFirst("div.cat-img img, .poster img, .wp-post-image")?.attr("src")?.let { fixUrl(it) }
-            ?: document.selectFirst("img[data-wpfc-original-src]")?.attr("data-wpfc-original-src")?.let { fixUrl(it) }
-            ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
-
-        // Extract description
-        val description = document.selectFirst("div.cat_ozet, .plot, .synopsis, .entry-content")?.text()?.trim()
-            ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim()
-
-        // Extract year
-        val year = document.select("div.cat-container-in div, .entry-content div").mapNotNull { div ->
-            val text = div.text().trim()
-            if (text.contains("Yapım Yılı") || text.contains("Yapım Yılı")) {
-                Regex("""(\d{4})""").find(text)?.value?.toIntOrNull()
-            } else {
-                null
-            }
-        }.firstOrNull() ?: Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
-
-        // Extract rating
-        val ratingText = document.select("div.cat-container-in div, .entry-content div").mapNotNull { div ->
-            val text = div.text().trim()
-            if (text.contains("IMDB") || text.contains("IMDb")) {
-                Regex("""IMDB\s*:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
-                    ?: Regex("""IMDb\s*:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
-            } else {
-                null
-            }
-        }.firstOrNull()
-        
-        val score = ratingText?.replace(",", ".")?.toFloatOrNull()?.times(10)?.toInt()
-
-        return newMovieLoadResponse(title, url, TvType.Movie, url) {
-            this.posterUrl = poster
-            this.plot = description
-            this.year = year
-            this.score = Score.from10(score)
-        }
-    }
-
-    // Update the loadLinks function to be more aggressive in finding video sources
-    override suspend fun loadLinks(
-        data: String,
-        isCasting: Boolean,
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        val document = app.get(data, headers = mapOf("User-Agent" to USER_AGENT)).document
-        
-        var foundLinks = false
-        val html = document.html()
-
-        // Method 1: Direct video elements
-        val videoElements = document.select("video source, video[src], audio source, audio[src]")
-        for (videoElement in videoElements) {
-            val videoUrl = videoElement.attr("src").let { fixUrl(it) }
-            if (videoUrl.isNotBlank() && isVideoUrl(videoUrl)) {
-                createVideoLink(videoUrl, data, callback, "Direct Video")
-                foundLinks = true
-            }
-        }
-
-        // Method 2: Iframe extraction
-        val iframes = document.select("iframe[src], embed[src]")
-        for (iframe in iframes) {
-            val iframeSrc = iframe.attr("src")
-            if (iframeSrc.isNotBlank()) {
-                val fixedIframeUrl = fixUrl(iframeSrc)
-                if (extractFromIframe(fixedIframeUrl, callback, subtitleCallback)) {
-                    foundLinks = true
-                }
-            }
-        }
-
-        // Method 3: Data attributes
-        val dataElements = document.select("[data-video-src], [data-src], [data-file], [data-url]")
-        for (element in dataElements) {
-            val videoUrl = element.attr("data-video-src")
-                .takeIf { it.isNotBlank() }
-                ?: element.attr("data-src")
-                .takeIf { it.isNotBlank() }
-                ?: element.attr("data-file")
-                .takeIf { it.isNotBlank() }
-                ?: element.attr("data-url")
-                .takeIf { it.isNotBlank() }
-                ?.let { fixUrl(it) }
-            
-            if (videoUrl != null && isVideoUrl(videoUrl)) {
-                createVideoLink(videoUrl, data, callback, "Data Attribute")
-                foundLinks = true
-            }
-        }
-
-        // Method 4: JavaScript variable extraction (more comprehensive)
-        val scriptTags = document.select("script")
-        for (script in scriptTags) {
-            val scriptContent = script.html()
-            val videoUrls = extractVideoUrlsFromJavaScript(scriptContent)
-            for (videoUrl in videoUrls) {
-                if (isVideoUrl(videoUrl)) {
-                    createVideoLink(videoUrl, data, callback, "JavaScript")
-                    foundLinks = true
-                }
-            }
-        }
-
-        // Method 5: Regex patterns in entire HTML
-        val regexPatterns = listOf(
-            """(?:src|file|videoUrl|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']""",
-            """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']\s*\)""",
-            """["'](https?://[^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']""",
-            """(https?://[^\s<>"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))""",
-            """file:\s*["']([^"']+\.m3u8)["']""",
-            """hlsUrl\s*[:=]\s*["']([^"']+\.m3u8)["']""",
-            """videoUrl\s*[:=]\s*["']([^"']+\.mp4)["']""",
-            """source\s*:\s*["']([^"']+\.m3u8)["']""",
-            """player\.setup[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']""",
-            """jwplayer[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']"""
-        )
-
-        for (pattern in regexPatterns) {
-            val regex = Regex(pattern, RegexOption.IGNORE_CASE)
-            val matches = regex.findAll(html)
-            for (match in matches) {
-                val videoUrl = fixUrl(match.groupValues[1])
-                if (isVideoUrl(videoUrl) && !videoUrl.contains("placeholder") && !videoUrl.contains("blank")) {
-                    createVideoLink(videoUrl, data, callback, "Regex: $pattern")
-                    foundLinks = true
-                    break
-                }
-            }
-            if (foundLinks) break
-        }
-
-        // Method 6: Check for common video hosting services
-        val hostingPatterns = listOf(
-            """(https?://[^"'\s]+\.(?:youtube|vimeo|dailymotion|streamable)\.com[^"'\s]*)""",
-            """(https?://[^"'\s]*\.cloudfront\.net[^"'\s]*)""",
-            """(https?://[^"'\s]*\.amazonaws\.com[^"'\s]*)""",
-            """(https?://[^"'\s]*\.googleapis\.com[^"'\s]*)"""
-        )
-
-        for (pattern in hostingPatterns) {
-            val regex = Regex(pattern, RegexOption.IGNORE_CASE)
-            val matches = regex.findAll(html)
-            for (match in matches) {
-                val videoUrl = fixUrl(match.groupValues[1])
-                createVideoLink(videoUrl, data, callback, "Hosting Service")
-                foundLinks = true
-                break
-            }
-            if (foundLinks) break
-        }
-
-        return foundLinks
-    }
-
-
+    // ===== LINK EXTRACTION HELPERS =====
+    
     private suspend fun extractFromIframe(
         url: String,
         callback: (ExtractorLink) -> Unit,
@@ -715,61 +434,21 @@ class CanliDizi : MainAPI() {
         try {
             val response = app.get(url, headers = mapOf(
                 "User-Agent" to USER_AGENT,
-                "Referer" to mainUrl,
-                "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Language" to "en-US,en;q=0.5",
-                "Accept-Encoding" to "gzip, deflate, br",
-                "DNT" to "1",
-                "Connection" to "keep-alive",
-                "Upgrade-Insecure-Requests" to "1"
+                "Referer" to mainUrl
             ))
 
             val document = response.document
-            val html = response.text
 
-            // Look for direct video sources in the iframe
-            val videoSources = document.select("video source, video[src]")
-            for (source in videoSources) {
-                val videoUrl = source.attr("src").let { fixUrl(it) }
-                if (videoUrl.isNotBlank() && isVideoUrl(videoUrl)) {
-                    val quality = determineQuality(videoUrl)
-                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-                    callback.invoke(
-                        newExtractorLink(
-                            "$name - Iframe Direct",
-                            name,
-                            videoUrl,
-                            type
-                        ) {
-                            this.referer = url
-                            this.quality = quality
-                            this.headers = mapOf("User-Agent" to USER_AGENT, "Referer" to url)
-                        }
-                    )
+            document.select("video source, video[src]").forEach { source ->
+                source.attr("src").let { fixUrl(it) }.takeIf { it.isNotBlank() && isVideoUrl(it) }?.let { videoUrl ->
+                    createVideoLink(videoUrl, url, callback, "Iframe Direct")
                     return true
                 }
             }
 
-            // Extract from JavaScript in iframe
-            val jsVideoUrls = extractVideoUrlsFromJavaScript(html)
-            for (videoUrl in jsVideoUrls) {
+            extractVideoUrlsFromJavaScript(response.text).forEach { videoUrl ->
                 if (isVideoUrl(videoUrl)) {
-                    val quality = determineQuality(videoUrl)
-                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-                    callback.invoke(
-                        newExtractorLink(
-                            "$name - Iframe JS",
-                            name,
-                            videoUrl,
-                            type
-                        ) {
-                            this.referer = url
-                            this.quality = quality
-                            this.headers = mapOf("User-Agent" to USER_AGENT, "Referer" to url)
-                        }
-                    )
+                    createVideoLink(videoUrl, url, callback, "Iframe JS")
                     return true
                 }
             }
@@ -800,11 +479,7 @@ class CanliDizi : MainAPI() {
                 this.quality = quality
                 this.headers = mapOf(
                     "User-Agent" to USER_AGENT,
-                    "Referer" to referer,
-                    "Accept" to "*/*",
-                    "Accept-Language" to "en-US,en;q=0.5",
-                    "Accept-Encoding" to "gzip, deflate, br",
-                    "Origin" to mainUrl
+                    "Referer" to referer
                 )
             }
         )
@@ -817,23 +492,12 @@ class CanliDizi : MainAPI() {
             """(?:src|file|videoUrl|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']""",
             """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']\s*\)""",
             """(?:hls|m3u8)Url\s*[:=]\s*["']([^"']+\.m3u8)["']""",
-            """(?:mp4|video)Url\s*[:=]\s*["']([^"']+\.mp4)["']""",
-            """(?:file|src)\s*:\s*\[[^\]]*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["'][^\]]*\]""",
-            """file:\s*["']([^"']+\.m3u8)["']""",
-            """source:\s*["']([^"']+\.m3u8)["']""",
-            """player\.setup[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']""",
-            """jwplayer\([^)]+\)\.setup[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']""",
-            """\.setup\([^)]+\)[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']"""
+            """file:\s*["']([^"']+\.m3u8)["']"""
         )
 
-        for (pattern in patterns) {
-            val regex = Regex(pattern, RegexOption.IGNORE_CASE)
-            val matches = regex.findAll(html)
-            matches.forEach { match ->
-                val url = fixUrl(match.groupValues[1])
-                if (isVideoUrl(url) && !url.contains("placeholder") && !url.contains("blank")) {
-                    videoUrls.add(url)
-                }
+        patterns.forEach { pattern ->
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                match.groupValues[1].let { fixUrl(it) }.takeIf { isVideoUrl(it) }?.let { videoUrls.add(it) }
             }
         }
 
@@ -844,42 +508,11 @@ class CanliDizi : MainAPI() {
         return (url.contains(".mp4") || 
             url.contains(".m3u8") || 
             url.contains(".webm") || 
-            url.contains(".mkv") ||
-            url.contains(".avi") ||
-            url.contains(".mov") ||
             url.contains("video") ||
             url.contains("stream")) &&
             !url.contains("data:image") &&
             !url.contains("base64") &&
-            !url.contains("placeholder") &&
-            !url.contains("blank")
-    }
-
-    private suspend fun createExtractorLink(
-        videoUrl: String,
-        referer: String,
-        callback: (ExtractorLink) -> Unit,
-        sourceName: String
-    ): Boolean {
-        val quality = determineQuality(videoUrl)
-        val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-        callback.invoke(
-            newExtractorLink(
-                sourceName,
-                name,
-                videoUrl,
-                type
-            ) {
-                this.referer = referer
-                this.quality = quality
-                this.headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Referer" to referer
-                )
-            }
-        )
-        return true
+            !url.contains("placeholder")
     }
 
     private fun determineQuality(url: String): Int {
@@ -892,18 +525,8 @@ class CanliDizi : MainAPI() {
         }
     }
 
-    override suspend fun search(query: String): List<SearchResponse> {
-        if (query.isBlank()) return emptyList()
-        
-        val searchUrl = "$mainUrl/search?q=${query.encodeToUrl()}"
-        val document = app.get(searchUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
-        
-        return document.select("div.search-results div.result, div.series-item, .dizi-item, div.episode-box").mapNotNull { element ->
-            parseSeriesItem(element) ?: parseEpisodeItem(element)
-        }
-    }
-
-    // Helper function for URL encoding
+    // ===== UTILITY FUNCTIONS =====
+    
     private fun String.encodeToUrl(): String {
         return java.net.URLEncoder.encode(this, "UTF-8")
     }
