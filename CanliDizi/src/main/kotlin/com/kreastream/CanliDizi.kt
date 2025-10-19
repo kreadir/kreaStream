@@ -20,182 +20,205 @@ class CanliDizi : MainAPI() {
     }
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
-    val all = ArrayList<HomePageList>()
-    
-    // Helper function to parse category with pagination for series
-    suspend fun parseCategoryWithPagination(baseUrl: String, categoryName: String): List<TvSeriesSearchResponse> {
-        val items = mutableListOf<TvSeriesSearchResponse>()
+        val all = ArrayList<HomePageList>()
         
-        // Parse first page
-        val firstPageDocument = app.get(baseUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
-        
-        // Parse items from first page
-        val firstPageItems = firstPageDocument.select("div.seriescontent div.single-item").mapNotNull {
-            parseDizilerItem(it)
-        }
-        items.addAll(firstPageItems)
-        println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
-        
-        // Try to parse additional pages by checking if they exist
-        for (pageNum in 2..10) {
-            val pageUrl = "$baseUrl/page/$pageNum"
-            try {
-                val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
-                
-                // Check if the page actually has content
-                val pageItems = pageDocument.select("div.seriescontent div.single-item").mapNotNull {
-                    parseDizilerItem(it)
-                }
-                
-                if (pageItems.isEmpty()) {
-                    break
-                }
-                
-                items.addAll(pageItems)
-                println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
-                
-            } catch (e: Exception) {
-                break
+        // Helper function to parse category with pagination for series
+        suspend fun parseCategoryWithPagination(baseUrl: String, categoryName: String): List<TvSeriesSearchResponse> {
+            val items = mutableListOf<TvSeriesSearchResponse>()
+            
+            // Parse first page
+            val firstPageDocument = app.get(baseUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+            
+            // Parse items from first page
+            val firstPageItems = firstPageDocument.select("div.seriescontent div.single-item").mapNotNull {
+                parseDizilerItem(it)
             }
-        }
-        
-        return items
-    }
-    
-    // Helper function to parse movies with pagination
-    suspend fun parseMoviesWithPagination(baseUrl: String, categoryName: String): List<MovieSearchResponse> {
-        val items = mutableListOf<MovieSearchResponse>()
-        
-        // Parse first page
-        val firstPageDocument = app.get(baseUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
-        
-        // Try different selectors for movie items
-        val movieSelectors = listOf(
-            "div.seriescontent div.single-item",
-            "div.episodes.episode div.list-episodes div.episode-box",
-            "div.film-list div.film-item",
-            "div.movie-list div.movie-item"
-        )
-        
-        var firstPageItems = emptyList<MovieSearchResponse>()
-        
-        for (selector in movieSelectors) {
-            firstPageItems = firstPageDocument.select(selector).mapNotNull {
-                parseMovieItem(it)
-            }
-            if (firstPageItems.isNotEmpty()) {
-                println("$categoryName: Using selector '$selector'")
-                break
-            }
-        }
-        
-        items.addAll(firstPageItems)
-        println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
-        
-        // Try to parse additional pages
-        for (pageNum in 2..10) {
-            val pageUrl = "$baseUrl/page/$pageNum"
-            try {
-                val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
-                
-                var pageItems = emptyList<MovieSearchResponse>()
-                for (selector in movieSelectors) {
-                    pageItems = pageDocument.select(selector).mapNotNull {
-                        parseMovieItem(it)
+            items.addAll(firstPageItems)
+            println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
+            
+            // Try to parse additional pages by checking if they exist
+            for (pageNum in 2..10) {
+                val pageUrl = "$baseUrl/page/$pageNum"
+                try {
+                    val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                    
+                    // Check if the page actually has content
+                    val pageItems = pageDocument.select("div.seriescontent div.single-item").mapNotNull {
+                        parseDizilerItem(it)
                     }
-                    if (pageItems.isNotEmpty()) break
-                }
-                
-                if (pageItems.isEmpty()) {
+                    
+                    if (pageItems.isEmpty()) {
+                        break
+                    }
+                    
+                    items.addAll(pageItems)
+                    println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
+                    
+                } catch (e: Exception) {
                     break
                 }
-                
-                items.addAll(pageItems)
-                println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
-                
-            } catch (e: Exception) {
-                break
             }
+            
+            return items
         }
         
-        return items
-    }
-    
-    // Parse Yerli Diziler
-    try {
-        val yerliDiziler = parseCategoryWithPagination("$mainUrl/diziler", "Yerli Diziler")
-        if (yerliDiziler.isNotEmpty()) {
-            all.add(HomePageList("Yerli Diziler", yerliDiziler))
+        // Helper function to parse movies with pagination
+        suspend fun parseMoviesWithPagination(baseUrl: String, categoryName: String): List<MovieSearchResponse> {
+            val items = mutableListOf<MovieSearchResponse>()
+            
+            // Parse first page
+            val firstPageDocument = app.get(baseUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+            
+            // Try different selectors for movie items
+            val movieSelectors = listOf(
+                "div.seriescontent div.single-item",
+                "div.episodes.episode div.list-episodes div.episode-box",
+                "div.film-list div.film-item",
+                "div.movie-list div.movie-item"
+            )
+            
+            var firstPageItems = emptyList<MovieSearchResponse>()
+            
+            for (selector in movieSelectors) {
+                firstPageItems = firstPageDocument.select(selector).mapNotNull {
+                    parseMovieItem(it)
+                }
+                if (firstPageItems.isNotEmpty()) {
+                    println("$categoryName: Using selector '$selector'")
+                    break
+                }
+            }
+            
+            items.addAll(firstPageItems)
+            println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
+            
+            // Try to parse additional pages
+            for (pageNum in 2..10) {
+                val pageUrl = "$baseUrl/page/$pageNum"
+                try {
+                    val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                    
+                    var pageItems = emptyList<MovieSearchResponse>()
+                    for (selector in movieSelectors) {
+                        pageItems = pageDocument.select(selector).mapNotNull {
+                            parseMovieItem(it)
+                        }
+                        if (pageItems.isNotEmpty()) break
+                    }
+                    
+                    if (pageItems.isEmpty()) {
+                        break
+                    }
+                    
+                    items.addAll(pageItems)
+                    println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
+                    
+                } catch (e: Exception) {
+                    break
+                }
+            }
+            
+            return items
         }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    
-    // Parse Dijital Diziler
-    try {
-        val dijitalDiziler = parseCategoryWithPagination("$mainUrl/dijital-diziler-izle", "Dijital Diziler")
-        if (dijitalDiziler.isNotEmpty()) {
-            all.add(HomePageList("Dijital Diziler", dijitalDiziler))
+        
+        // Parse Yerli Diziler
+        try {
+            val yerliDiziler = parseCategoryWithPagination("$mainUrl/diziler", "Yerli Diziler")
+            if (yerliDiziler.isNotEmpty()) {
+                all.add(HomePageList("Yerli Diziler", yerliDiziler))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-    
-    // Parse Filmler
-    try {
-        val filmler = parseMoviesWithPagination("$mainUrl/film-izle", "Filmler")
-        if (filmler.isNotEmpty()) {
-            all.add(HomePageList("Filmler", filmler))
+        
+        // Parse Dijital Diziler
+        try {
+            val dijitalDiziler = parseCategoryWithPagination("$mainUrl/dijital-diziler-izle", "Dijital Diziler")
+            if (dijitalDiziler.isNotEmpty()) {
+                all.add(HomePageList("Dijital Diziler", dijitalDiziler))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-    } catch (e: Exception) {
-        e.printStackTrace()
+        
+        // Parse Filmler
+        try {
+            val filmler = parseMoviesWithPagination("$mainUrl/film-izle", "Filmler")
+            if (filmler.isNotEmpty()) {
+                all.add(HomePageList("Filmler", filmler))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        
+        return if (all.isEmpty()) null else newHomePageResponse(all)
     }
-    
-    return if (all.isEmpty()) null else newHomePageResponse(all)
-}
+
+    override suspend fun load(url: String): LoadResponse {
+        val document = app.get(url, headers = mapOf("User-Agent" to USER_AGENT)).document
+        
+        // Check if this is the new series page structure with incontentx
+        val isNewStructure = document.selectFirst("div.incontentx") != null
+        
+        if (isNewStructure) {
+            return loadNewSeriesStructure(document, url)
+        } else {
+            // Check if this is a movie page
+            val isMovie = url.contains("/film") || 
+                        url.contains("/izle.html") || 
+                        document.selectFirst("div.incontentx") == null && 
+                        document.selectFirst("div.bolumust") == null
+            
+            if (isMovie) {
+                return loadMovieStructure(document, url)
+            } else {
+                return loadOldStructure(document, url)
+            }
+        }
+    }
 
 // Update the parseMovieItem function to handle different movie structures
-private fun parseMovieItem(element: Element): MovieSearchResponse? {
-    // Try multiple possible link locations
-    val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } 
-        ?: element.selectFirst(".cat-img a, .poster a, .image a")?.attr("href")?.let { fixUrl(it) }
-        ?: return null
+    private fun parseMovieItem(element: Element): MovieSearchResponse? {
+        // Try multiple possible link locations
+        val link = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } 
+            ?: element.selectFirst(".cat-img a, .poster a, .image a")?.attr("href")?.let { fixUrl(it) }
+            ?: return null
 
-    // Try multiple possible title locations
-    val title = element.selectFirst(".serie-name, .episode-name, .categorytitle, .title, .film-title")?.text()?.trim()
-        ?: element.selectFirst("img")?.attr("alt")?.trim()
-        ?: element.selectFirst("img")?.attr("title")?.trim()
-        ?: return null
+        // Try multiple possible title locations
+        val title = element.selectFirst(".serie-name, .episode-name, .categorytitle, .title, .film-title")?.text()?.trim()
+            ?: element.selectFirst("img")?.attr("alt")?.trim()
+            ?: element.selectFirst("img")?.attr("title")?.trim()
+            ?: return null
 
-    // Handle lazy-loaded images with data-wpfc-original-src
-    val poster = element.selectFirst("img")?.let { img ->
-        img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-            ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-    }
+        // Handle lazy-loaded images with data-wpfc-original-src
+        val poster = element.selectFirst("img")?.let { img ->
+            img.attr("data-wpfc-original-src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+                ?: img.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+        }
 
-    // Try to extract year from various locations
-    val year = element.selectFirst(".episode-name, .year, .release-date")?.text()?.trim()?.toIntOrNull()
-        ?: Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
+        // Try to extract year from various locations
+        val year = element.selectFirst(".episode-name, .year, .release-date")?.text()?.trim()?.toIntOrNull()
+            ?: Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
 
-    // Try to extract rating
-    val ratingText = element.selectFirst(".episode-date, .rating, .imdb, .imdbp")?.text()?.trim()
-    val score = ratingText?.let { text ->
-        when {
-            text.contains("IMDb") -> {
-                val ratingValue = Regex("""IMDb\s*:?\s*([\d,]+)""").find(text)?.groupValues?.get(1)
-                    ?.replace(",", ".")?.toFloatOrNull()
-                ratingValue?.times(10)?.toInt()
+        // Try to extract rating
+        val ratingText = element.selectFirst(".episode-date, .rating, .imdb, .imdbp")?.text()?.trim()
+        val score = ratingText?.let { text ->
+            when {
+                text.contains("IMDb") -> {
+                    val ratingValue = Regex("""IMDb\s*:?\s*([\d,]+)""").find(text)?.groupValues?.get(1)
+                        ?.replace(",", ".")?.toFloatOrNull()
+                    ratingValue?.times(10)?.toInt()
+                }
+                else -> null
             }
-            else -> null
+        }
+
+        return newMovieSearchResponse(title, link, TvType.Movie) {
+            this.posterUrl = poster
+            this.year = year
+            this.score = Score.from10(score)
         }
     }
-
-    return newMovieSearchResponse(title, link, TvType.Movie) {
-        this.posterUrl = poster
-        this.year = year
-        this.score = Score.from10(score)
-    }
-}
 
     private fun parseDizilerItem(element: Element): TvSeriesSearchResponse? {
         // Get link from cat-img > a
@@ -531,117 +554,132 @@ private fun parseMovieItem(element: Element): MovieSearchResponse? {
         }
     }
 
-override suspend fun loadLinks(
-    data: String,
-    isCasting: Boolean,
-    subtitleCallback: (SubtitleFile) -> Unit,
-    callback: (ExtractorLink) -> Unit
-): Boolean {
-    val document = app.get(data, headers = mapOf("User-Agent" to USER_AGENT)).document
-    
-    var foundLinks = false
-
-    // Method 1: Look for direct video sources in video tags
-    val videoElements = document.select("video source, video[src]")
-    for (videoElement in videoElements) {
-        val videoUrl = videoElement.attr("src").let { fixUrl(it) }
-        if (videoUrl.isNotBlank() && isVideoUrl(videoUrl)) {
-            val quality = determineQuality(videoUrl)
-            val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-            callback.invoke(
-                newExtractorLink(
-                    "$name - Direct",
-                    name,
-                    videoUrl,
-                    type
-                ) {
-                    this.referer = data
-                    this.quality = quality
-                    this.headers = mapOf("User-Agent" to USER_AGENT, "Referer" to data)
-                }
-            )
-            foundLinks = true
-        }
-    }
-
-    // Method 2: Look for iframes with video sources
-    val iframes = document.select("iframe[src]")
-    for (iframe in iframes) {
-        val iframeSrc = iframe.attr("src")
-        if (iframeSrc.isNotBlank()) {
-            val fixedIframeUrl = fixUrl(iframeSrc)
-            if (extractFromIframe(fixedIframeUrl, callback, subtitleCallback)) {
-                foundLinks = true
-            }
-        }
-    }
-
-    // Method 3: Look for data attributes that might contain video URLs
-    val dataVideoElements = document.select("[data-video-src], [data-src]")
-    for (element in dataVideoElements) {
-        val videoUrl = element.attr("data-video-src").ifBlank { 
-            element.attr("data-src") 
-        }.let { fixUrl(it) }
+    private suspend fun loadMovieStructure(document: Element, url: String): LoadResponse {
+    // Extract title from h1 or meta tags
+        val title = document.selectFirst("h1.title-border, h1, h1.entry-title")?.text()?.trim()
+            ?.replace("son bölüm izle", "")?.trim()
+            ?.replace("izle", "")?.trim()
+            ?: document.selectFirst("meta[property=og:title]")?.attr("content")?.trim()
+            ?: throw ErrorLoadingException("Title not found")
         
-        if (videoUrl.isNotBlank() && isVideoUrl(videoUrl)) {
-            val quality = determineQuality(videoUrl)
-            val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+        // Extract poster
+        val poster = document.selectFirst("div.cat-img img, .poster img, .wp-post-image")?.attr("src")?.let { fixUrl(it) }
+            ?: document.selectFirst("img[data-wpfc-original-src]")?.attr("data-wpfc-original-src")?.let { fixUrl(it) }
+            ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
 
-            callback.invoke(
-                newExtractorLink(
-                    "$name - Data Attribute",
-                    name,
-                    videoUrl,
-                    type
-                ) {
-                    this.referer = data
-                    this.quality = quality
-                    this.headers = mapOf("User-Agent" to USER_AGENT, "Referer" to data)
-                }
-            )
-            foundLinks = true
+        // Extract description
+        val description = document.selectFirst("div.cat_ozet, .plot, .synopsis, .entry-content")?.text()?.trim()
+            ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim()
+
+        // Extract year
+        val year = document.select("div.cat-container-in div, .entry-content div").mapNotNull { div ->
+            val text = div.text().trim()
+            if (text.contains("Yapım Yılı") || text.contains("Yapım Yılı")) {
+                Regex("""(\d{4})""").find(text)?.value?.toIntOrNull()
+            } else {
+                null
+            }
+        }.firstOrNull() ?: Regex("""\b(19|20)\d{2}\b""").find(title)?.value?.toIntOrNull()
+
+        // Extract rating
+        val ratingText = document.select("div.cat-container-in div, .entry-content div").mapNotNull { div ->
+            val text = div.text().trim()
+            if (text.contains("IMDB") || text.contains("IMDb")) {
+                Regex("""IMDB\s*:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
+                    ?: Regex("""IMDb\s*:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
+            } else {
+                null
+            }
+        }.firstOrNull()
+        
+        val score = ratingText?.replace(",", ".")?.toFloatOrNull()?.times(10)?.toInt()
+
+        return newMovieLoadResponse(title, url, TvType.Movie, url) {
+            this.posterUrl = poster
+            this.plot = description
+            this.year = year
+            this.score = Score.from10(score)
         }
     }
 
-    // Method 4: Extract from JavaScript variables in script tags
-    val scriptTags = document.select("script")
-    for (script in scriptTags) {
-        val scriptContent = script.html()
-        val videoUrls = extractVideoUrlsFromJavaScript(scriptContent)
-        for (videoUrl in videoUrls) {
-            if (isVideoUrl(videoUrl)) {
-                val quality = determineQuality(videoUrl)
-                val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+    // Update the loadLinks function to be more aggressive in finding video sources
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        val document = app.get(data, headers = mapOf("User-Agent" to USER_AGENT)).document
+        
+        var foundLinks = false
+        val html = document.html()
 
-                callback.invoke(
-                    newExtractorLink(
-                        "$name - JavaScript",
-                        name,
-                        videoUrl,
-                        type
-                    ) {
-                        this.referer = data
-                        this.quality = quality
-                        this.headers = mapOf("User-Agent" to USER_AGENT, "Referer" to data)
-                    }
-                )
+        // Method 1: Direct video elements
+        val videoElements = document.select("video source, video[src], audio source, audio[src]")
+        for (videoElement in videoElements) {
+            val videoUrl = videoElement.attr("src").let { fixUrl(it) }
+            if (videoUrl.isNotBlank() && isVideoUrl(videoUrl)) {
+                createVideoLink(videoUrl, data, callback, "Direct Video")
                 foundLinks = true
             }
         }
-    }
 
-    // Method 5: Look for common video hosting patterns
-    if (!foundLinks) {
-        val html = document.html()
+        // Method 2: Iframe extraction
+        val iframes = document.select("iframe[src], embed[src]")
+        for (iframe in iframes) {
+            val iframeSrc = iframe.attr("src")
+            if (iframeSrc.isNotBlank()) {
+                val fixedIframeUrl = fixUrl(iframeSrc)
+                if (extractFromIframe(fixedIframeUrl, callback, subtitleCallback)) {
+                    foundLinks = true
+                }
+            }
+        }
+
+        // Method 3: Data attributes
+        val dataElements = document.select("[data-video-src], [data-src], [data-file], [data-url]")
+        for (element in dataElements) {
+            val videoUrl = element.attr("data-video-src")
+                .takeIf { it.isNotBlank() }
+                ?: element.attr("data-src")
+                .takeIf { it.isNotBlank() }
+                ?: element.attr("data-file")
+                .takeIf { it.isNotBlank() }
+                ?: element.attr("data-url")
+                .takeIf { it.isNotBlank() }
+                ?.let { fixUrl(it) }
+            
+            if (videoUrl != null && isVideoUrl(videoUrl)) {
+                createVideoLink(videoUrl, data, callback, "Data Attribute")
+                foundLinks = true
+            }
+        }
+
+        // Method 4: JavaScript variable extraction (more comprehensive)
+        val scriptTags = document.select("script")
+        for (script in scriptTags) {
+            val scriptContent = script.html()
+            val videoUrls = extractVideoUrlsFromJavaScript(scriptContent)
+            for (videoUrl in videoUrls) {
+                if (isVideoUrl(videoUrl)) {
+                    createVideoLink(videoUrl, data, callback, "JavaScript")
+                    foundLinks = true
+                }
+            }
+        }
+
+        // Method 5: Regex patterns in entire HTML
         val regexPatterns = listOf(
-            """(?:src|file|videoUrl|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["']""",
-            """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["']\s*\)""",
-            """["'](https?://[^"']+\.(?:mp4|m3u8|webm|mkv))["']""",
-            """(https?://[^\s<>"']+\.(?:mp4|m3u8|webm|mkv))""",
+            """(?:src|file|videoUrl|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']""",
+            """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']\s*\)""",
+            """["'](https?://[^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']""",
+            """(https?://[^\s<>"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))""",
             """file:\s*["']([^"']+\.m3u8)["']""",
             """hlsUrl\s*[:=]\s*["']([^"']+\.m3u8)["']""",
-            """videoUrl\s*[:=]\s*["']([^"']+\.mp4)["']"""
+            """videoUrl\s*[:=]\s*["']([^"']+\.mp4)["']""",
+            """source\s*:\s*["']([^"']+\.m3u8)["']""",
+            """player\.setup[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']""",
+            """jwplayer[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']"""
         )
 
         for (pattern in regexPatterns) {
@@ -650,31 +688,37 @@ override suspend fun loadLinks(
             for (match in matches) {
                 val videoUrl = fixUrl(match.groupValues[1])
                 if (isVideoUrl(videoUrl) && !videoUrl.contains("placeholder") && !videoUrl.contains("blank")) {
-                    val quality = determineQuality(videoUrl)
-                    val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-                    callback.invoke(
-                        newExtractorLink(
-                            "$name - Regex",
-                            name,
-                            videoUrl,
-                            type
-                        ) {
-                            this.referer = data
-                            this.quality = quality
-                            this.headers = mapOf("User-Agent" to USER_AGENT, "Referer" to data)
-                        }
-                    )
+                    createVideoLink(videoUrl, data, callback, "Regex: $pattern")
                     foundLinks = true
                     break
                 }
             }
             if (foundLinks) break
         }
+
+        // Method 6: Check for common video hosting services
+        val hostingPatterns = listOf(
+            """(https?://[^"'\s]+\.(?:youtube|vimeo|dailymotion|streamable)\.com[^"'\s]*)""",
+            """(https?://[^"'\s]*\.cloudfront\.net[^"'\s]*)""",
+            """(https?://[^"'\s]*\.amazonaws\.com[^"'\s]*)""",
+            """(https?://[^"'\s]*\.googleapis\.com[^"'\s]*)"""
+        )
+
+        for (pattern in hostingPatterns) {
+            val regex = Regex(pattern, RegexOption.IGNORE_CASE)
+            val matches = regex.findAll(html)
+            for (match in matches) {
+                val videoUrl = fixUrl(match.groupValues[1])
+                createVideoLink(videoUrl, data, callback, "Hosting Service")
+                foundLinks = true
+                break
+            }
+            if (foundLinks) break
+        }
+
+        return foundLinks
     }
 
-    return foundLinks
-}
 
     private suspend fun extractFromIframe(
         url: String,
@@ -749,17 +793,50 @@ override suspend fun loadLinks(
         return false
     }
 
+    private suspend fun createVideoLink(
+        videoUrl: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit,
+        sourceName: String
+    ) {
+        val quality = determineQuality(videoUrl)
+        val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+
+        callback.invoke(
+            newExtractorLink(
+                "$name - $sourceName",
+                name,
+                videoUrl,
+                type
+            ) {
+                this.referer = referer
+                this.quality = quality
+                this.headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to referer,
+                    "Accept" to "*/*",
+                    "Accept-Language" to "en-US,en;q=0.5",
+                    "Accept-Encoding" to "gzip, deflate, br",
+                    "Origin" to mainUrl
+                )
+            }
+        )
+    }
+
     private fun extractVideoUrlsFromJavaScript(html: String): List<String> {
         val videoUrls = mutableListOf<String>()
         
         val patterns = listOf(
-            """(?:src|file|videoUrl|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["']""",
-            """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["']\s*\)""",
+            """(?:src|file|videoUrl|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']""",
+            """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']\s*\)""",
             """(?:hls|m3u8)Url\s*[:=]\s*["']([^"']+\.m3u8)["']""",
             """(?:mp4|video)Url\s*[:=]\s*["']([^"']+\.mp4)["']""",
-            """(?:file|src)\s*:\s*\[[^\]]*["']([^"']+\.(?:mp4|m3u8|webm|mkv))["'][^\]]*\]""",
+            """(?:file|src)\s*:\s*\[[^\]]*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["'][^\]]*\]""",
             """file:\s*["']([^"']+\.m3u8)["']""",
-            """source:\s*["']([^"']+\.m3u8)["']"""
+            """source:\s*["']([^"']+\.m3u8)["']""",
+            """player\.setup[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']""",
+            """jwplayer\([^)]+\)\.setup[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']""",
+            """\.setup\([^)]+\)[^{]*\{[^}]*file\s*:\s*["']([^"']+)["']"""
         )
 
         for (pattern in patterns) {
@@ -780,9 +857,15 @@ override suspend fun loadLinks(
         return (url.contains(".mp4") || 
             url.contains(".m3u8") || 
             url.contains(".webm") || 
-            url.contains(".mkv")) &&
+            url.contains(".mkv") ||
+            url.contains(".avi") ||
+            url.contains(".mov") ||
+            url.contains("video") ||
+            url.contains("stream")) &&
             !url.contains("data:image") &&
-            !url.contains("base64")
+            !url.contains("base64") &&
+            !url.contains("placeholder") &&
+            !url.contains("blank")
     }
 
     private suspend fun createExtractorLink(
