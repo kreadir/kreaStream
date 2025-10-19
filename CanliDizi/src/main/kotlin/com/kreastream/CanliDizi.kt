@@ -5,6 +5,7 @@ import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.*
 import org.jsoup.nodes.Element
 
+
 class CanliDizi : MainAPI() {
     override var mainUrl = "https://www.canlidizi14.com"
     override var name = "Canlı Dizi"
@@ -18,7 +19,7 @@ class CanliDizi : MainAPI() {
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
+    override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse? {
     val all = ArrayList<HomePageList>()
     
     // Helper function to parse category with pagination
@@ -36,8 +37,8 @@ override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageR
         println("$categoryName: Parsed ${firstPageItems.size} items from page 1")
         
         // Try to parse additional pages by checking if they exist
-        // We'll try up to page 20, but stop when we get an error or no items
-        for (pageNum in 2..20) {
+        // We'll try up to page 10, but stop when we get an error or no items
+        for (pageNum in 2..10) {
             val pageUrl = "$baseUrl/page/$pageNum"
             try {
                 val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
@@ -55,9 +56,6 @@ override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageR
                 
                 items.addAll(pageItems)
                 println("$categoryName: Parsed ${pageItems.size} items from page $pageNum")
-                
-                // Small delay between requests
-                kotlinx.coroutines.delay(100)
                 
             } catch (e: Exception) {
                 // Page doesn't exist or error occurred, stop pagination
