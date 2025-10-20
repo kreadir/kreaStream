@@ -141,20 +141,20 @@
     "name": "NeonSpor"
   },
   {
-    "iconUrl": "https://www.google.com/s2/favicons?domain=www.setfilmizle.nl&sz=%size%",
+    "iconUrl": "https://www.google.com/s2/favicons?domain=www.setfilmizle.de&sz=%size%",
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "fileSize": 19311,
+    "fileSize": 22981,
     "status": 1,
     "language": "tr",
     "authors": [
-      "keyiflerolsun"
+      "kreastream"
     ],
     "tvTypes": [
       "Movie",
       "TvSeries"
     ],
-    "version": 23,
+    "version": 14,
     "internalName": "SetFilmIzle",
     "description": "Setfilmizle sitemizde, donma yaşamadan Türkçe dublaj ve altyazılı filmleri ile dizileri muhteşem 1080p full HD kalitesinde izleyebilirsiniz.",
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/SetFilmIzle.cs3",
