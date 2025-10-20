@@ -59,6 +59,26 @@
     "name": "DiziPal"
   },
   {
+    "iconUrl": "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dizipal932.com&size=128",
+    "apiVersion": 1,
+    "repositoryUrl": "https://github.com/kreadir/kreaStream",
+    "fileSize": 44124,
+    "status": 1,
+    "language": "tr",
+    "authors": [
+      "kerimmkirac",
+      "kraptor"
+    ],
+    "tvTypes": [
+      "TvSeries"
+    ],
+    "version": 28,
+    "internalName": "DiziPalOrijinal",
+    "description": "DiziPal Orijinal.",
+    "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPalOrijinal.cs3",
+    "name": "DiziPalOrijinal"
+  },
+  {
     "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi.com&sz=%size%",
     "apiVersion": 1,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
@@ -149,7 +169,7 @@
       "kreadir"
     ],
     "tvTypes": [
-      "TvSeries"
+      "Tv"
     ],
     "version": 2,
     "internalName": "YerelDiziler",
@@ -157,25 +177,6 @@
     "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/YerelDiziler.cs3",
     "name": "Yerli Diziler",
     "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/960px-Flag_of_Turkey.svg.png"
-  },
-  {
-    "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "apiVersion": 3,
-    "status": 1,
-    "language": "tr",
-    "authors": [
-      "kreadir"
-    ],
-    "tvTypes": [
-      "TvSeries",
-      "Movie"
-    ],
-    "version": 2,
-    "internalName": "DiziPalOrijinal",
-    "description": "DiziPalOrijinal için CloudStream eklentisi",
-    "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/DiziPalOrijinal.cs3",
-    "name": "DiziPal Orijinal",
-    "iconUrl": "https://www.google.com/s2/favicons?domain=www.dzipal1503.com&sz=%size%"
   },
   {
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
