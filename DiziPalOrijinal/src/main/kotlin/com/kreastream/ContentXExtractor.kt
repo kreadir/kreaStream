@@ -51,7 +51,7 @@ open class ContentX : ExtractorApi() {
             subUrls.add(subUrl)
 
             subtitleCallback.invoke(
-                SubtitleFile(
+                newSubtitleFile(
                     lang = language,
                     url = fixUrl(subUrl)
                 )
@@ -130,7 +130,7 @@ open class RapidVid : ExtractorApi() {
             }
             if (subUrls.add(subUrl)) {
                 subtitleCallback(
-                    SubtitleFile(
+                    newSubtitleFile(
                         lang = language,
                         url = fixUrl(subUrl.replace("\\", ""))
                     )

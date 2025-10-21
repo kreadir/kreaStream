@@ -184,8 +184,8 @@ class CanliDizi : MainAPI() {
             }.firstOrNull()
 
             // Extract rating from imdbp div
-            val ratingText = element.selectFirst("div.imdbp")?.text()?.trim()
-            val score = ratingText?.let { text ->
+            val scoreText = element.selectFirst("div.imdbp")?.text()?.trim()
+            val score = scoreText?.let { text ->
                 Regex("""IMDb:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
                     ?.replace(",", ".")?.toFloatOrNull()?.times(10)?.toInt()
             }
@@ -237,8 +237,8 @@ class CanliDizi : MainAPI() {
             }
         }.firstOrNull()
 
-        val ratingText = element.selectFirst("div.imdbp")?.text()?.trim()
-        val score = ratingText?.let { text ->
+        val scoreText = element.selectFirst("div.imdbp")?.text()?.trim()
+        val score = scoreText?.let { text ->
             Regex("""IMDb:\s*([\d,]+)""").find(text)?.groupValues?.get(1)
                 ?.replace(",", ".")?.toFloatOrNull()?.times(10)?.toInt()
         }
@@ -272,6 +272,7 @@ class CanliDizi : MainAPI() {
         return newMovieSearchResponse(title, link, TvType.Movie) {
             this.posterUrl = poster
             this.year = year
+            this.score = Score.from10(score)
         }
     }
 

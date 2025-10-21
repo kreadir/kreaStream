@@ -32,28 +32,27 @@ class InatBox : MainAPI() {
     private val aesKey = "ywevqtjrurkwtqgz" //Master secret and iv key (This is used for both secret key and iv. This is the embedded master key for loading categories like sport channels.)
 
     override val mainPage = mainPageOf(
-        "https://boxbc.icu/CDN/001_STR/boxbc.icu/spor_v2.php"  to "Spor Kanalları",
         
 
-        "${contentUrl}/tv/list1.php"                           to "Kanallar Liste 1 ",
-        "${contentUrl}/tv/list2.php"                           to "Kanallar Liste 2",
-        "${contentUrl}/tv/list3.php"                           to "Kanallar Liste 3 ",
+        //"${contentUrl}/tv/list1.php"                           to "Kanallar Liste 1 ",
+        //"${contentUrl}/tv/list2.php"                           to "Kanallar Liste 2",
+        //"${contentUrl}/tv/list3.php"                           to "Kanallar Liste 3 ",
         "${contentUrl}/tv/sinema.php"                          to "Sinema Kanalları",
-        "${contentUrl}/tv/belgesel.php"                        to "Belgesel Kanalları",
-        "${contentUrl}/tv/ulusal.php"                          to "Ulusal Kanallar",
-        "${contentUrl}/tv/haber.php"                           to "Haber Kanalları",
-        "${contentUrl}/tv/eba.php"                             to "Eba Kanalları",
-        "${contentUrl}/tv/cocuk.php"                           to "Çocuk Kanalları",
-        "${contentUrl}/tv/dini.php"                            to "Dini Kanallar",
         "${contentUrl}/ex/index.php"                           to "EXXEN",
-        "${contentUrl}/ga/index.php"                           to "Gain",
-        
+        "${contentUrl}/ga/index.php"                           to "Gain",   
         "${contentUrl}/dsny/index.php"                         to "Disney+",
         "${contentUrl}/amz/index.php"                          to "Amazon Prime",
         "${contentUrl}/hb/index.php"                           to "HBO Max",
         "${contentUrl}/tbi/index.php"                          to "Tabii",
-        "${contentUrl}/film/mubi.php"                          to "Mubi",
+        //"${contentUrl}/film/mubi.php"                          to "Mubi",
         "https://boxbc.icu/CDN/001_STR/boxbc.icu/ccc/index.php"                          to "TOD",
+        "https://boxbc.icu/CDN/001_STR/boxbc.icu/spor_v2.php"  to "Spor Kanalları",
+        "${contentUrl}/tv/belgesel.php"                        to "Belgesel Kanalları",
+        "${contentUrl}/tv/ulusal.php"                          to "Ulusal Kanallar",
+        //"${contentUrl}/tv/haber.php"                           to "Haber Kanalları",
+        //"${contentUrl}/tv/eba.php"                             to "Eba Kanalları",
+        "${contentUrl}/tv/cocuk.php"                           to "Çocuk Kanalları",
+        "${contentUrl}/tv/dini.php"                            to "Dini Kanallar",
         
         
     )
@@ -378,14 +377,14 @@ class InatBox : MainAPI() {
         val extractorFound =
             loadExtractor(sourceUrl, headers["Referer"], subtitleCallback){
                 callback.invoke(
-                    ExtractorLink(source = it.source,name = contentToProcess.chName, url = it.url, referer = it.referer, quality = it.quality, headers = it.headers, type = it.type)
+                    newExtractorLink(source = it.source,name = contentToProcess.chName, url = it.url, referer = it.referer, quality = it.quality, headers = it.headers, type = it.type)
                 )
             }
 
         //When no extractor found, try to load as generic
         if (!extractorFound) {
             callback.invoke(
-                ExtractorLink(
+                newExtractorLink(
                     source = this.name,
                     name = contentToProcess.chName,
                     url = sourceUrl,
