@@ -167,7 +167,7 @@ class DiziPal : MainAPI() {
         val year        = document.selectXpath("//div[text()='Yapım Yılı']//following-sibling::div").text().trim().toIntOrNull()
         val description = document.selectFirst("div.summary p")?.text()?.trim()
         val tags        = document.selectXpath("//div[text()='Türler']//following-sibling::div").text().trim().split(" ").map { it.trim() }
-        val score      = document.selectXpath("//div[text()='IMDB Puanı']//following-sibling::div").text().trim().toRatingInt()
+        val score      = document.selectXpath("//div[text()='IMDB Puanı']//following-sibling::div").text().trim().toFloatOrNull()?.times(10)?.toInt()
         val duration    = Regex("(\\d+)").find(document.selectXpath("//div[text()='Ortalama Süre']//following-sibling::div").text())?.value?.toIntOrNull()
 
         if (url.contains("/dizi/")) {
