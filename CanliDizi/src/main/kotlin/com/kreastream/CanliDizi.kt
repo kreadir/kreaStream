@@ -15,7 +15,7 @@ class CanliDizi : MainAPI() {
     override val hasQuickSearch = true
 
     companion object {
-        const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" // Removed private
+        const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
     // ===== MAIN PAGE =====
@@ -50,7 +50,7 @@ class CanliDizi : MainAPI() {
         if (query.isBlank()) return emptyList()
         
         val searchUrl = "$mainUrl/search/${query.encodeToUrl()}/"
-        val document = app.get(searchUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+        val document = app.get(searchUrl).document
         
         val results = mutableListOf<SearchResponse>()
         
@@ -63,7 +63,7 @@ class CanliDizi : MainAPI() {
 
     // ===== LOAD CONTENT =====
     override suspend fun load(url: String): LoadResponse {
-        val document = app.get(url, headers = mapOf("User-Agent" to USER_AGENT)).document
+        val document = app.get(url).document
         
         return when {
             document.selectFirst("div.incontentx") != null -> 
@@ -84,31 +84,373 @@ class CanliDizi : MainAPI() {
     ): Boolean {
         println("Starting link extraction for: $data")
         
-        val extractors = listOf(
-            YouTubeExtractor(),
-            CanliPlayerExtractor(),
-            BetaPlayerExtractor(),
-            IframeExtractor(),
-            DirectVideoExtractor()
-        )
-        
-        val document = app.get(data, headers = mapOf("User-Agent" to USER_AGENT)).document
+        val document = app.get(data).document
         val html = document.html()
         
-        for (extractor in extractors) {
-            try {
-                println("Trying ${extractor.name} extractor...")
-                if (extractor.extract(app, html, data, callback, subtitleCallback)) {
-                    println("${extractor.name} extractor found links!")
-                    return true
-                }
-            } catch (e: Exception) {
-                println("${extractor.name} extractor failed: ${e.message}")
-            }
+        // Try YouTube extraction first
+        if (extractYouTubeLinks(html, data, callback)) {
+            println("YouTube extractor found links!")
+            return true
+        }
+        
+        // Try CanliPlayer extraction
+        if (extractCanliPlayerLinks(html, data, callback)) {
+            println("CanliPlayer extractor found links!")
+            return true
+        }
+        
+        // Try BetaPlayer extraction
+        if (extractBetaPlayerLinks(html, data, callback)) {
+            println("BetaPlayer extractor found links!")
+            return true
+        }
+        
+        // Try iframe extraction
+        if (extractIframeLinks(document, data, callback, subtitleCallback)) {
+            println("Iframe extractor found links!")
+            return true
+        }
+        
+        // Try direct video extraction
+        if (extractDirectVideoLinks(html, data, callback)) {
+            println("Direct video extractor found links!")
+            return true
         }
         
         println("No video links found after all extraction methods")
         return false
+    }
+
+    // ===== EXTRACTION METHODS =====
+    
+    private suspend fun extractYouTubeLinks(html: String, referer: String, callback: (ExtractorLink) -> Unit): Boolean {
+        println("YouTube extractor started")
+        
+        val patterns = listOf(
+            """youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
+            """youtu\.be/([a-zA-Z0-9_-]{11})""",
+            """youtube\.com/embed/([a-zA-Z0-9_-]{11})""",
+            """videoId["']?\s*:\s*["']([^"']{11})["']""",
+            """source\s*:\s*["'](https?://www\.youtube\.com/watch\?v=([^"']{11}))["']"""
+        )
+
+        for (pattern in patterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val youtubeUrl = when {
+                    pattern.contains("youtube\\.com/watch\\?v=") -> 
+                        "https://www.youtube.com/watch?v=${match.groupValues[1]}"
+                    pattern.contains("youtu\\.be/") -> 
+                        "https://www.youtube.com/watch?v=${match.groupValues[1]}"
+                    pattern.contains("youtube\\.com/embed/") -> 
+                        "https://www.youtube.com/watch?v=${match.groupValues[1]}"
+                    pattern.contains("videoId") -> 
+                        "https://www.youtube.com/watch?v=${match.groupValues[1]}"
+                    pattern.contains("source") && match.groupValues.size > 2 -> 
+                        match.groupValues[1]
+                    else -> 
+                        "https://www.youtube.com/watch?v=${match.groupValues[1]}"
+                }
+
+                if (isValidYouTubeUrl(youtubeUrl)) {
+                    println("Found valid YouTube URL: $youtubeUrl")
+                    if (createYouTubeLink(youtubeUrl, referer, callback)) {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    private suspend fun extractCanliPlayerLinks(html: String, referer: String, callback: (ExtractorLink) -> Unit): Boolean {
+        println("CanliPlayer extractor started")
+        
+        val playerPatterns = listOf(
+            """(https?://[^"'\s]*canliplayer\.com/fireplayer/video/[^"'\s]*)""",
+            """(https?://[^"'\s]*canliplayer\.com[^"'\s]*video[^"'\s]*)""",
+            """(https?://[^"'\s]*fireplayer\.com[^"'\s]*)"""
+        )
+
+        for (pattern in playerPatterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val playerUrl = fixUrl(match.groupValues[1])
+                println("Found CanliPlayer URL: $playerUrl")
+                
+                try {
+                    val response = app.get(playerUrl, referer = referer)
+                    val playerHtml = response.text
+                    
+                    // Look for YouTube IDs in packed JavaScript
+                    if (extractFromPackedJavaScript(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Look for direct video URLs
+                    if (extractDirectVideos(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                } catch (e: Exception) {
+                    println("Error fetching CanliPlayer: ${e.message}")
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    private suspend fun extractBetaPlayerLinks(html: String, referer: String, callback: (ExtractorLink) -> Unit): Boolean {
+        println("BetaPlayer extractor started")
+        
+        val playerPatterns = listOf(
+            """(https?://[^"'\s]*betaplayer\.site/embed/[^"'\s]*)""",
+            """(https?://[^"'\s]*betaplayer\.site[^"'\s]*)"""
+        )
+
+        for (pattern in playerPatterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val playerUrl = fixUrl(match.groupValues[1])
+                println("Found BetaPlayer URL: $playerUrl")
+                
+                try {
+                    val response = app.get(playerUrl, referer = referer)
+                    val playerHtml = response.text
+                    
+                    // Try YouTube extraction first
+                    if (extractYouTubeLinks(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Then try direct videos
+                    if (extractDirectVideos(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                } catch (e: Exception) {
+                    println("Error fetching BetaPlayer: ${e.message}")
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    private suspend fun extractIframeLinks(
+        document: Element, 
+        referer: String, 
+        callback: (ExtractorLink) -> Unit,
+        subtitleCallback: (SubtitleFile) -> Unit
+    ): Boolean {
+        println("Iframe extractor started")
+        
+        document.select("iframe[src]").forEach { iframe ->
+            val iframeSrc = iframe.attr("src")
+            if (iframeSrc.isNotBlank()) {
+                val fixedUrl = fixUrl(iframeSrc)
+                println("Found iframe: $fixedUrl")
+                
+                try {
+                    val response = app.get(fixedUrl, referer = referer)
+                    val iframeHtml = response.text
+                    
+                    // Try YouTube extraction
+                    if (extractYouTubeLinks(iframeHtml, fixedUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Try direct video extraction
+                    if (extractDirectVideoLinks(iframeHtml, fixedUrl, callback)) {
+                        return true
+                    }
+                    
+                } catch (e: Exception) {
+                    println("Error fetching iframe: ${e.message}")
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    private suspend fun extractDirectVideoLinks(html: String, referer: String, callback: (ExtractorLink) -> Unit): Boolean {
+        println("Direct video extractor started")
+        
+        val videoPatterns = listOf(
+            """(https?://[^"'\s]+\.m3u8(?:\?[^"'\s]*)?)""",
+            """(https?://[^"'\s]+\.mp4(?:\?[^"'\s]*)?)""",
+            """(https?://[^"'\s]+\.webm(?:\?[^"'\s]*)?)""",
+            """file\s*:\s*["'](https?://[^"']+)["']""",
+            """source\s*:\s*["'](https?://[^"']+)["']""",
+            """videoUrl\s*:\s*["'](https?://[^"']+)["']""",
+            """src\s*:\s*["'](https?://[^"']+)["']"""
+        )
+        
+        for (pattern in videoPatterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val videoUrl = fixUrl(match.groupValues[1])
+                if (isVideoUrl(videoUrl)) {
+                    println("Found direct video URL: $videoUrl")
+                    createVideoLink(videoUrl, referer, callback, "Direct")
+                    return true
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    // ===== HELPER EXTRACTION METHODS =====
+    
+    private suspend fun extractFromPackedJavaScript(
+        html: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        // Look for packed arrays containing YouTube IDs
+        val packedPatterns = listOf(
+            """split\('\|'\)[^)]+\)[^,]+,\d+,[^,]+,'([^']+)'\)""",
+            """eval\(function\([^)]+\)\s*\([^,]+,\s*[^,]+,\s*[^,]+,\s*'([^']+)'\)"""
+        )
+        
+        for (pattern in packedPatterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val packedString = match.groupValues[1]
+                println("Found packed string: $packedString")
+                
+                val parts = packedString.split('|')
+                for (part in parts) {
+                    if (isValidYouTubeId(part)) {
+                        val youtubeUrl = "https://www.youtube.com/watch?v=$part"
+                        println("Found YouTube ID in packed array: $part")
+                        if (createYouTubeLink(youtubeUrl, referer, callback)) {
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    private suspend fun extractDirectVideos(
+        html: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        val videoPatterns = listOf(
+            """(https?://[^"'\s]+\.m3u8(?:\?[^"'\s]*)?)""",
+            """(https?://[^"'\s]+\.mp4(?:\?[^"'\s]*)?)""",
+            """file\s*:\s*["'](https?://[^"']+)["']""",
+            """source\s*:\s*["'](https?://[^"']+)["']"""
+        )
+        
+        for (pattern in videoPatterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val videoUrl = fixUrl(match.groupValues[1])
+                if (isVideoUrl(videoUrl)) {
+                    println("Found direct video: $videoUrl")
+                    createVideoLink(videoUrl, referer, callback, "Direct")
+                    return true
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    // ===== LINK CREATION METHODS =====
+    
+    private suspend fun createYouTubeLink(
+        youtubeUrl: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        try {
+            val videoId = youtubeUrl.substringAfter("v=").substringBefore("&")
+            if (videoId.length != 11) return false
+
+            callback.invoke(
+                ExtractorLink(
+                    "YouTube",
+                    "YouTube",
+                    youtubeUrl,
+                    referer,
+                    Qualities.Unknown.value,
+                    false
+                )
+            )
+            
+            println("Successfully created YouTube extractor link")
+            return true
+        } catch (e: Exception) {
+            println("Error creating YouTube link: ${e.message}")
+            return false
+        }
+    }
+    
+    private suspend fun createVideoLink(
+        videoUrl: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit,
+        sourceName: String
+    ) {
+        try {
+            val quality = determineQuality(videoUrl)
+            val type = when {
+                videoUrl.contains(".m3u8") -> ExtractorLinkType.M3U8
+                videoUrl.contains(".mpd") -> ExtractorLinkType.DASH
+                else -> ExtractorLinkType.VIDEO
+            }
+
+            println("Creating video link: $videoUrl (Quality: $quality, Type: $type)")
+
+            callback.invoke(
+                ExtractorLink(
+                    "$name - $sourceName",
+                    name,
+                    videoUrl,
+                    referer,
+                    quality,
+                    type == ExtractorLinkType.M3U8
+                )
+            )
+        } catch (e: Exception) {
+            println("Error creating video link: ${e.message}")
+        }
+    }
+    
+    // ===== VALIDATION METHODS =====
+    
+    private fun isValidYouTubeUrl(url: String): Boolean {
+        return url.contains("youtube.com/watch?v=") && 
+               url.length >= 30 &&
+               !url.contains("no-referrer")
+    }
+    
+    private fun isValidYouTubeId(id: String): Boolean {
+        return id.length == 11 && 
+               id.matches(Regex("[a-zA-Z0-9_-]+")) &&
+               id !in listOf("fireplayer", "FirePlayer", "jwplayer8", "videojsSkin", 
+                           "beezPlayer", "youtubeApi", "no-referrer", "referrer", "canliplayer")
+    }
+    
+    private fun isVideoUrl(url: String): Boolean {
+        if (url.isBlank()) return false
+        
+        val videoExtensions = listOf(".mp4", ".m3u8", ".webm", ".mkv", ".avi", ".mov", ".flv")
+        val videoKeywords = listOf("video", "stream", "m3u8", "mp4", "hls", "dash")
+        
+        return (videoExtensions.any { url.contains(it, ignoreCase = true) } ||
+                videoKeywords.any { url.contains(it, ignoreCase = true) }) &&
+                !url.contains("data:image") &&
+                !url.contains("base64") &&
+                !url.contains("placeholder") &&
+                !url.contains("blank") &&
+                !url.contains("logo") &&
+                !url.contains("ads") &&
+                !url.contains("banner")
     }
 
     // ===== PARSER FUNCTIONS =====
@@ -304,7 +646,7 @@ class CanliDizi : MainAPI() {
             ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
 
         val description = document.selectFirst("div.cat_ozet, .plot, .synopsis, .entry-content")?.text()?.trim()
-            ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim() // Fixed: selectFirst (lowercase)
+            ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim()
 
         return newMovieLoadResponse(title, url, TvType.Movie, url) {
             this.posterUrl = poster
@@ -320,7 +662,7 @@ class CanliDizi : MainAPI() {
         for (pageNum in 1..10) {
             val pageUrl = if (pageNum == 1) baseUrl else "$baseUrl/page/$pageNum"
             try {
-                val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                val pageDocument = app.get(pageUrl).document
                 val pageItems = pageDocument.select("div.seriescontent div.single-item").mapNotNull {
                     parseDizilerItem(it)
                 }
@@ -343,7 +685,7 @@ class CanliDizi : MainAPI() {
         for (pageNum in 1..10) {
             val pageUrl = if (pageNum == 1) baseUrl else "$baseUrl/page/$pageNum"
             try {
-                val pageDocument = app.get(pageUrl, headers = mapOf("User-Agent" to USER_AGENT)).document
+                val pageDocument = app.get(pageUrl).document
                 
                 val movieSelectors = listOf(
                     "div.seriescontent div.single-item",
@@ -422,22 +764,5 @@ class CanliDizi : MainAPI() {
             url.contains("360") -> Qualities.P360.value
             else -> Qualities.Unknown.value
         }
-    }
-
-    private fun isVideoUrl(url: String): Boolean {
-        if (url.isBlank()) return false
-        
-        val videoExtensions = listOf(".mp4", ".m3u8", ".webm", ".mkv", ".avi", ".mov", ".flv")
-        val videoKeywords = listOf("video", "stream", "m3u8", "mp4", "hls", "dash")
-        
-        return (videoExtensions.any { url.contains(it, ignoreCase = true) } ||
-                videoKeywords.any { url.contains(it, ignoreCase = true) }) &&
-                !url.contains("data:image") &&
-                !url.contains("base64") &&
-                !url.contains("placeholder") &&
-                !url.contains("blank") &&
-                !url.contains("logo") &&
-                !url.contains("ads") &&
-                !url.contains("banner")
     }
 }
