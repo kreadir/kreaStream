@@ -34,8 +34,8 @@ jobs:
       - name: "'build' Depo Kontrolü"
         uses: actions/checkout@v4.2.2
         with:
-          ref: "**/builds"
-          path: "**/builds"
+          ref: "master/builds"
+          path: "master/builds"
 
       #- name: Eski Derlemeleri Temizle
         #run: rm $GITHUB_WORKSPACE/builds/*.cs3 || true
