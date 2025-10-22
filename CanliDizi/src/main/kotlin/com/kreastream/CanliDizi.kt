@@ -372,14 +372,16 @@ class CanliDizi : MainAPI() {
             if (videoId.length != 11) return false
 
             callback.invoke(
-                ExtractorLink(
+                newExtractorLink(
                     "YouTube",
                     "YouTube",
                     youtubeUrl,
-                    referer,
+                    "",
                     Qualities.Unknown.value,
                     false
-                )
+                ) {
+                    this.referer = referer
+                }
             )
             
             println("Successfully created YouTube extractor link")
@@ -407,14 +409,16 @@ class CanliDizi : MainAPI() {
             println("Creating video link: $videoUrl (Quality: $quality, Type: $type)")
 
             callback.invoke(
-                ExtractorLink(
+                newExtractorLink(
                     "$name - $sourceName",
                     name,
                     videoUrl,
-                    referer,
+                    "",
                     quality,
                     type == ExtractorLinkType.M3U8
-                )
+                ) {
+                    this.referer = referer
+                }
             )
         } catch (e: Exception) {
             println("Error creating video link: ${e.message}")
