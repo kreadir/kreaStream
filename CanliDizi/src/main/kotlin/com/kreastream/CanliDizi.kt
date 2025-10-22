@@ -272,7 +272,10 @@ class CanliDizi : MainAPI() {
         return newMovieSearchResponse(title, link, TvType.Movie) {
             this.posterUrl = poster
             this.year = year
-            this.score = Score.from10(score)
+            // Extract score from rating element if available, otherwise don't set it
+            element.selectFirst(".rating, .imdb, .imdb-rating")?.text()?.toFloatOrNull()?.let { rating ->
+                this.score = Score.from10(rating)
+            }
         }
     }
 
