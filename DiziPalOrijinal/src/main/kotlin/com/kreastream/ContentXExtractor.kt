@@ -18,7 +18,7 @@ open class ContentX : ExtractorApi() {
     override val mainUrl         = "https://contentx.me"
     override val requiresReferer = true
 
-    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (newSubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
+    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
         val extRef   = referer ?: ""
 
         val iSource = app.get(url, referer = extRef).text
@@ -108,7 +108,7 @@ open class RapidVid : ExtractorApi() {
     override suspend fun getUrl(
         url: String,
         referer: String?,
-        subtitleCallback: (newSubtitleFile) -> Unit,
+        subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
         val extRef = referer ?: ""
@@ -203,7 +203,7 @@ open class Sobreatsesuyp : ExtractorApi() {
     override val mainUrl         = "https://sobreatsesuyp.com"
     override val requiresReferer = true
 
-    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (newSubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
+    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
         val extRef = url
 
         val videoReq = app.get(url, referer = extRef).text
@@ -252,7 +252,7 @@ open class TRsTX : ExtractorApi() {
     override val mainUrl         = "https://trstx.org"
     override val requiresReferer = true
 
-    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (newSubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
+    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
         val extRef = referer ?: ""
 
         val videoReq = app.get(url, referer=extRef).text
@@ -318,7 +318,7 @@ open class TurboImgz : ExtractorApi() {
     override val mainUrl         = "https://turbo.imgz.me"
     override val requiresReferer = true
 
-    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (newSubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
+    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
         val extRef   = referer ?: ""
         val videoReq = app.get(url.substringAfter("||"), referer=extRef).text
 
@@ -413,7 +413,7 @@ open class VidMoxy : ExtractorApi() {
         }
     }
 
-    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (newSubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
+    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
         val extRef   = referer ?: ""
         val videoReq = app.get(url, referer=extRef).text
         val regex = Regex("""file\s*:\s*EE\.dd\("([^"]+)"""")
@@ -488,7 +488,7 @@ open class VidMolyExtractor : ExtractorApi() {
     override val name            = "VidMoly"
     override val mainUrl         = "https://vidmoly.net"
     override val requiresReferer = true
-    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (newSubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
+    override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
 
         val url = if (url.contains("https://vidmoly.to")){
             url.replace("vidmoly.to","vidmoly.net")

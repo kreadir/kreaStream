@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.keyiflerolsun.HDFilmCehennemi.SubSource
-import com.lagradost.cloudstream3.newSubtitleFile
+import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.base64Decode
 import com.lagradost.cloudstream3.base64DecodeArray
@@ -43,7 +43,7 @@ open class HCCloseLoadExtractor : ExtractorApi() {
     ) {
         iSource.document.select("track").forEach {
             subtitleCallback.invoke(
-                newSubtitleFile(
+                SubtitleFile(
                     lang = it.attr("label"),
                     url = mainUrl + it.attr("src")
                 )
@@ -58,7 +58,7 @@ open class HCCloseLoadExtractor : ExtractorApi() {
             Log.d("KreaStream${this.name}", "tracks -> $tracks")
             tracks.forEach { it ->
                 subtitleCallback.invoke(
-                    newSubtitleFile(
+                    SubtitleFile(
                         lang = it.label.toString(),
                         url = mainUrl + it.file.toString()
                     )
