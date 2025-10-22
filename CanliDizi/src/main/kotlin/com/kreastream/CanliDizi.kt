@@ -505,65 +505,6 @@ class CanliDizi : MainAPI() {
         return false
     }
 
-// ===== IMPROVED IFRAME EXTRACTION =====
-private suspend fun extractFromIframe(
-    url: String,
-    callback: (ExtractorLink) -> Unit,
-    subtitleCallback: (SubtitleFile) -> Unit
-): Boolean {
-    try {
-        println("Extracting from iframe: $url")
-        
-        val response = app.get(url, headers = mapOf(
-            "User-Agent" to USER_AGENT,
-            "Referer" to mainUrl
-        ))
-
-        val html = response.text
-
-        // Look for YouTube URLs in iframe
-        val youtubePatterns = listOf(
-            """youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
-            """youtu\.be/([a-zA-Z0-9_-]{11})"""
-        )
-
-        for (pattern in youtubePatterns) {
-            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
-                val videoId = match.groupValues[1]
-                val youtubeUrl = "https://www.youtube.com/watch?v=$videoId"
-                println("Found YouTube URL in iframe: $youtubeUrl")
-                if (createYouTubeExtractorLink(youtubeUrl, url, callback)) {
-                    return true
-                }
-            }
-        }
-
-        // Look for direct video URLs
-        val videoPatterns = listOf(
-            """(https?://[^"'\s]+\.m3u8(?:\?[^"'\s]*)?)""",
-            """(https?://[^"'\s]+\.mp4(?:\?[^"'\s]*)?)""",
-            """file\s*:\s*["'](https?://[^"']+)["']""",
-            """source\s*:\s*["'](https?://[^"']+)["']"""
-        )
-
-        for (pattern in videoPatterns) {
-            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
-                val videoUrl = fixUrl(match.groupValues[1])
-                if (isVideoUrl(videoUrl)) {
-                    println("Found iframe video: $videoUrl")
-                    createVideoLink(videoUrl, url, callback, "Iframe")
-                    return true
-                }
-            }
-        }
-
-    } catch (e: Exception) {
-        println("Error extracting from iframe $url: ${e.message}")
-    }
-    
-    return false
-}
-
 
     // ===== IMPROVED VIDEO URL DETECTION =====
     private fun isVideoUrl(url: String): Boolean {
