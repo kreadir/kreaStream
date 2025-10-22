@@ -88,7 +88,13 @@ class CanliDizi : MainAPI() {
         val document = app.get(data).document
         val html = document.html()
         
-        // Try CanliPlayer extraction first (most common)
+        // Try BetaPlayer extraction first (for movies)
+        if (extractBetaPlayerLinks(html, data, callback)) {
+            println("BetaPlayer extractor found links!")
+            return true
+        }
+        
+        // Try CanliPlayer extraction (for series)
         if (extractCanliPlayerLinks(html, data, callback)) {
             println("CanliPlayer extractor found links!")
             return true
@@ -97,12 +103,6 @@ class CanliDizi : MainAPI() {
         // Try YouTube extraction
         if (extractYouTubeLinks(html, data, callback)) {
             println("YouTube extractor found links!")
-            return true
-        }
-        
-        // Try BetaPlayer extraction
-        if (extractBetaPlayerLinks(html, data, callback)) {
-            println("BetaPlayer extractor found links!")
             return true
         }
         
@@ -210,6 +210,7 @@ class CanliDizi : MainAPI() {
     private suspend fun extractBetaPlayerLinks(html: String, referer: String, callback: (ExtractorLink) -> Unit): Boolean {
         println("BetaPlayer extractor started")
         
+        // Look for betaplayer.site URLs
         val playerPatterns = listOf(
             """(https?://[^"'\s]*betaplayer\.site/embed/[^"'\s]*)""",
             """(https?://[^"'\s]*betaplayer\.site[^"'\s]*)"""
@@ -224,13 +225,23 @@ class CanliDizi : MainAPI() {
                     val response = app.get(playerUrl, referer = referer)
                     val playerHtml = response.text
                     
-                    // Try YouTube extraction first
+                    // Method 1: Extract from JWPlayer configuration with base64 sources
+                    if (extractFromJWPlayerConfig(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Method 2: Try YouTube extraction
                     if (extractYouTubeLinks(playerHtml, playerUrl, callback)) {
                         return true
                     }
                     
-                    // Then try direct videos
+                    // Method 3: Then try direct videos
                     if (extractDirectVideos(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Method 4: Look for base64 encoded URLs in the HTML
+                    if (extractBase64VideoLinks(playerHtml, playerUrl, callback)) {
                         return true
                     }
                     
@@ -307,6 +318,137 @@ class CanliDizi : MainAPI() {
         return false
     }
     
+    // ===== IMPROVED BETA PLAYER EXTRACTION =====
+    
+    private suspend fun extractFromJWPlayerConfig(
+        html: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        println("Looking for JWPlayer configuration...")
+        
+        // Method 1: Look for JWPlayer setup with base64 encoded sources
+        val jwPlayerPatterns = listOf(
+            """jwplayer\s*\(\s*["'][^"']+["']\s*\)\s*\.setup\s*\(\s*({[^}]+})\s*\)""",
+            """beplayer\s*=\s*jwplayer\s*\(\s*["'][^"']+["']\s*\)\s*\.setup\s*\(\s*({[^}]+})\s*\)""",
+            """sources\s*:\s*\[\s*{\s*file\s*:\s*"([^"]+)""""
+        )
+        
+        for (pattern in jwPlayerPatterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                try {
+                    val configString = if (pattern.contains("sources")) {
+                        // Extract just the base64 string from sources array
+                        val base64String = match.groupValues[1]
+                        println("Found base64 string in sources: $base64String")
+                        decodeAndCreateVideoLink(base64String, referer, callback, "BetaPlayer JWPlayer")
+                        return true
+                    } else {
+                        // Extract the entire JWPlayer configuration
+                        val configJson = match.groupValues[1]
+                        println("Found JWPlayer config: $configJson")
+                        
+                        // Look for sources array in the configuration
+                        val sourcesPattern = """sources\s*:\s*\[\s*\{[^}]+\}"""
+                        Regex(sourcesPattern, RegexOption.IGNORE_CASE).findAll(configJson).forEach { sourceMatch ->
+                            val sourceBlock = sourceMatch.value
+                            println("Found sources block: $sourceBlock")
+                            
+                            // Extract file URL from source block
+                            val filePattern = """file\s*:\s*"([^"]+)"""
+                            Regex(filePattern, RegexOption.IGNORE_CASE).findAll(sourceBlock).forEach { fileMatch ->
+                                val fileUrl = fileMatch.groupValues[1]
+                                println("Found file URL: $fileUrl")
+                                
+                                // Check if it's base64 encoded
+                                if (fileUrl.contains("betaplayer.site/list/") && fileUrl.length > 100) {
+                                    val base64Part = fileUrl.substringAfter("list/").substringBefore("\"")
+                                    if (base64Part.isNotBlank()) {
+                                        decodeAndCreateVideoLink(base64Part, referer, callback, "BetaPlayer JWPlayer")
+                                        return true
+                                    }
+                                } else if (isVideoUrl(fileUrl)) {
+                                    createVideoLink(fileUrl, referer, callback, "BetaPlayer Direct")
+                                    return true
+                                }
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    println("Error parsing JWPlayer config: ${e.message}")
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    private suspend fun extractBase64VideoLinks(
+        html: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        println("Looking for base64 encoded video URLs...")
+        
+        // Look for base64 encoded strings that might be video URLs
+        val base64Patterns = listOf(
+            """list/([A-Za-z0-9+/=]+)""",
+            """file\s*:\s*"([A-Za-z0-9+/=]{50,})""",
+            """sources\s*:\s*\[\s*{\s*file\s*:\s*"([A-Za-z0-9+/=]{50,})"""
+        )
+        
+        for (pattern in base64Patterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val base64String = match.groupValues[1]
+                if (base64String.length > 50) { // Likely a video URL if it's long enough
+                    println("Found potential base64 string: $base64String")
+                    if (decodeAndCreateVideoLink(base64String, referer, callback, "BetaPlayer Base64")) {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    private suspend fun decodeAndCreateVideoLink(
+        base64String: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit,
+        sourceName: String
+    ): Boolean {
+        try {
+            val decodedBytes = Base64.getDecoder().decode(base64String)
+            val decodedString = String(decodedBytes)
+            println("Decoded base64: $decodedString")
+            
+            if (isVideoUrl(decodedString)) {
+                println("Found video URL in base64: $decodedString")
+                createVideoLink(decodedString, referer, callback, sourceName)
+                return true
+            }
+            
+            // Sometimes it might be double-encoded
+            if (decodedString.matches(Regex("[A-Za-z0-9+/=]+")) && decodedString.length > 50) {
+                println("Trying double decode...")
+                val doubleDecodedBytes = Base64.getDecoder().decode(decodedString)
+                val doubleDecodedString = String(doubleDecodedBytes)
+                println("Double decoded: $doubleDecodedString")
+                
+                if (isVideoUrl(doubleDecodedString)) {
+                    println("Found video URL in double base64: $doubleDecodedString")
+                    createVideoLink(doubleDecodedString, referer, callback, "$sourceName Double")
+                    return true
+                }
+            }
+        } catch (e: Exception) {
+            println("Failed to decode base64: ${e.message}")
+        }
+        
+        return false
+    }
+    
     // ===== IMPROVED CANLIPLAYER EXTRACTION =====
     
     private suspend fun extractFromPackedJavaScript(
@@ -317,24 +459,13 @@ class CanliDizi : MainAPI() {
         println("Looking for packed JavaScript patterns...")
         
         // Method 1: Look for base64 encoded URLs in the packed JavaScript
-        // Pattern: "12":"base64string==" (like "12":"10==" in the example)
         val base64Pattern = """"12"\s*:\s*"([A-Za-z0-9+/=]+)""""
         Regex(base64Pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
             val base64String = match.groupValues[1]
             println("Found base64 string: $base64String")
             
-            try {
-                val decodedBytes = Base64.getDecoder().decode(base64String)
-                val decodedString = String(decodedBytes)
-                println("Decoded base64: $decodedString")
-                
-                if (isVideoUrl(decodedString)) {
-                    println("Found video URL in base64: $decodedString")
-                    createVideoLink(decodedString, referer, callback, "CanliPlayer Base64")
-                    return true
-                }
-            } catch (e: Exception) {
-                println("Failed to decode base64: ${e.message}")
+            if (decodeAndCreateVideoLink(base64String, referer, callback, "CanliPlayer Base64")) {
+                return true
             }
         }
         
@@ -364,16 +495,8 @@ class CanliDizi : MainAPI() {
                     
                     // Look for base64 encoded URLs in the packed parts
                     if (part.length > 20 && part.matches(Regex("[A-Za-z0-9+/=]+"))) {
-                        try {
-                            val decodedBytes = Base64.getDecoder().decode(part)
-                            val decodedString = String(decodedBytes)
-                            if (isVideoUrl(decodedString)) {
-                                println("Found video URL in packed base64: $decodedString")
-                                createVideoLink(decodedString, referer, callback, "CanliPlayer Packed")
-                                return true
-                            }
-                        } catch (e: Exception) {
-                            // Not a valid base64, continue
+                        if (decodeAndCreateVideoLink(part, referer, callback, "CanliPlayer Packed")) {
+                            return true
                         }
                     }
                 }
@@ -711,7 +834,7 @@ class CanliDizi : MainAPI() {
         val poster = document.selectFirst("img.poster, .poster img, .series-poster img")?.attr("src")?.let { fixUrl(it) }
             ?: document.selectFirst(".wp-post-image, .attachment-post-thumbnail")?.attr("src")?.let { fixUrl(it) }
             ?: document.selectFirst("img[data-wpfc-original-src]")?.attr("data-wpfc-original-src")?.let { fixUrl(it) }
-            ?: document.SelectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
+            ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
 
         val description = document.selectFirst("div.description, .plot, .synopsis, .entry-content")?.text()?.trim()
             ?: document.selectFirst("meta[name=description]")?.attr("content")?.trim()
@@ -811,4 +934,59 @@ class CanliDizi : MainAPI() {
     }
 
     private fun parseNewEpisodeItem(element: Element): Episode? {
-        val epUrl = element.attr("
+        val epUrl = element.attr("href")?.let { fixUrl(it) } ?: return null
+        
+        val epTitle = element.selectFirst("div.baslik")?.text()?.trim()
+            ?: element.attr("title")?.trim()
+            ?: "Episode"
+
+        val epNum = Regex("""(\d+)\.?Bölüm""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
+            ?: Regex("""\b(\d+)\b""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
+            ?: 1
+
+        return newEpisode(epUrl) {
+            this.name = epTitle
+            this.episode = epNum
+            this.season = 1
+        }
+    }
+
+    private fun parseEpisode(element: Element): Episode? {
+        val epTitle = element.selectFirst("span.episode-title, .episode-name, .title, a")?.text()?.trim() 
+            ?: element.selectFirst("img")?.attr("alt")?.trim()
+            ?: "Episode"
+        
+        val epUrl = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
+        
+        val epNum = element.selectFirst("span.episode-number, .episode-num, .number")?.text()?.toIntOrNull()
+            ?: Regex("""(\d+)\.?Bölüm""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
+            ?: Regex("""\b(\d+)\b""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
+            ?: 1
+
+        val season = element.selectFirst("span.season-number, .season-num")?.text()?.toIntOrNull()
+            ?: Regex("""(\d+)\.?Sezon""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
+            ?: 1
+
+        return newEpisode(epUrl) {
+            this.name = epTitle
+            this.episode = epNum
+            this.season = season
+        }
+    }
+
+    // ===== UTILITY FUNCTIONS =====
+    
+    private fun String.encodeToUrl(): String {
+        return java.net.URLEncoder.encode(this, "UTF-8")
+    }
+
+    private fun determineQuality(url: String): Int {
+        return when {
+            url.contains("1080") -> Qualities.P1080.value
+            url.contains("720") -> Qualities.P720.value
+            url.contains("480") -> Qualities.P480.value
+            url.contains("360") -> Qualities.P360.value
+            else -> Qualities.Unknown.value
+        }
+    }
+}
