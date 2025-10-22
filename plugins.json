@@ -3,14 +3,15 @@
         "iconUrl": "https://www.canlidizi14.com/favicon.ico",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/kreadir/kreaStream",
-        "fileSize": 33643,
+        "fileSize": 30411,
         "status": 1,
         "language": "tr",
         "authors": [
-            "KreaStream"
+            "kreaStream"
         ],
         "tvTypes": [
-            "TvSeries"
+            "TvSeries",
+            "Movie"
         ],
         "version": 2,
         "internalName": "CanliDizi",
