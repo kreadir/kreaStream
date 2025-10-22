@@ -35,7 +35,7 @@ class InatBox : MainAPI() {
 
         "${contentUrl}/ex/index.php"                                to "EXXEN",
         "${contentUrl}/ga/index.php"                                to "Gain",
-        "${contentUrl}/CDN/001/dizibox/nf/index.php"                to "Netflix",
+        "${contentUrl}/nf/index.php"                to "Netflix",
         "${contentUrl}/dsny/index.php"                              to "Disney+",
         "${contentUrl}/amz/index.php"                               to "Amazon Prime",
         "${contentUrl}/hb/index.php"                                to "HBO Max",
