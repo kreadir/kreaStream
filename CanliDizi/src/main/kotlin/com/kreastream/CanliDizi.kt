@@ -76,7 +76,6 @@ class CanliDizi : MainAPI() {
         }
     }
 
-
 // ===== LOAD LINKS =====
 override suspend fun loadLinks(
     data: String,
@@ -185,53 +184,106 @@ private suspend fun extractYouTubeFromCanliPlayer(
 
         println("CanliPlayer page loaded, looking for YouTube video...")
 
-        // Method 1: Look for YouTube video ID in the obfuscated JavaScript
-        // The video ID is in the array: 'tMX3FwlLK18' etc.
-        val videoIdPattern = """['"]([a-zA-Z0-9_-]{11})['"]"""
-        val matches = Regex(videoIdPattern, RegexOption.IGNORE_CASE).findAll(html).toList()
+        // Method 1: Look for the specific YouTube video ID in the packed JavaScript
+        // The video ID is in the packed array: 'tMX3FwlLK18' etc.
+        val packedArrayPattern = """split\('\|'\)[^)]+\)[^,]+,\d+,[^,]+,'([^']+)'\)"""
+        val packedMatches = Regex(packedArrayPattern, RegexOption.IGNORE_CASE).findAll(html)
         
-        // Filter potential YouTube video IDs (they are 11 characters)
-        val potentialVideoIds = matches.map { it.groupValues[1] }
-            .filter { it.length == 11 }
-            .filter { it.matches(Regex("[a-zA-Z0-9_-]+")) }
-            .distinct()
-
-        println("Found potential video IDs: $potentialVideoIds")
-
-        for (videoId in potentialVideoIds) {
-            // Skip common false positives
-            if (videoId in listOf("fireplayer", "FirePlayer", "jwplayer8", "videojsSkin", "beezPlayer", "youtubeApi")) {
-                continue
-            }
+        for (match in packedMatches) {
+            val packedString = match.groupValues[1]
+            println("Found packed string: $packedString")
             
-            val youtubeUrl = "https://www.youtube.com/watch?v=$videoId"
-            println("Trying YouTube URL: $youtubeUrl")
-            
-            if (createYouTubeExtractorLink(youtubeUrl, playerUrl, callback)) {
-                return true
+            // Split by pipe and look for YouTube video IDs
+            val parts = packedString.split('|')
+            for (part in parts) {
+                if (part.length == 11 && part.matches(Regex("[a-zA-Z0-9_-]+"))) {
+                    // Check if it's a valid YouTube ID (not a keyword)
+                    if (part !in listOf("fireplayer", "FirePlayer", "jwplayer8", "videojsSkin", 
+                                      "beezPlayer", "youtubeApi", "no-referrer", "referrer")) {
+                        val youtubeUrl = "https://www.youtube.com/watch?v=$part"
+                        println("Found potential YouTube ID in packed array: $part")
+                        if (createYouTubeExtractorLink(youtubeUrl, playerUrl, callback)) {
+                            return true
+                        }
+                    }
+                }
             }
         }
 
-        // Method 2: Look for YouTube URLs in script content
-        val scriptPatterns = listOf(
+        // Method 2: Look for YouTube URLs in script content using multiple patterns
+        val youtubePatterns = listOf(
             """youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
-            """source\s*:\s*["'](https?://www\.youtube\.com/watch\?v=[^"']+)["']""",
-            """["'](https?://[^"']*youtube\.com/watch\?v=[^"']*)["']"""
+            """youtu\.be/([a-zA-Z0-9_-]{11})""",
+            """source\s*:\s*["'](https?://www\.youtube\.com/watch\?v=([^"']{11}))["']""",
+            """["'](https?://[^"']*youtube\.com/watch\?v=([^"']{11}))["']""",
+            """videoId["']?\s*:\s*["']([^"']{11})["']""",
+            """src["']?\s*:\s*["']([^"']{11})["']"""
         )
 
-        for (pattern in scriptPatterns) {
+        for (pattern in youtubePatterns) {
             Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
-                val youtubeUrl = if (pattern.startsWith("""["'](https?""")) {
-                    fixUrl(match.groupValues[1])
-                } else if (pattern.contains("source")) {
-                    "https://www.youtube.com/watch?v=${match.groupValues[1]}"
-                } else {
-                    "https://www.youtube.com/watch?v=${match.groupValues[1]}"
+                val videoId = when {
+                    pattern.contains("youtube\\.com/watch\\?v=") -> match.groupValues[1]
+                    pattern.contains("youtu\\.be/") -> match.groupValues[1]
+                    pattern.contains("source") && match.groupValues.size > 2 -> match.groupValues[2]
+                    pattern.contains("videoId") -> match.groupValues[1]
+                    pattern.contains("src") -> match.groupValues[1]
+                    else -> match.groupValues[1].takeIf { it.length == 11 } ?: ""
                 }
-                println("Found YouTube URL in script: $youtubeUrl")
-                if (createYouTubeExtractorLink(youtubeUrl, playerUrl, callback)) {
-                    return true
+                
+                if (videoId.length == 11 && videoId.matches(Regex("[a-zA-Z0-9_-]+"))) {
+                    val youtubeUrl = "https://www.youtube.com/watch?v=$videoId"
+                    println("Found YouTube URL with pattern '$pattern': $youtubeUrl")
+                    if (createYouTubeExtractorLink(youtubeUrl, playerUrl, callback)) {
+                        return true
+                    }
                 }
+            }
+        }
+
+        // Method 3: Look for the specific video ID in the eval function parameters
+        val evalPattern = """eval\(function\([^)]+\)\s*\([^,]+,\s*[^,]+,\s*[^,]+,\s*'([^']+)'\)"""
+        val evalMatches = Regex(evalPattern, RegexOption.IGNORE_CASE).findAll(html)
+        
+        for (match in evalMatches) {
+            val evalString = match.groupValues[1]
+            println("Found eval string: $evalString")
+            
+            // This is the packed array - split by pipe
+            val parts = evalString.split('|')
+            for (part in parts) {
+                if (part.length == 11 && part.matches(Regex("[a-zA-Z0-9_-]+"))) {
+                    if (part !in listOf("fireplayer", "FirePlayer", "jwplayer8", "videojsSkin", 
+                                      "beezPlayer", "youtubeApi", "no-referrer", "referrer")) {
+                        val youtubeUrl = "https://www.youtube.com/watch?v=$part"
+                        println("Found YouTube ID in eval array: $part")
+                        if (createYouTubeExtractorLink(youtubeUrl, playerUrl, callback)) {
+                            return true
+                        }
+                    }
+                }
+            }
+        }
+
+        // Method 4: Look for any 11-character YouTube-like ID in the entire HTML
+        val allVideoIds = mutableSetOf<String>()
+        val genericPattern = """(?<![a-zA-Z0-9])([a-zA-Z0-9_-]{11})(?![a-zA-Z0-9])"""
+        Regex(genericPattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+            val potentialId = match.groupValues[1]
+            if (potentialId.matches(Regex("[a-zA-Z0-9_-]+")) &&
+                potentialId !in listOf("fireplayer", "FirePlayer", "jwplayer8", "videojsSkin", 
+                                     "beezPlayer", "youtubeApi", "no-referrer", "referrer",
+                                     "BrJZEEZFSL", "8PKzE75iRni", "CipZE5Sy66f", "d4G3Kw")) {
+                allVideoIds.add(potentialId)
+            }
+        }
+
+        // Try each potential video ID
+        for (videoId in allVideoIds) {
+            val youtubeUrl = "https://www.youtube.com/watch?v=$videoId"
+            println("Trying potential YouTube ID: $videoId")
+            if (createYouTubeExtractorLink(youtubeUrl, playerUrl, callback)) {
+                return true
             }
         }
 
@@ -252,16 +304,26 @@ private suspend fun createYouTubeExtractorLink(
     callback: (ExtractorLink) -> Unit
 ): Boolean {
     try {
+        // Validate the YouTube URL
+        if (!youtubeUrl.contains("youtube.com/watch?v=") || youtubeUrl.length < 30) {
+            println("Invalid YouTube URL: $youtubeUrl")
+            return false
+        }
+
+        // Extract video ID for validation
+        val videoId = youtubeUrl.substringAfter("v=").substringBefore("&")
+        if (videoId.length != 11 || videoId == "no-referrer") {
+            println("Invalid YouTube video ID: $videoId")
+            return false
+        }
+
         println("Creating YouTube extractor link: $youtubeUrl")
         
-        // For YouTube, we need to use a proper extractor
-        // CloudStream has built-in YouTube support via the YoutubePlugin
-        // We'll create a direct extractor link that CloudStream can handle
-        
+        // Create the extractor link
         callback.invoke(
             newExtractorLink(
                 "YouTube",
-                "YouTube", // Use "YouTube" as the name to trigger CloudStream's YouTube handler
+                "YouTube",
                 youtubeUrl,
                 ExtractorLinkType.VIDEO
             ) {
@@ -274,7 +336,7 @@ private suspend fun createYouTubeExtractorLink(
             }
         )
         
-        println("Successfully created YouTube extractor link")
+        println("Successfully created YouTube extractor link for video: $videoId")
         return true
         
     } catch (e: Exception) {
@@ -443,29 +505,30 @@ private suspend fun extractFromIframe(
     return false
 }
 
-// ===== IMPROVED VIDEO URL DETECTION =====
-private fun isVideoUrl(url: String): Boolean {
-    if (url.isBlank()) return false
-    
-    val videoExtensions = listOf(".mp4", ".m3u8", ".webm", ".mkv", ".avi", ".mov", ".flv")
-    val videoKeywords = listOf("video", "stream", "m3u8", "mp4", "hls", "dash")
-    
-    val isVideo = (videoExtensions.any { url.contains(it, ignoreCase = true) } ||
-                  videoKeywords.any { url.contains(it, ignoreCase = true) }) &&
-                  !url.contains("data:image") &&
-                  !url.contains("base64") &&
-                  !url.contains("placeholder") &&
-                  !url.contains("blank") &&
-                  !url.contains("logo") &&
-                  !url.contains("ads") &&
-                  !url.contains("banner")
-    
-    if (isVideo) {
-        println("Valid video URL: $url")
+
+    // ===== IMPROVED VIDEO URL DETECTION =====
+    private fun isVideoUrl(url: String): Boolean {
+        if (url.isBlank()) return false
+        
+        val videoExtensions = listOf(".mp4", ".m3u8", ".webm", ".mkv", ".avi", ".mov", ".flv")
+        val videoKeywords = listOf("video", "stream", "m3u8", "mp4", "hls", "dash")
+        
+        val isVideo = (videoExtensions.any { url.contains(it, ignoreCase = true) } ||
+                    videoKeywords.any { url.contains(it, ignoreCase = true) }) &&
+                    !url.contains("data:image") &&
+                    !url.contains("base64") &&
+                    !url.contains("placeholder") &&
+                    !url.contains("blank") &&
+                    !url.contains("logo") &&
+                    !url.contains("ads") &&
+                    !url.contains("banner")
+        
+        if (isVideo) {
+            println("Valid video URL: $url")
+        }
+        
+        return isVideo
     }
-    
-    return isVideo
-}
 
     // ===== PARSER FUNCTIONS =====
     
