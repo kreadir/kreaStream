@@ -448,6 +448,47 @@ private fun isVideoUrl(url: String): Boolean {
             !url.contains("banner")
 }
 
+    // ===== CREATE VIDEO LINK =====
+    private suspend fun createVideoLink(
+        videoUrl: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit,
+        sourceName: String
+    ) {
+        try {
+            val quality = determineQuality(videoUrl)
+            val type = when {
+                videoUrl.contains(".m3u8") -> ExtractorLinkType.M3U8
+                videoUrl.contains(".mpd") -> ExtractorLinkType.DASH
+                else -> ExtractorLinkType.VIDEO
+            }
+
+            println("Found video: $videoUrl (Quality: $quality, Type: $type)")
+
+            callback.invoke(
+                newExtractorLink(
+                    "$name - $sourceName",
+                    name,
+                    videoUrl,
+                    type
+                ) {
+                    this.referer = referer
+                    this.quality = quality
+                    this.headers = mapOf(
+                        "User-Agent" to USER_AGENT,
+                        "Referer" to referer,
+                        "Accept" to "*/*",
+                        "Accept-Language" to "en-US,en;q=0.5",
+                        "Accept-Encoding" to "gzip, deflate, br",
+                        "Origin" to mainUrl.split("/").take(3).joinToString("/")
+                    )
+                }
+            )
+        } catch (e: Exception) {
+            println("Error creating video link: ${e.message}")
+        }
+    }
+
     // ===== PARSER FUNCTIONS =====
     
     // Search result parser - SINGLE VERSION (remove duplicates)
@@ -775,6 +816,7 @@ private fun isVideoUrl(url: String): Boolean {
 
         return videoUrls.distinct()
     }
+
 
     private fun determineQuality(url: String): Int {
         return when {
