@@ -76,6 +76,7 @@ class CanliDizi : MainAPI() {
         }
     }
 
+
 // ===== LOAD LINKS =====
 override suspend fun loadLinks(
     data: String,
@@ -101,44 +102,69 @@ override suspend fun loadLinks(
         Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
             val playerUrl = fixUrl(match.groupValues[1])
             println("Found CanliPlayer URL: $playerUrl")
-            if (extractFromCanliPlayerDirect(playerUrl, data, callback)) {
+            if (extractFromCanliPlayerWithYouTube(playerUrl, data, callback)) {
                 foundLinks = true
                 return@forEach
             }
         }
     }
 
-    // Method 2: Look for script tags containing video configurations
+    // Method 2: Look for direct YouTube embeds
+    val youtubePatterns = listOf(
+        """(https?://[^"'\s]*youtube\.com/embed/[^"'\s]*)""",
+        """(https?://[^"'\s]*youtube\.com/watch\?v=[^"'\s]*)""",
+        """(https?://[^"'\s]*youtu\.be/[^"'\s]*)""",
+        """youtube\.com/watch\?v=([a-zA-Z0-9_-]+)""",
+        """youtu\.be/([a-zA-Z0-9_-]+)"""
+    )
+
+    youtubePatterns.forEach { pattern ->
+        Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+            val youtubeUrl = if (pattern.contains("watch\\?v=") || pattern.contains("youtu.be/")) {
+                val videoId = match.groupValues[1]
+                "https://www.youtube.com/watch?v=$videoId"
+            } else {
+                fixUrl(match.groupValues[1])
+            }
+            println("Found YouTube URL: $youtubeUrl")
+            createYouTubeLink(youtubeUrl, data, callback)
+            foundLinks = true
+            return@forEach
+        }
+    }
+
+    // Method 3: Look for script tags containing YouTube URLs
     document.select("script").forEach { script ->
         val scriptContent = script.html()
-        if (scriptContent.contains("canliplayer") || scriptContent.contains("fireplayer")) {
-            println("Found script with canliplayer reference")
+        if (scriptContent.contains("youtube.com/watch?v=") || scriptContent.contains("youtu.be/")) {
+            println("Found script with YouTube reference")
             
-            // Try to extract direct video URL from script
-            val videoPatterns = listOf(
-                """file\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-                """source\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-                """src\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-                """(https?://[^"'\s]+\.(?:mp4|m3u8)(?:\?[^"'\s]*)?)""",
-                """videoUrl\s*:\s*["'](https?://[^"']+)["']""",
-                """url\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']"""
+            // Extract YouTube video ID from script
+            val youtubeIdPatterns = listOf(
+                """youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
+                """youtu\.be/([a-zA-Z0-9_-]{11})""",
+                """source["']?\s*:\s*["']?(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
+                """["'](https?://[^"']*youtube\.com/watch\?v=[^"']*)["']"""
             )
             
-            videoPatterns.forEach { pattern ->
+            youtubeIdPatterns.forEach { pattern ->
                 Regex(pattern, RegexOption.IGNORE_CASE).findAll(scriptContent).forEach { match ->
-                    val videoUrl = fixUrl(match.groupValues[1])
-                    if (isVideoUrl(videoUrl)) {
-                        println("Found direct video in script: $videoUrl")
-                        createVideoLink(videoUrl, data, callback, "Script Direct")
-                        foundLinks = true
-                        return@forEach
+                    val youtubeUrl = if (pattern.startsWith("""["'](https?""")) {
+                        fixUrl(match.groupValues[1])
+                    } else {
+                        val videoId = match.groupValues[1]
+                        "https://www.youtube.com/watch?v=$videoId"
                     }
+                    println("Found YouTube URL in script: $youtubeUrl")
+                    createYouTubeLink(youtubeUrl, data, callback)
+                    foundLinks = true
+                    return@forEach
                 }
             }
         }
     }
 
-    // Method 3: Look for iframe embeds
+    // Method 4: Look for iframe embeds
     document.select("iframe[src]").forEach { iframe ->
         val iframeSrc = iframe.attr("src")
         if (iframeSrc.isNotBlank()) {
@@ -150,185 +176,42 @@ override suspend fun loadLinks(
         }
     }
 
-    // Method 4: Look for data attributes that might contain video URLs
-    document.select("[data-src], [data-file], [data-video], [data-url]").forEach { element ->
-        listOf("data-src", "data-file", "data-video", "data-url").forEach { attr ->
-            element.attr(attr).takeIf { it.isNotBlank() }?.let { url ->
-                val fixedUrl = fixUrl(url)
-                if (isVideoUrl(fixedUrl)) {
-                    println("Found data attribute video: $fixedUrl")
-                    createVideoLink(fixedUrl, data, callback, "Data Attribute")
-                    foundLinks = true
-                }
-            }
-        }
-    }
+    // Method 5: Look for betaplayer.site links
+    val betaPlayerPatterns = listOf(
+        """(https?://[^"'\s]*betaplayer\.site/embed/[^"'\s]*)""",
+        """(https?://[^"'\s]*betaplayer\.site[^"'\s]*)"""
+    )
 
-    // Method 5: Direct video elements (fallback)
-    if (!foundLinks) {
-        document.select("video source, video[src]").forEach { source ->
-            val videoUrl = source.attr("src").let { fixUrl(it) }
-            if (videoUrl.isNotBlank() && isVideoUrl(videoUrl)) {
-                println("Found direct video element: $videoUrl")
-                createVideoLink(videoUrl, data, callback, "Video Element")
+    betaPlayerPatterns.forEach { pattern ->
+        Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+            val playerUrl = fixUrl(match.groupValues[1])
+            println("Found BetaPlayer URL: $playerUrl")
+            if (extractFromBetaPlayer(playerUrl, data, callback)) {
                 foundLinks = true
+                return@forEach
             }
         }
     }
 
     if (!foundLinks) {
         println("No video links found after all extraction methods")
-        // Try one more aggressive approach - look for any m3u8 or mp4 in the entire HTML
-        val aggressivePatterns = listOf(
-            """(https?://[^"'\s]+\.m3u8(?:\?[^"'\s]*)?)""",
-            """(https?://[^"'\s]+\.mp4(?:\?[^"'\s]*)?)""",
-            """["'](https?://[^"']+\.m3u8)["']""",
-            """["'](https?://[^"']+\.mp4)["']"""
-        )
-        
-        aggressivePatterns.forEach { pattern ->
-            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
-                val videoUrl = fixUrl(match.groupValues[1])
-                if (isVideoUrl(videoUrl) && !videoUrl.contains("placeholder")) {
-                    println("Found aggressive pattern video: $videoUrl")
-                    createVideoLink(videoUrl, data, callback, "Aggressive Pattern")
-                    foundLinks = true
-                    return@forEach
-                }
-            }
-        }
     }
 
     return foundLinks
 }
 
-// ===== DIRECT CANLIPLAYER EXTRACTION =====
-private suspend fun extractFromCanliPlayerDirect(
+// ===== CANLIPLAYER WITH YOUTUBE EXTRACTION =====
+private suspend fun extractFromCanliPlayerWithYouTube(
     playerUrl: String,
     referer: String,
     callback: (ExtractorLink) -> Unit
 ): Boolean {
     try {
-        println("Extracting directly from CanliPlayer: $playerUrl")
+        println("Extracting YouTube from CanliPlayer: $playerUrl")
         
         val response = app.get(playerUrl, headers = mapOf(
             "User-Agent" to USER_AGENT,
             "Referer" to referer,
-            "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Accept-Language" to "en-US,en;q=0.5",
-            "Accept-Encoding" to "gzip, deflate, br",
-            "DNT" to "1",
-            "Connection" to "keep-alive",
-            "Upgrade-Insecure-Requests" to "1",
-            "Sec-Fetch-Dest" to "iframe",
-            "Sec-Fetch-Mode" to "navigate",
-            "Sec-Fetch-Site" to "cross-site"
-        ))
-
-        val document = response.document
-        val html = response.text
-
-        println("CanliPlayer page loaded, analyzing structure...")
-
-        // Method 1: Look for video elements directly
-        document.select("video source, video[src]").forEach { source ->
-            val videoUrl = source.attr("src").let { fixUrl(it) }
-            if (videoUrl.isNotBlank() && isVideoUrl(videoUrl)) {
-                println("Found CanliPlayer direct video element: $videoUrl")
-                createVideoLink(videoUrl, playerUrl, callback, "CanliPlayer Direct")
-                return true
-            }
-        }
-
-        // Method 2: Look for JavaScript variables containing video URLs
-        val jsPatterns = listOf(
-            """file\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-            """source\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-            """src\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-            """videoUrl\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-            """url\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-            """hlsUrl\s*:\s*["'](https?://[^"']+\.m3u8)["']""",
-            """\.setup\([^)]+\)[^{]*\{[^}]*file\s*:\s*["'](https?://[^"']+)["']""",
-            """jwplayer\([^)]+\)\.setup\([^)]*file\s*:\s*["']([^"']+)["']"""
-        )
-
-        jsPatterns.forEach { pattern ->
-            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
-                val videoUrl = fixUrl(match.groupValues[1])
-                if (isVideoUrl(videoUrl)) {
-                    println("Found CanliPlayer JS video: $videoUrl")
-                    createVideoLink(videoUrl, playerUrl, callback, "CanliPlayer JS")
-                    return true
-                }
-            }
-        }
-
-        // Method 3: Look for data attributes
-        document.select("[data-file], [data-src], [data-url]").forEach { element ->
-            listOf("data-file", "data-src", "data-url").forEach { attr ->
-                element.attr(attr).takeIf { it.isNotBlank() }?.let { url ->
-                    val videoUrl = fixUrl(url)
-                    if (isVideoUrl(videoUrl)) {
-                        println("Found CanliPlayer data attribute video: $videoUrl")
-                        createVideoLink(videoUrl, playerUrl, callback, "CanliPlayer Data")
-                        return true
-                    }
-                }
-            }
-        }
-
-        // Method 4: Look for common video hosting patterns in CanliPlayer
-        val hostingPatterns = listOf(
-            """(https?://[^"'\s]+\.(?:mp4|m3u8)(?:\?[^"'\s]*)?)""",
-            """(https?://[^"'\s]+/videos/[^"'\s]+\.(?:mp4|m3u8))""",
-            """(https?://[^"'\s]+/stream/[^"'\s]+\.(?:mp4|m3u8))""",
-            """(https?://[^"'\s]+/hls/[^"'\s]+\.m3u8)"""
-        )
-
-        hostingPatterns.forEach { pattern ->
-            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
-                val videoUrl = fixUrl(match.groupValues[1])
-                if (isVideoUrl(videoUrl) && !videoUrl.contains("placeholder")) {
-                    println("Found CanliPlayer hosting pattern video: $videoUrl")
-                    createVideoLink(videoUrl, playerUrl, callback, "CanliPlayer Hosting")
-                    return true
-                }
-            }
-        }
-
-        // Method 5: Try to find iframe within CanliPlayer
-        document.select("iframe[src]").forEach { iframe ->
-            val iframeSrc = iframe.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
-            if (iframeSrc != null) {
-                println("Found iframe in CanliPlayer: $iframeSrc")
-                if (extractFromIframe(iframeSrc, callback) {}) {
-                    return true
-                }
-            }
-        }
-
-        println("No video found in CanliPlayer after all methods")
-
-    } catch (e: Exception) {
-        println("Error extracting from CanliPlayer $playerUrl: ${e.message}")
-        e.printStackTrace()
-    }
-    
-    return false
-}
-
-// ===== IMPROVED IFRAME EXTRACTION =====
-private suspend fun extractFromIframe(
-    url: String,
-    callback: (ExtractorLink) -> Unit,
-    subtitleCallback: (SubtitleFile) -> Unit
-): Boolean {
-    try {
-        println("Extracting from iframe: $url")
-        
-        val response = app.get(url, headers = mapOf(
-            "User-Agent" to USER_AGENT,
-            "Referer" to mainUrl,
             "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
             "Accept-Language" to "en-US,en;q=0.5",
             "Accept-Encoding" to "gzip, deflate, br",
@@ -339,33 +222,175 @@ private suspend fun extractFromIframe(
 
         val html = response.text
 
-        // Look for direct video URLs with multiple patterns
-        val videoPatterns = listOf(
-            """(https?://[^"'\s]+\.m3u8(?:\?[^"'\s]*)?)""",
-            """(https?://[^"'\s]+\.mp4(?:\?[^"'\s]*)?)""",
-            """file\s*:\s*["'](https?://[^"']+)["']""",
-            """source\s*:\s*["'](https?://[^"']+)["']""",
-            """src\s*:\s*["'](https?://[^"']+)["']""",
-            """<source[^>]+src\s*=\s*["'](https?://[^"']+)["']""",
-            """video[^>]+src\s*=\s*["'](https?://[^"']+)["']"""
+        println("CanliPlayer page loaded, looking for YouTube video...")
+
+        // Method 1: Look for YouTube URLs in the HTML
+        val youtubePatterns = listOf(
+            """youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
+            """youtu\.be/([a-zA-Z0-9_-]{11})""",
+            """source["']?\s*:\s*["']?(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
+            """["'](https?://[^"']*youtube\.com/watch\?v=[^"']*)["']""",
+            """source\s*:\s*["'](https?://www\.youtube\.com/watch\?v=[^"']+)["']"""
         )
 
-        videoPatterns.forEach { pattern ->
+        youtubePatterns.forEach { pattern ->
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val youtubeUrl = if (pattern.startsWith("""["'](https?""")) {
+                    fixUrl(match.groupValues[1])
+                } else if (pattern.contains("source")) {
+                    val videoId = match.groupValues[1]
+                    "https://www.youtube.com/watch?v=$videoId"
+                } else {
+                    val videoId = match.groupValues[1]
+                    "https://www.youtube.com/watch?v=$videoId"
+                }
+                println("Found YouTube URL in CanliPlayer: $youtubeUrl")
+                createYouTubeLink(youtubeUrl, playerUrl, callback)
+                return true
+            }
+        }
+
+        // Method 2: Look for the specific pattern in the obfuscated JavaScript
+        // The pattern we're looking for is in the fireload function
+        val fireloadPatterns = listOf(
+            """source["']?\s*:\s*["']?(https?://[^"']*youtube\.com/watch\?v=[^"']*)""",
+            """source["']?\s*:\s*["']?([^"']*youtube\.com/watch\?v=[^"']*)""",
+            """source\s*:\s*["'](https?://www\.youtube\.com/watch\?v=[^"']+)["']"""
+        )
+
+        fireloadPatterns.forEach { pattern ->
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                var youtubeUrl = match.groupValues[1]
+                if (!youtubeUrl.startsWith("http")) {
+                    youtubeUrl = "https://$youtubeUrl"
+                }
+                println("Found YouTube URL in fireload: $youtubeUrl")
+                createYouTubeLink(youtubeUrl, playerUrl, callback)
+                return true
+            }
+        }
+
+        // Method 3: Extract from the specific obfuscated function call
+        // Look for the pattern: "source":"https://www.youtube.com/watch?v=VIDEO_ID"
+        val jsonPattern = """source["']?\s*:\s*["'](https?://www\.youtube\.com/watch\?v=[^"']+)["']"""
+        Regex(jsonPattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+            val youtubeUrl = match.groupValues[1]
+            println("Found YouTube URL in JSON: $youtubeUrl")
+            createYouTubeLink(youtubeUrl, playerUrl, callback)
+            return true
+        }
+
+        // Method 4: Look for any YouTube video ID in the entire HTML
+        val videoIdPattern = """(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})"""
+        Regex(videoIdPattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+            val videoId = match.groupValues[1]
+            val youtubeUrl = "https://www.youtube.com/watch?v=$videoId"
+            println("Found YouTube video ID: $videoId -> $youtubeUrl")
+            createYouTubeLink(youtubeUrl, playerUrl, callback)
+            return true
+        }
+
+        println("No YouTube video found in CanliPlayer")
+
+    } catch (e: Exception) {
+        println("Error extracting from CanliPlayer $playerUrl: ${e.message}")
+        e.printStackTrace()
+    }
+    
+    return false
+}
+
+// ===== BETA PLAYER EXTRACTION =====
+private suspend fun extractFromBetaPlayer(
+    playerUrl: String,
+    referer: String,
+    callback: (ExtractorLink) -> Unit
+): Boolean {
+    try {
+        println("Extracting from BetaPlayer: $playerUrl")
+        
+        val response = app.get(playerUrl, headers = mapOf(
+            "User-Agent" to USER_AGENT,
+            "Referer" to referer
+        ))
+
+        val html = response.text
+
+        // Look for YouTube URLs in BetaPlayer
+        val youtubePatterns = listOf(
+            """youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
+            """youtu\.be/([a-zA-Z0-9_-]{11})""",
+            """source["']?\s*:\s*["']?(?:https?://)?(?:www\.)?youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
+            """["'](https?://[^"']*youtube\.com/watch\?v=[^"']*)["']"""
+        )
+
+        youtubePatterns.forEach { pattern ->
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val youtubeUrl = if (pattern.startsWith("""["'](https?""")) {
+                    fixUrl(match.groupValues[1])
+                } else {
+                    val videoId = match.groupValues[1]
+                    "https://www.youtube.com/watch?v=$videoId"
+                }
+                println("Found YouTube URL in BetaPlayer: $youtubeUrl")
+                createYouTubeLink(youtubeUrl, playerUrl, callback)
+                return true
+            }
+        }
+
+        // Look for direct video URLs in BetaPlayer
+        val directPatterns = listOf(
+            """file\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
+            """source\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
+            """(https?://[^"'\s]+\.(?:mp4|m3u8)(?:\?[^"'\s]*)?)"""
+        )
+
+        directPatterns.forEach { pattern ->
             Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
                 val videoUrl = fixUrl(match.groupValues[1])
                 if (isVideoUrl(videoUrl)) {
-                    println("Found iframe video: $videoUrl")
-                    createVideoLink(videoUrl, url, callback, "Iframe")
+                    println("Found direct video in BetaPlayer: $videoUrl")
+                    createVideoLink(videoUrl, playerUrl, callback, "BetaPlayer Direct")
                     return true
                 }
             }
         }
 
     } catch (e: Exception) {
-        println("Error extracting from iframe $url: ${e.message}")
+        println("Error extracting from BetaPlayer $playerUrl: ${e.message}")
     }
     
     return false
+}
+
+// ===== CREATE YOUTUBE LINK =====
+private suspend fun createYouTubeLink(
+    youtubeUrl: String,
+    referer: String,
+    callback: (ExtractorLink) -> Unit
+) {
+    try {
+        println("Creating YouTube link: $youtubeUrl")
+        
+        // CloudStream has built-in YouTube support, so we can create a direct extractor link
+        callback.invoke(
+            newExtractorLink(
+                "$name - YouTube",
+                name,
+                youtubeUrl,
+                ExtractorLinkType.VIDEO
+            ) {
+                this.referer = referer
+                this.quality = Qualities.Unknown.value
+                this.headers = mapOf(
+                    "User-Agent" to USER_AGENT,
+                    "Referer" to referer
+                )
+            }
+        )
+    } catch (e: Exception) {
+        println("Error creating YouTube link: ${e.message}")
+    }
 }
 
 // ===== CREATE VIDEO LINK =====
@@ -396,17 +421,79 @@ private suspend fun createVideoLink(
                 this.quality = quality
                 this.headers = mapOf(
                     "User-Agent" to USER_AGENT,
-                    "Referer" to referer,
-                    "Accept" to "*/*",
-                    "Accept-Language" to "en-US,en;q=0.5",
-                    "Accept-Encoding" to "gzip, deflate, br",
-                    "Origin" to mainUrl.split("/").take(3).joinToString("/")
+                    "Referer" to referer
                 )
             }
         )
     } catch (e: Exception) {
         println("Error creating video link: ${e.message}")
     }
+}
+
+// ===== IMPROVED IFRAME EXTRACTION =====
+private suspend fun extractFromIframe(
+    url: String,
+    callback: (ExtractorLink) -> Unit,
+    subtitleCallback: (SubtitleFile) -> Unit
+): Boolean {
+    try {
+        println("Extracting from iframe: $url")
+        
+        // Skip YouTube embeds as we handle them separately
+        if (url.contains("youtube.com/embed") || url.contains("youtu.be")) {
+            val youtubeUrl = url.replace("/embed/", "/watch?v=")
+            println("Converting YouTube embed to watch URL: $youtubeUrl")
+            createYouTubeLink(youtubeUrl, url, callback)
+            return true
+        }
+
+        val response = app.get(url, headers = mapOf(
+            "User-Agent" to USER_AGENT,
+            "Referer" to mainUrl
+        ))
+
+        val html = response.text
+
+        // Look for YouTube URLs in iframe
+        val youtubePatterns = listOf(
+            """youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
+            """youtu\.be/([a-zA-Z0-9_-]{11})"""
+        )
+
+        youtubePatterns.forEach { pattern ->
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val videoId = match.groupValues[1]
+                val youtubeUrl = "https://www.youtube.com/watch?v=$videoId"
+                println("Found YouTube URL in iframe: $youtubeUrl")
+                createYouTubeLink(youtubeUrl, url, callback)
+                return true
+            }
+        }
+
+        // Look for direct video URLs
+        val videoPatterns = listOf(
+            """(https?://[^"'\s]+\.m3u8(?:\?[^"'\s]*)?)""",
+            """(https?://[^"'\s]+\.mp4(?:\?[^"'\s]*)?)""",
+            """file\s*:\s*["'](https?://[^"']+)["']""",
+            """source\s*:\s*["'](https?://[^"']+)["']"""
+        )
+
+        videoPatterns.forEach { pattern ->
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val videoUrl = fixUrl(match.groupValues[1])
+                if (isVideoUrl(videoUrl)) {
+                    println("Found iframe video: $videoUrl")
+                    createVideoLink(videoUrl, url, callback, "Iframe")
+                    return true
+                }
+            }
+        }
+
+    } catch (e: Exception) {
+        println("Error extracting from iframe $url: ${e.message}")
+    }
+    
+    return false
 }
 
 // ===== IMPROVED VIDEO URL DETECTION =====
@@ -433,36 +520,6 @@ private fun isVideoUrl(url: String): Boolean {
     return isVideo
 }
 
-// ===== SPECIFIC PLAYER EXTRACTORS =====
-
-private suspend fun extractFromCanliPlayer(
-    html: String,
-    playerUrl: String,
-    callback: (ExtractorLink) -> Unit
-): Boolean {
-    println("Extracting from CanliPlayer")
-    
-    val patterns = listOf(
-        """file\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-        """source\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-        """src\s*:\s*["'](https?://[^"']+\.(?:mp4|m3u8))["']""",
-        """(https?://[^"'\s]+\.fireplayer\.com[^"'\s]*\.(?:mp4|m3u8))""",
-        """(https?://[^"'\s]+/video/[^"'\s]+\.(?:mp4|m3u8))"""
-    )
-
-    patterns.forEach { pattern ->
-        Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
-            val videoUrl = fixUrl(match.groupValues[1])
-            if (isVideoUrl(videoUrl)) {
-                println("Found CanliPlayer video: $videoUrl")
-                createVideoLink(videoUrl, playerUrl, callback, "CanliPlayer")
-                return true
-            }
-        }
-    }
-    
-    return false
-}
 
     // ===== PARSER FUNCTIONS =====
     
