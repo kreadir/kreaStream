@@ -88,7 +88,26 @@ class CanliDizi : MainAPI() {
         
         var foundLinks = false
 
-        // Method 1: Direct video elements
+        // Method 1: Look for embedded video players (canliplayer.com, betaplayer.site, etc.)
+        val embeddedPlayerPatterns = listOf(
+            """(https?://[^"'\s]*canliplayer\.com[^"'\s]*)""",
+            """(https?://[^"'\s]*betaplayer\.site[^"'\s]*)""",
+            """(https?://[^"'\s]*player\.[^"'\s]*)""",
+            """(https?://[^"'\s]*embed\.?[^"'\s]*)""",
+            """(https?://[^"'\s]*video\.?[^"'\s]*)""",
+            """src=["'](https?://[^"']*/(?:embed|video|player)/[^"']*)["']"""
+        )
+
+        embeddedPlayerPatterns.forEach { pattern ->
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val playerUrl = fixUrl(match.groupValues[1])
+                if (extractFromExternalPlayer(playerUrl, data, callback, subtitleCallback)) {
+                    foundLinks = true
+                }
+            }
+        }
+
+        // Method 2: Direct video elements
         document.select("video source, video[src], audio source, audio[src]").forEach { videoElement ->
             videoElement.attr("src").let { fixUrl(it) }.takeIf { it.isNotBlank() && isVideoUrl(it) }?.let { videoUrl ->
                 createVideoLink(videoUrl, data, callback, "Direct Video")
@@ -96,16 +115,17 @@ class CanliDizi : MainAPI() {
             }
         }
 
-        // Method 2: Iframe extraction
+        // Method 3: Iframe extraction
         document.select("iframe[src], embed[src]").forEach { iframe ->
             iframe.attr("src").takeIf { it.isNotBlank() }?.let { iframeSrc ->
-                if (extractFromIframe(fixUrl(iframeSrc), callback, subtitleCallback)) {
+                val fixedIframeUrl = fixUrl(iframeSrc)
+                if (extractFromIframe(fixedIframeUrl, callback, subtitleCallback)) {
                     foundLinks = true
                 }
             }
         }
 
-        // Method 3: Data attributes
+        // Method 4: Data attributes
         document.select("[data-video-src], [data-src], [data-file], [data-url]").forEach { element ->
             listOf("data-video-src", "data-src", "data-file", "data-url").forEach { attr ->
                 element.attr(attr).takeIf { it.isNotBlank() }?.let { fixUrl(it) }?.let { videoUrl ->
@@ -117,7 +137,7 @@ class CanliDizi : MainAPI() {
             }
         }
 
-        // Method 4: JavaScript extraction
+        // Method 5: JavaScript extraction
         document.select("script").forEach { script ->
             extractVideoUrlsFromJavaScript(script.html()).forEach { videoUrl ->
                 if (isVideoUrl(videoUrl)) {
@@ -127,7 +147,7 @@ class CanliDizi : MainAPI() {
             }
         }
 
-        // Method 5: Regex patterns
+        // Method 6: Regex patterns for direct video files
         val regexPatterns = listOf(
             """(?:src|file|videoUrl|source)\s*[:=]\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']""",
             """(?:url|source)\s*\(\s*["']([^"']+\.(?:mp4|m3u8|webm|mkv|avi|mov))["']\s*\)""",
@@ -146,6 +166,222 @@ class CanliDizi : MainAPI() {
         }
 
         return foundLinks
+    }
+
+    // ===== EXTERNAL PLAYER EXTRACTION =====
+    private suspend fun extractFromExternalPlayer(
+        playerUrl: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit,
+        subtitleCallback: (SubtitleFile) -> Unit
+    ): Boolean {
+        try {
+            println("Extracting from external player: $playerUrl")
+            
+            val response = app.get(playerUrl, headers = mapOf(
+                "User-Agent" to USER_AGENT,
+                "Referer" to referer,
+                "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language" to "en-US,en;q=0.5",
+                "Accept-Encoding" to "gzip, deflate, br",
+                "DNT" to "1",
+                "Connection" to "keep-alive",
+                "Upgrade-Insecure-Requests" to "1"
+            ))
+
+            val document = response.document
+            val html = response.text
+
+            // Try to extract direct video URLs from the player page
+            val videoUrls = mutableListOf<String>()
+
+            // Look for direct video sources
+            document.select("video source, video[src]").forEach { source ->
+                source.attr("src").takeIf { it.isNotBlank() }?.let { videoUrls.add(fixUrl(it)) }
+            }
+
+            // Look for video URLs in data attributes
+            document.select("[data-src], [data-file], [data-video]").forEach { element ->
+                listOf("data-src", "data-file", "data-video").forEach { attr ->
+                    element.attr(attr).takeIf { it.isNotBlank() }?.let { videoUrls.add(fixUrl(it)) }
+                }
+            }
+
+            // Extract from JavaScript
+            videoUrls.addAll(extractVideoUrlsFromJavaScript(html))
+
+            // Special handling for specific players
+            when {
+                playerUrl.contains("canliplayer.com") -> {
+                    // Extract from canliplayer.com
+                    val canliPatterns = listOf(
+                        """file:\s*["']([^"']+\.(?:mp4|m3u8))["']""",
+                        """source\s*:\s*["']([^"']+\.(?:mp4|m3u8))["']""",
+                        """(https?://[^"'\s]+\.(?:mp4|m3u8))"""
+                    )
+                    
+                    canliPatterns.forEach { pattern ->
+                        Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                            match.groupValues[1].let { fixUrl(it) }?.let { videoUrls.add(it) }
+                        }
+                    }
+                }
+                
+                playerUrl.contains("betaplayer.site") -> {
+                    // Extract from betaplayer.site
+                    val betaPatterns = listOf(
+                        """(https?://[^"'\s]+\.(?:mp4|m3u8))""",
+                        """file\s*=\s*["']([^"']+)["']""",
+                        """src\s*:\s*["']([^"']+\.(?:mp4|m3u8))["']"""
+                    )
+                    
+                    betaPatterns.forEach { pattern ->
+                        Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                            match.groupValues[1].let { fixUrl(it) }?.let { videoUrls.add(it) }
+                        }
+                    }
+                }
+            }
+
+            // Create links for found video URLs
+            videoUrls.distinct().forEach { videoUrl ->
+                if (isVideoUrl(videoUrl)) {
+                    createVideoLink(videoUrl, playerUrl, callback, "External Player")
+                    return true
+                }
+            }
+
+            // If no direct video found, try to extract from iframes within the player
+            document.select("iframe[src]").forEach { iframe ->
+                val iframeSrc = iframe.attr("src").takeIf { it.isNotBlank() }?.let { fixUrl(it) }
+                if (iframeSrc != null && extractFromIframe(iframeSrc, callback, subtitleCallback)) {
+                    return true
+                }
+            }
+
+        } catch (e: Exception) {
+            println("Error extracting from external player $playerUrl: ${e.message}")
+            e.printStackTrace()
+        }
+        
+        return false
+    }
+
+    // ===== IFRAME EXTRACTION (UPDATED) =====
+    private suspend fun extractFromIframe(
+        url: String,
+        callback: (ExtractorLink) -> Unit,
+        subtitleCallback: (SubtitleFile) -> Unit
+    ): Boolean {
+        try {
+            println("Extracting from iframe: $url")
+            
+            val response = app.get(url, headers = mapOf(
+                "User-Agent" to USER_AGENT,
+                "Referer" to mainUrl,
+                "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language" to "en-US,en;q=0.5",
+                "Accept-Encoding" to "gzip, deflate, br",
+                "DNT" to "1",
+                "Connection" to "keep-alive",
+                "Upgrade-Insecure-Requests" to "1"
+            ))
+
+            val document = response.document
+            val html = response.text
+
+            // Look for direct video sources in the iframe
+            document.select("video source, video[src]").forEach { source ->
+                val videoUrl = source.attr("src").let { fixUrl(it) }
+                if (videoUrl.isNotBlank() && isVideoUrl(videoUrl)) {
+                    createVideoLink(videoUrl, url, callback, "Iframe Direct")
+                    return true
+                }
+            }
+
+            // Look for video URLs in data attributes
+            document.select("[data-src], [data-file], [data-video]").forEach { element ->
+                listOf("data-src", "data-file", "data-video").forEach { attr ->
+                    element.attr(attr).takeIf { it.isNotBlank() }?.let { videoUrl ->
+                        if (isVideoUrl(videoUrl)) {
+                            createVideoLink(fixUrl(videoUrl), url, callback, "Iframe Data Attribute")
+                            return true
+                        }
+                    }
+                }
+            }
+
+            // Extract from JavaScript in iframe
+            extractVideoUrlsFromJavaScript(html).forEach { videoUrl ->
+                if (isVideoUrl(videoUrl)) {
+                    createVideoLink(videoUrl, url, callback, "Iframe JavaScript")
+                    return true
+                }
+            }
+
+            // Try to find embedded players within the iframe
+            val embeddedPatterns = listOf(
+                """(https?://[^"'\s]*\.(?:mp4|m3u8))""",
+                """file\s*:\s*["']([^"']+\.(?:mp4|m3u8))["']""",
+                """source\s*:\s*["']([^"']+\.(?:mp4|m3u8))["']"""
+            )
+
+            embeddedPatterns.forEach { pattern ->
+                Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                    val videoUrl = fixUrl(match.groupValues[1])
+                    if (isVideoUrl(videoUrl)) {
+                        createVideoLink(videoUrl, url, callback, "Iframe Embedded")
+                        return true
+                    }
+                }
+            }
+
+        } catch (e: Exception) {
+            println("Error extracting from iframe $url: ${e.message}")
+            e.printStackTrace()
+        }
+        return false
+    }
+
+    // ===== CREATE VIDEO LINK =====
+    private suspend fun createVideoLink(
+        videoUrl: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit,
+        sourceName: String
+    ) {
+        try {
+            val quality = determineQuality(videoUrl)
+            val type = when {
+                videoUrl.contains(".m3u8") -> ExtractorLinkType.M3U8
+                videoUrl.contains(".mpd") -> ExtractorLinkType.DASH
+                else -> ExtractorLinkType.VIDEO
+            }
+
+            println("Found video: $videoUrl (Quality: $quality, Type: $type)")
+
+            callback.invoke(
+                newExtractorLink(
+                    "$name - $sourceName",
+                    name,
+                    videoUrl,
+                    type
+                ) {
+                    this.referer = referer
+                    this.quality = quality
+                    this.headers = mapOf(
+                        "User-Agent" to USER_AGENT,
+                        "Referer" to referer,
+                        "Accept" to "*/*",
+                        "Accept-Language" to "en-US,en;q=0.5",
+                        "Accept-Encoding" to "gzip, deflate, br",
+                        "Origin" to mainUrl.split("/").take(3).joinToString("/")
+                    )
+                }
+            )
+        } catch (e: Exception) {
+            println("Error creating video link: ${e.message}")
+        }
     }
 
     // ===== PARSER FUNCTIONS =====
@@ -455,67 +691,6 @@ class CanliDizi : MainAPI() {
             this.episode = epNum
             this.season = season
         }
-    }
-
-    // ===== LINK EXTRACTION HELPERS =====
-    
-    private suspend fun extractFromIframe(
-        url: String,
-        callback: (ExtractorLink) -> Unit,
-        subtitleCallback: (SubtitleFile) -> Unit
-    ): Boolean {
-        try {
-            val response = app.get(url, headers = mapOf(
-                "User-Agent" to USER_AGENT,
-                "Referer" to mainUrl
-            ))
-
-            val document = response.document
-
-            document.select("video source, video[src]").forEach { source ->
-                source.attr("src").let { fixUrl(it) }.takeIf { it.isNotBlank() && isVideoUrl(it) }?.let { videoUrl ->
-                    createVideoLink(videoUrl, url, callback, "Iframe Direct")
-                    return true
-                }
-            }
-
-            extractVideoUrlsFromJavaScript(response.text).forEach { videoUrl ->
-                if (isVideoUrl(videoUrl)) {
-                    createVideoLink(videoUrl, url, callback, "Iframe JS")
-                    return true
-                }
-            }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return false
-    }
-
-    private suspend fun createVideoLink(
-        videoUrl: String,
-        referer: String,
-        callback: (ExtractorLink) -> Unit,
-        sourceName: String
-    ) {
-        val quality = determineQuality(videoUrl)
-        val type = if (videoUrl.contains(".m3u8")) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-
-        callback.invoke(
-            newExtractorLink(
-                "$name - $sourceName",
-                name,
-                videoUrl,
-                type
-            ) {
-                this.referer = referer
-                this.quality = quality
-                this.headers = mapOf(
-                    "User-Agent" to USER_AGENT,
-                    "Referer" to referer
-                )
-            }
-        )
     }
 
     private fun extractVideoUrlsFromJavaScript(html: String): List<String> {
