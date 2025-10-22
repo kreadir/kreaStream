@@ -59,54 +59,6 @@ jobs:
       #- name: jq Araçlarını Kur (GolgeTV ve AnimeciX eklemeleri için)
         #run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: YerelDiziler Eklentisini plugins.json'a Elle Ekle
-        run: |
-          cd $GITHUB_WORKSPACE/builds
-          if ! jq -e '.[] | select(.internalName == "YerelDiziler")' plugins.json > /dev/null; then
-            jq '. += [{
-              "repositoryUrl": "https://github.com/kreadir/kreaStream",
-              "apiVersion": 3,
-              "status": 1,
-              "language": "tr",
-              "authors": ["kreadir"],
-              "tvTypes": ["Tv"],
-              "version": 2,
-              "internalName": "YerelDiziler",
-              "description": "YerelDiziler için CloudStream eklentisi",
-              "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/YerelDiziler.cs3",
-              "name": "Yerli Diziler",
-              "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/960px-Flag_of_Turkey.svg.png"
-            }]' plugins.json > plugins-new.json && mv plugins-new.json plugins.json
-          else
-            echo "YerelDiziler zaten plugins.json'da mevcut, eklenmedi."
-          fi
-          
-
-      - name: Puhu Eklentisini plugins.json'a Elle Ekle
-        run: |
-          cd $GITHUB_WORKSPACE/builds
-          if ! jq -e '.[] | select(.internalName == "Puhu")' plugins.json > /dev/null; then
-            jq '. += [{
-              "repositoryUrl": "https://github.com/kreadir/kreaStream",
-              "apiVersion": 3,
-              "status": 1,
-              "language": "tr",
-              "authors": ["kreadir"],
-             "tvTypes": [
-                          "TvSeries",
-                          "Movie"
-                        ],
-              "version": 2,
-              "internalName": "Puhu",
-              "description": "Puhu için CloudStream eklentisi",
-              "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/Puhu.cs3",
-              "name": "Puhu TV",
-              "iconUrl": "https://www.google.com/s2/favicons?domain=www.puhutv.com&sz=%size%"
-            }]' plugins.json > plugins-new.json && mv plugins-new.json plugins.json
-          else
-            echo "PuhuTV zaten plugins.json'da mevcut, eklenmedi."
-          fi
-          
       - name: Derlemeleri Yükle
         run: |
           cd $GITHUB_WORKSPACE/builds
