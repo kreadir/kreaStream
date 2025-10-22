@@ -372,7 +372,7 @@ class CanliDizi : MainAPI() {
             if (videoId.length != 11) return false
 
             callback.invoke(
-                ExtractorLink(
+                newExtractorLink(
                     "YouTube",
                     "YouTube",
                     youtubeUrl,
@@ -407,7 +407,7 @@ class CanliDizi : MainAPI() {
             println("Creating video link: $videoUrl (Quality: $quality, Type: $type)")
 
             callback.invoke(
-                ExtractorLink(
+                newExtractorLink(
                     "$name - $sourceName",
                     name,
                     videoUrl,
