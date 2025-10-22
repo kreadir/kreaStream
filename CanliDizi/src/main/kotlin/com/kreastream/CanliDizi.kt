@@ -376,11 +376,10 @@ class CanliDizi : MainAPI() {
                     "YouTube",
                     "YouTube",
                     youtubeUrl,
-                    "",
-                    Qualities.Unknown.value,
-                    false
+                    ExtractorLinkType.VIDEO
                 ) {
                     this.referer = referer
+                    this.quality = Qualities.Unknown.value
                 }
             )
             
@@ -413,11 +412,10 @@ class CanliDizi : MainAPI() {
                     "$name - $sourceName",
                     name,
                     videoUrl,
-                    "",
-                    quality,
-                    type == ExtractorLinkType.M3U8
+                    type
                 ) {
                     this.referer = referer
+                    this.quality = quality
                 }
             )
         } catch (e: Exception) {
