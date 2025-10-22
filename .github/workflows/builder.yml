@@ -55,8 +55,8 @@ jobs:
           cd $GITHUB_WORKSPACE/src
           chmod +x gradlew
           ./gradlew make makePluginsJson
-          cp **/builds/*.cs3 $GITHUB_WORKSPACE/builds
-          cp **/builds/plugins.json $GITHUB_WORKSPACE/builds
+          cp builds/*.cs3 $GITHUB_WORKSPACE/builds
+          cp builds/plugins.json $GITHUB_WORKSPACE/builds
 
       #- name: jq Araçlarını Kur (GolgeTV ve AnimeciX eklemeleri için)
         #run: sudo apt-get update && sudo apt-get install -y jq
