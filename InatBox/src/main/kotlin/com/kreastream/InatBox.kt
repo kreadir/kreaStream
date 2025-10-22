@@ -33,33 +33,27 @@ class InatBox : MainAPI() {
 
     override val mainPage = mainPageOf(
 
-        "${contentUrl}/ex/index.php"                           to "EXXEN",
-        "${contentUrl}/ga/index.php"                           to "Gain",
+        "${contentUrl}/ex/index.php"                                to "EXXEN",
+        "${contentUrl}/ga/index.php"                                to "Gain",
+        "${contentUrl}/CDN/001/dizibox/nf/index.php"                to "Netflix",
+        "${contentUrl}/dsny/index.php"                              to "Disney+",
+        "${contentUrl}/amz/index.php"                               to "Amazon Prime",
+        "${contentUrl}/hb/index.php"                                to "HBO Max",
+        "${contentUrl}/tbi/index.php"                               to "Tabii",
+        "https://boxbc.icu/CDN/001_STR/boxbc.icu/ccc/index.php"     to "TOD",
+        "${contentUrl}/tv/sinema.php"                               to "Sinema Kanalları",
+        "${contentUrl}/tv/ulusal.php"                               to "Ulusal Kanallar",
+        "https://boxbc.icu/CDN/001_STR/boxbc.icu/spor_v2.php"       to "Spor Kanalları",
         
-        "${contentUrl}/dsny/index.php"                         to "Disney+",
-        "${contentUrl}/amz/index.php"                          to "Amazon Prime",
-        "${contentUrl}/hb/index.php"                           to "HBO Max",
-        "${contentUrl}/tbi/index.php"                          to "Tabii",
-        //"${contentUrl}/film/mubi.php"                          to "Mubi",
-        "https://boxbc.icu/CDN/001_STR/boxbc.icu/ccc/index.php"                          to "TOD",
-        "${contentUrl}/tv/sinema.php"                          to "Sinema Kanalları",
-        "${contentUrl}/tv/ulusal.php"                          to "Ulusal Kanallar",
-        "https://boxbc.icu/CDN/001_STR/boxbc.icu/spor_v2.php"  to "Spor Kanalları",
-        
-
-        //"${contentUrl}/tv/list1.php"                           to "Kanallar Liste 1 ",
-        //"${contentUrl}/tv/list2.php"                           to "Kanallar Liste 2",
-        //"${contentUrl}/tv/list3.php"                           to "Kanallar Liste 3 ",
-        
-        //"${contentUrl}/tv/belgesel.php"                        to "Belgesel Kanalları",
-        
-        //"${contentUrl}/tv/haber.php"                           to "Haber Kanalları",
-        //"${contentUrl}/tv/eba.php"                             to "Eba Kanalları",
-        //"${contentUrl}/tv/cocuk.php"                           to "Çocuk Kanalları",
-        //"${contentUrl}/tv/dini.php"                            to "Dini Kanallar",
-       
-        
-        
+        //"${contentUrl}/film/mubi.php"                             to "Mubi",
+        //"${contentUrl}/tv/list1.php"                              to "Kanallar Liste 1 ",
+        //"${contentUrl}/tv/list2.php"                              to "Kanallar Liste 2",
+        //"${contentUrl}/tv/list3.php"                              to "Kanallar Liste 3 ",
+        //"${contentUrl}/tv/belgesel.php"                           to "Belgesel Kanalları",
+        //"${contentUrl}/tv/haber.php"                              to "Haber Kanalları",
+        //"${contentUrl}/tv/eba.php"                                to "Eba Kanalları",
+        //"${contentUrl}/tv/cocuk.php"                              to "Çocuk Kanalları",
+        //"${contentUrl}/tv/dini.php"                               to "Dini Kanallar",
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
