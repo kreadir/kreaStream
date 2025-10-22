@@ -4,6 +4,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.network.*
 import org.jsoup.nodes.Element
+import java.util.Base64
 
 class CanliDizi : MainAPI() {
     override var mainUrl = "https://www.canlidizi14.com"
@@ -87,15 +88,15 @@ class CanliDizi : MainAPI() {
         val document = app.get(data).document
         val html = document.html()
         
-        // Try YouTube extraction first
-        if (extractYouTubeLinks(html, data, callback)) {
-            println("YouTube extractor found links!")
+        // Try CanliPlayer extraction first (most common)
+        if (extractCanliPlayerLinks(html, data, callback)) {
+            println("CanliPlayer extractor found links!")
             return true
         }
         
-        // Try CanliPlayer extraction
-        if (extractCanliPlayerLinks(html, data, callback)) {
-            println("CanliPlayer extractor found links!")
+        // Try YouTube extraction
+        if (extractYouTubeLinks(html, data, callback)) {
+            println("YouTube extractor found links!")
             return true
         }
         
@@ -166,6 +167,7 @@ class CanliDizi : MainAPI() {
     private suspend fun extractCanliPlayerLinks(html: String, referer: String, callback: (ExtractorLink) -> Unit): Boolean {
         println("CanliPlayer extractor started")
         
+        // Look for canliplayer.com URLs
         val playerPatterns = listOf(
             """(https?://[^"'\s]*canliplayer\.com/fireplayer/video/[^"'\s]*)""",
             """(https?://[^"'\s]*canliplayer\.com[^"'\s]*video[^"'\s]*)""",
@@ -181,13 +183,18 @@ class CanliDizi : MainAPI() {
                     val response = app.get(playerUrl, referer = referer)
                     val playerHtml = response.text
                     
-                    // Look for YouTube IDs in packed JavaScript
+                    // Method 1: Look for base64 encoded video URLs in packed JavaScript
                     if (extractFromPackedJavaScript(playerHtml, playerUrl, callback)) {
                         return true
                     }
                     
-                    // Look for direct video URLs
+                    // Method 2: Look for direct video URLs in the HTML
                     if (extractDirectVideos(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Method 3: Look for YouTube embeds in CanliPlayer
+                    if (extractYouTubeFromCanliPlayer(playerHtml, playerUrl, callback)) {
                         return true
                     }
                     
@@ -300,17 +307,42 @@ class CanliDizi : MainAPI() {
         return false
     }
     
-    // ===== HELPER EXTRACTION METHODS =====
+    // ===== IMPROVED CANLIPLAYER EXTRACTION =====
     
     private suspend fun extractFromPackedJavaScript(
         html: String,
         referer: String,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        // Look for packed arrays containing YouTube IDs
+        println("Looking for packed JavaScript patterns...")
+        
+        // Method 1: Look for base64 encoded URLs in the packed JavaScript
+        // Pattern: "12":"base64string==" (like "12":"10==" in the example)
+        val base64Pattern = """"12"\s*:\s*"([A-Za-z0-9+/=]+)""""
+        Regex(base64Pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+            val base64String = match.groupValues[1]
+            println("Found base64 string: $base64String")
+            
+            try {
+                val decodedBytes = Base64.getDecoder().decode(base64String)
+                val decodedString = String(decodedBytes)
+                println("Decoded base64: $decodedString")
+                
+                if (isVideoUrl(decodedString)) {
+                    println("Found video URL in base64: $decodedString")
+                    createVideoLink(decodedString, referer, callback, "CanliPlayer Base64")
+                    return true
+                }
+            } catch (e: Exception) {
+                println("Failed to decode base64: ${e.message}")
+            }
+        }
+        
+        // Method 2: Look for the specific packed array pattern used by CanliPlayer
         val packedPatterns = listOf(
             """split\('\|'\)[^)]+\)[^,]+,\d+,[^,]+,'([^']+)'\)""",
-            """eval\(function\([^)]+\)\s*\([^,]+,\s*[^,]+,\s*[^,]+,\s*'([^']+)'\)"""
+            """eval\(function\([^)]+\)\s*\([^,]+,\s*[^,]+,\s*[^,]+,\s*'([^']+)'\)""",
+            """'([^']+)'\)\)\)\)\)\);"""
         )
         
         for (pattern in packedPatterns) {
@@ -318,14 +350,81 @@ class CanliDizi : MainAPI() {
                 val packedString = match.groupValues[1]
                 println("Found packed string: $packedString")
                 
+                // Try to extract YouTube IDs from packed array
                 val parts = packedString.split('|')
                 for (part in parts) {
-                    if (isValidYouTubeId(part)) {
+                    // Look for YouTube video IDs (11 characters)
+                    if (part.length == 11 && isValidYouTubeId(part)) {
                         val youtubeUrl = "https://www.youtube.com/watch?v=$part"
                         println("Found YouTube ID in packed array: $part")
                         if (createYouTubeLink(youtubeUrl, referer, callback)) {
                             return true
                         }
+                    }
+                    
+                    // Look for base64 encoded URLs in the packed parts
+                    if (part.length > 20 && part.matches(Regex("[A-Za-z0-9+/=]+"))) {
+                        try {
+                            val decodedBytes = Base64.getDecoder().decode(part)
+                            val decodedString = String(decodedBytes)
+                            if (isVideoUrl(decodedString)) {
+                                println("Found video URL in packed base64: $decodedString")
+                                createVideoLink(decodedString, referer, callback, "CanliPlayer Packed")
+                                return true
+                            }
+                        } catch (e: Exception) {
+                            // Not a valid base64, continue
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Method 3: Look for direct file references in the packed JavaScript
+        val filePatterns = listOf(
+            """file["']?\s*:\s*["']([^"']+)["']""",
+            """source["']?\s*:\s*["']([^"']+)["']""",
+            """url["']?\s*:\s*["']([^"']+)["']"""
+        )
+        
+        for (pattern in filePatterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val videoUrl = fixUrl(match.groupValues[1])
+                if (isVideoUrl(videoUrl)) {
+                    println("Found direct video in packed JS: $videoUrl")
+                    createVideoLink(videoUrl, referer, callback, "CanliPlayer JS")
+                    return true
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    private suspend fun extractYouTubeFromCanliPlayer(
+        html: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        println("Looking for YouTube embeds in CanliPlayer...")
+        
+        // Look for YouTube video IDs in various patterns
+        val youtubePatterns = listOf(
+            """youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})""",
+            """youtu\.be/([a-zA-Z0-9_-]{11})""",
+            """youtube\.com/embed/([a-zA-Z0-9_-]{11})""",
+            """videoId["']?\s*:\s*["']([^"']{11})["']""",
+            """src["']?\s*:\s*["']([^"']{11})["']"""
+        )
+        
+        for (pattern in youtubePatterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val videoId = match.groupValues[1]
+                if (isValidYouTubeId(videoId)) {
+                    val youtubeUrl = "https://www.youtube.com/watch?v=$videoId"
+                    println("Found YouTube URL in CanliPlayer: $youtubeUrl")
+                    if (createYouTubeLink(youtubeUrl, referer, callback)) {
+                        return true
                     }
                 }
             }
@@ -612,7 +711,7 @@ class CanliDizi : MainAPI() {
         val poster = document.selectFirst("img.poster, .poster img, .series-poster img")?.attr("src")?.let { fixUrl(it) }
             ?: document.selectFirst(".wp-post-image, .attachment-post-thumbnail")?.attr("src")?.let { fixUrl(it) }
             ?: document.selectFirst("img[data-wpfc-original-src]")?.attr("data-wpfc-original-src")?.let { fixUrl(it) }
-            ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
+            ?: document.SelectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
 
         val description = document.selectFirst("div.description, .plot, .synopsis, .entry-content")?.text()?.trim()
             ?: document.selectFirst("meta[name=description]")?.attr("content")?.trim()
@@ -712,59 +811,4 @@ class CanliDizi : MainAPI() {
     }
 
     private fun parseNewEpisodeItem(element: Element): Episode? {
-        val epUrl = element.attr("href")?.let { fixUrl(it) } ?: return null
-        
-        val epTitle = element.selectFirst("div.baslik")?.text()?.trim()
-            ?: element.attr("title")?.trim()
-            ?: "Episode"
-
-        val epNum = Regex("""(\d+)\.?Bölüm""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
-            ?: Regex("""\b(\d+)\b""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
-            ?: 1
-
-        return newEpisode(epUrl) {
-            this.name = epTitle
-            this.episode = epNum
-            this.season = 1
-        }
-    }
-
-    private fun parseEpisode(element: Element): Episode? {
-        val epTitle = element.selectFirst("span.episode-title, .episode-name, .title, a")?.text()?.trim() 
-            ?: element.selectFirst("img")?.attr("alt")?.trim()
-            ?: "Episode"
-        
-        val epUrl = element.selectFirst("a")?.attr("href")?.let { fixUrl(it) } ?: return null
-        
-        val epNum = element.selectFirst("span.episode-number, .episode-num, .number")?.text()?.toIntOrNull()
-            ?: Regex("""(\d+)\.?Bölüm""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
-            ?: Regex("""\b(\d+)\b""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
-            ?: 1
-
-        val season = element.selectFirst("span.season-number, .season-num")?.text()?.toIntOrNull()
-            ?: Regex("""(\d+)\.?Sezon""").find(epTitle)?.groupValues?.get(1)?.toIntOrNull()
-            ?: 1
-
-        return newEpisode(epUrl) {
-            this.name = epTitle
-            this.episode = epNum
-            this.season = season
-        }
-    }
-
-    // ===== UTILITY FUNCTIONS =====
-    
-    private fun String.encodeToUrl(): String {
-        return java.net.URLEncoder.encode(this, "UTF-8")
-    }
-
-    private fun determineQuality(url: String): Int {
-        return when {
-            url.contains("1080") -> Qualities.P1080.value
-            url.contains("720") -> Qualities.P720.value
-            url.contains("480") -> Qualities.P480.value
-            url.contains("360") -> Qualities.P360.value
-            else -> Qualities.Unknown.value
-        }
-    }
-}
+        val epUrl = element.attr("
