@@ -1,7 +1,7 @@
 version = 2
 
 cloudstream {
-    authors     = listOf("KreaStream")
+    authors     = listOf("kreaStream")
     language    = "tr"
     description = "Canlı Dizi için Cloudstream eklentisi"
     
@@ -13,6 +13,6 @@ cloudstream {
      * 3: Beta only
     **/
     status  = 1 // will be 3 if unspecified
-    tvTypes = listOf("TvSeries")
+    tvTypes = listOf("TvSeries", "Movie")
     iconUrl = "https://www.canlidizi14.com/favicon.ico"
 }

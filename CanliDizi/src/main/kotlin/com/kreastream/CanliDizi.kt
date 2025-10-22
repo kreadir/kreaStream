@@ -15,7 +15,7 @@ class CanliDizi : MainAPI() {
     override val hasQuickSearch = true
 
     companion object {
-        private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" // Removed private
     }
 
     // ===== MAIN PAGE =====
@@ -98,7 +98,7 @@ class CanliDizi : MainAPI() {
         for (extractor in extractors) {
             try {
                 println("Trying ${extractor.name} extractor...")
-                if (extractor.extract(html, data, callback, subtitleCallback)) {
+                if (extractor.extract(app, html, data, callback, subtitleCallback)) {
                     println("${extractor.name} extractor found links!")
                     return true
                 }
@@ -304,7 +304,7 @@ class CanliDizi : MainAPI() {
             ?: document.selectFirst("meta[property=og:image]")?.attr("content")?.let { fixUrl(it) }
 
         val description = document.selectFirst("div.cat_ozet, .plot, .synopsis, .entry-content")?.text()?.trim()
-            ?: document.SelectFirst("meta[property=og:description]")?.attr("content")?.trim()
+            ?: document.selectFirst("meta[property=og:description]")?.attr("content")?.trim() // Fixed: selectFirst (lowercase)
 
         return newMovieLoadResponse(title, url, TvType.Movie, url) {
             this.posterUrl = poster

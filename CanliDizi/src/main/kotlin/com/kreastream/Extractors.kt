@@ -7,6 +7,7 @@ import com.lagradost.cloudstream3.network.*
 interface VideoExtractor {
     val name: String
     suspend fun extract(
+        app: App,
         html: String,
         referer: String,
         callback: (ExtractorLink) -> Unit,
@@ -18,6 +19,7 @@ class YouTubeExtractor : VideoExtractor {
     override val name = "YouTube"
     
     override suspend fun extract(
+        app: App,
         html: String,
         referer: String,
         callback: (ExtractorLink) -> Unit,
@@ -68,7 +70,7 @@ class YouTubeExtractor : VideoExtractor {
                !url.contains("no-referrer")
     }
     
-    private suspend fun createYouTubeLink(
+    suspend fun createYouTubeLink( // Made public
         youtubeUrl: String,
         referer: String,
         callback: (ExtractorLink) -> Unit
@@ -106,6 +108,7 @@ class CanliPlayerExtractor : VideoExtractor {
     override val name = "CanliPlayer"
     
     override suspend fun extract(
+        app: App,
         html: String,
         referer: String,
         callback: (ExtractorLink) -> Unit,
@@ -224,6 +227,7 @@ class BetaPlayerExtractor : VideoExtractor {
     override val name = "BetaPlayer"
     
     override suspend fun extract(
+        app: App,
         html: String,
         referer: String,
         callback: (ExtractorLink) -> Unit,
@@ -251,7 +255,7 @@ class BetaPlayerExtractor : VideoExtractor {
                     
                     // Try YouTube extraction first
                     val youtubeExtractor = YouTubeExtractor()
-                    if (youtubeExtractor.extract(playerHtml, playerUrl, callback, subtitleCallback)) {
+                    if (youtubeExtractor.extract(app, playerHtml, playerUrl, callback, subtitleCallback)) {
                         return true
                     }
                     
@@ -300,6 +304,7 @@ class IframeExtractor : VideoExtractor {
     override val name = "Iframe"
     
     override suspend fun extract(
+        app: App,
         html: String,
         referer: String,
         callback: (ExtractorLink) -> Unit,
@@ -330,7 +335,7 @@ class IframeExtractor : VideoExtractor {
                     )
                     
                     for (extractor in extractors) {
-                        if (extractor.extract(iframeHtml, fixedUrl, callback, subtitleCallback)) {
+                        if (extractor.extract(app, iframeHtml, fixedUrl, callback, subtitleCallback)) {
                             return true
                         }
                     }
@@ -349,6 +354,7 @@ class DirectVideoExtractor : VideoExtractor {
     override val name = "DirectVideo"
     
     override suspend fun extract(
+        app: App,
         html: String,
         referer: String,
         callback: (ExtractorLink) -> Unit,
