@@ -43,18 +43,10 @@ open class HCCloseLoadExtractor : ExtractorApi() {
     ) {
         iSource.document.select("track").forEach {
             subtitleCallback.invoke(
-                // SubtitleFile(
-                //     lang = it.attr("label"),
-                //     url = mainUrl + it.attr("src")
-                // )
-                newSubtitleFile(
-                        lang,
-                        url
-                    ) 
-                    { 
-                        lang = it.attr("label"),
-                        url = mainUrl + it.attr("src")
-                    }
+                SubtitleFile(
+                    lang = it.attr("label"),
+                    url = mainUrl + it.attr("src")
+                )
             )
         }
         val track = obfuscatedScript?.substringAfter("tracks: ")?.substringBefore("]") + "]"
@@ -66,18 +58,10 @@ open class HCCloseLoadExtractor : ExtractorApi() {
             Log.d("KreaStream${this.name}", "tracks -> $tracks")
             tracks.forEach { it ->
                 subtitleCallback.invoke(
-                    // SubtitleFile(
-                    //     lang = it.label.toString(),
-                    //     url = mainUrl + it.file.toString()
-                    // )
-                    newSubtitleFile(
-                        lang,
-                        url
-                    ) 
-                    { 
-                        lang = it.attr("label"),
-                        url = mainUrl + it.attr("src")
-                    }
+                    SubtitleFile(
+                        lang = it.label.toString(),
+                        url = mainUrl + it.file.toString()
+                    )
                 )
             }
         }
