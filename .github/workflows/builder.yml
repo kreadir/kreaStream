@@ -34,8 +34,8 @@ jobs:
       - name: "'build' Depo Kontrolü"
         uses: actions/checkout@v4.2.2
         with:
-          ref: "master/builds"
-          path: "master/builds"
+          ref: "builds"
+          path: "builds"
 
       #- name: Eski Derlemeleri Temizle
         #run: rm $GITHUB_WORKSPACE/builds/*.cs3 || true
@@ -55,15 +55,15 @@ jobs:
           cd $GITHUB_WORKSPACE/src
           chmod +x gradlew
           ./gradlew make makePluginsJson
-          cp **/builds/*.cs3 $GITHUB_WORKSPACE/master/builds
-          cp **/builds/plugins.json $GITHUB_WORKSPACE/master/builds
+          cp **/builds/*.cs3 $GITHUB_WORKSPACE/builds
+          cp **/builds/plugins.json $GITHUB_WORKSPACE/builds
 
       #- name: jq Araçlarını Kur (GolgeTV ve AnimeciX eklemeleri için)
         #run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: YerelDiziler Eklentisini plugins.json'a Elle Ekle
         run: |
-          cd $GITHUB_WORKSPACE/master/builds
+          cd $GITHUB_WORKSPACE/builds
           if ! jq -e '.[] | select(.internalName == "YerelDiziler")' plugins.json > /dev/null; then
             jq '. += [{
               "repositoryUrl": "https://github.com/kreadir/kreaStream",
@@ -86,7 +86,7 @@ jobs:
 
       - name: Puhu Eklentisini plugins.json'a Elle Ekle
         run: |
-          cd $GITHUB_WORKSPACE/master/builds
+          cd $GITHUB_WORKSPACE/builds
           if ! jq -e '.[] | select(.internalName == "Puhu")' plugins.json > /dev/null; then
             jq '. += [{
               "repositoryUrl": "https://github.com/kreadir/kreaStream",
@@ -111,7 +111,7 @@ jobs:
           
       - name: Derlemeleri Yükle
         run: |
-          cd $GITHUB_WORKSPACE/master/builds
+          cd $GITHUB_WORKSPACE/builds
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add .
