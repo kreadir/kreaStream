@@ -206,53 +206,7 @@ class CanliDizi : MainAPI() {
         
         return false
     }
-    
-    private suspend fun extractBetaPlayerLinks(html: String, referer: String, callback: (ExtractorLink) -> Unit): Boolean {
-        println("BetaPlayer extractor started")
-        
-        // Look for betaplayer.site URLs
-        val playerPatterns = listOf(
-            """(https?://[^"'\s]*betaplayer\.site/embed/[^"'\s]*)""",
-            """(https?://[^"'\s]*betaplayer\.site[^"'\s]*)"""
-        )
 
-        for (pattern in playerPatterns) {
-            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
-                val playerUrl = fixUrl(match.groupValues[1])
-                println("Found BetaPlayer URL: $playerUrl")
-                
-                try {
-                    val response = app.get(playerUrl, referer = referer)
-                    val playerHtml = response.text
-                    
-                    // Method 1: Extract from JWPlayer configuration with base64 sources
-                    if (extractFromJWPlayerConfig(playerHtml, playerUrl, callback)) {
-                        return true
-                    }
-                    
-                    // Method 2: Try direct m3u8 URL extraction
-                    if (extractDirectBetaPlayerM3U8(playerHtml, playerUrl, callback)) {
-                        return true
-                    }
-                    
-                    // Method 3: Try YouTube extraction
-                    if (extractYouTubeLinks(playerHtml, playerUrl, callback)) {
-                        return true
-                    }
-                    
-                    // Method 4: Then try direct videos
-                    if (extractDirectVideos(playerHtml, playerUrl, callback)) {
-                        return true
-                    }
-                    
-                } catch (e: Exception) {
-                    println("Error fetching BetaPlayer: ${e.message}")
-                }
-            }
-        }
-        
-        return false
-    }
     
     private suspend fun extractIframeLinks(
         document: Element, 
@@ -313,139 +267,6 @@ class CanliDizi : MainAPI() {
                     return true
                 }
             }
-        }
-        
-        return false
-    }
-    
-    // ===== IMPROVED BETA PLAYER EXTRACTION =====
-    
-    private suspend fun extractFromJWPlayerConfig(
-        html: String,
-        referer: String,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        println("Looking for JWPlayer configuration...")
-        
-        // Method 1: Look for JWPlayer setup with base64 encoded sources
-        val jwPlayerPatterns = listOf(
-            """jwplayer\s*\(\s*["'][^"']+["']\s*\)\s*\.setup\s*\(\s*({[^}]+})\s*\)""",
-            """beplayer\s*=\s*jwplayer\s*\(\s*["'][^"']+["']\s*\)\s*\.setup\s*\(\s*({[^}]+})\s*\)""",
-            """sources\s*:\s*\[\s*{\s*file\s*:\s*"([^"]+)""""
-        )
-        
-        for (pattern in jwPlayerPatterns) {
-            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
-                try {
-                    if (pattern.contains("sources")) {
-                        // Extract just the base64 string from sources array
-                        val base64String = match.groupValues[1]
-                        println("Found base64 string in sources: $base64String")
-                        
-                        // Check if it's a betaplayer.site list URL
-                        if (base64String.contains("betaplayer.site/list/")) {
-                            val encodedPart = base64String.substringAfter("list/").substringBefore("\"")
-                            if (encodedPart.isNotBlank()) {
-                                println("Found betaplayer list encoded part: $encodedPart")
-                                if (decodeBetaPlayerList(encodedPart, referer, callback)) {
-                                    return true
-                                }
-                            }
-                        } else {
-                            // Try direct base64 decoding
-                            if (decodeAndCreateVideoLink(base64String, referer, callback, "BetaPlayer JWPlayer")) {
-                                return true
-                            }
-                        }
-                    } else {
-                        // Extract the entire JWPlayer configuration
-                        val configJson = match.groupValues[1]
-                        println("Found JWPlayer config: $configJson")
-                        
-                        // Look for sources array in the configuration
-                        val sourcesPattern = """sources\s*:\s*\[\s*\{[^}]+\}"""
-                        Regex(sourcesPattern, RegexOption.IGNORE_CASE).findAll(configJson).forEach { sourceMatch ->
-                            val sourceBlock = sourceMatch.value
-                            println("Found sources block: $sourceBlock")
-                            
-                            // Extract file URL from source block
-                            val filePattern = """file\s*:\s*"([^"]+)"""
-                            Regex(filePattern, RegexOption.IGNORE_CASE).findAll(sourceBlock).forEach { fileMatch ->
-                                val fileUrl = fileMatch.groupValues[1]
-                                println("Found file URL: $fileUrl")
-                                
-                                // Check if it's a betaplayer.site list URL
-                                if (fileUrl.contains("betaplayer.site/list/")) {
-                                    val encodedPart = fileUrl.substringAfter("list/").substringBefore("\"")
-                                    if (encodedPart.isNotBlank()) {
-                                        println("Found betaplayer list encoded part: $encodedPart")
-                                        if (decodeBetaPlayerList(encodedPart, referer, callback)) {
-                                            return true
-                                        }
-                                    }
-                                } else if (isVideoUrl(fileUrl)) {
-                                    createVideoLink(fileUrl, referer, callback, "BetaPlayer Direct")
-                                    return true
-                                }
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    println("Error parsing JWPlayer config: ${e.message}")
-                }
-            }
-        }
-        
-        return false
-    }
-    
-    private suspend fun decodeBetaPlayerList(
-        base64String: String,
-        referer: String,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        try {
-            println("Decoding BetaPlayer list base64: $base64String")
-            
-            // Decode the base64 string
-            val decodedBytes = Base64.getDecoder().decode(base64String)
-            val decodedString = String(decodedBytes)
-            println("First decode: $decodedString")
-            
-            // The decoded string might be another base64 string
-            if (decodedString.matches(Regex("[A-Za-z0-9+/=]+")) && decodedString.length > 50) {
-                // Try double decoding
-                val doubleDecodedBytes = Base64.getDecoder().decode(decodedString)
-                val doubleDecodedString = String(doubleDecodedBytes)
-                println("Double decoded: $doubleDecodedString")
-                
-                // Check if this is a valid video URL
-                if (isVideoUrl(doubleDecodedString)) {
-                    println("Found video URL after double decode: $doubleDecodedString")
-                    createVideoLink(doubleDecodedString, referer, callback, "BetaPlayer Double Decode")
-                    return true
-                }
-                
-                // If not a direct URL, it might be a path that needs to be combined with betaplayer.site
-                if (doubleDecodedString.startsWith("/") || !doubleDecodedString.contains("://")) {
-                    val fullUrl = "https://betaplayer.site$doubleDecodedString"
-                    println("Constructed full URL: $fullUrl")
-                    if (isVideoUrl(fullUrl)) {
-                        createVideoLink(fullUrl, referer, callback, "BetaPlayer Constructed")
-                        return true
-                    }
-                }
-            }
-            
-            // Check if the first decoded string is a video URL
-            if (isVideoUrl(decodedString)) {
-                println("Found video URL after first decode: $decodedString")
-                createVideoLink(decodedString, referer, callback, "BetaPlayer Single Decode")
-                return true
-            }
-            
-        } catch (e: Exception) {
-            println("Failed to decode BetaPlayer list: ${e.message}")
         }
         
         return false
@@ -1102,5 +923,282 @@ class CanliDizi : MainAPI() {
             url.contains("360") -> Qualities.P360.value
             else -> Qualities.Unknown.value
         }
+    }
+
+    // ===== IMPROVED BETA PLAYER EXTRACTION =====
+
+private suspend fun extractFromJWPlayerConfig(
+    html: String,
+    referer: String,
+    callback: (ExtractorLink) -> Unit
+): Boolean {
+    println("Looking for JWPlayer configuration...")
+    
+    // Method 1: Look for JWPlayer setup with base64 encoded sources
+    val jwPlayerPatterns = listOf(
+        """jwplayer\s*\(\s*["'][^"']+["']\s*\)\s*\.setup\s*\(\s*({[^}]+})\s*\)""",
+        """beplayer\s*=\s*jwplayer\s*\(\s*["'][^"']+["']\s*\)\s*\.setup\s*\(\s*({[^}]+})\s*\)""",
+        """sources\s*:\s*\[\s*{\s*file\s*:\s*"([^"]+)"""",
+        """file\s*:\s*"([^"]*betaplayer\.site/list/[^"]*)""""
+    )
+    
+    for (pattern in jwPlayerPatterns) {
+        Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+            try {
+                if (pattern.contains("sources") || pattern.contains("file")) {
+                    // Extract just the base64 string from sources array
+                    val fileUrl = match.groupValues[1]
+                    println("Found file URL: $fileUrl")
+                    
+                    // Check if it's a betaplayer.site list URL
+                    if (fileUrl.contains("betaplayer.site/list/")) {
+                        val encodedPart = fileUrl.substringAfter("list/").substringBefore("\"")
+                        if (encodedPart.isNotBlank()) {
+                            println("Found betaplayer list encoded part: $encodedPart")
+                            if (decodeBetaPlayerList(encodedPart, referer, callback)) {
+                                return true
+                            }
+                        }
+                    } else if (isVideoUrl(fileUrl)) {
+                        createVideoLink(fileUrl, referer, callback, "BetaPlayer Direct")
+                        return true
+                    }
+                } else {
+                    // Extract the entire JWPlayer configuration
+                    val configJson = match.groupValues[1]
+                    println("Found JWPlayer config: $configJson")
+                    
+                    // Look for sources array in the configuration
+                    val sourcesPattern = """sources\s*:\s*\[\s*\{[^}]+\}"""
+                    Regex(sourcesPattern, RegexOption.IGNORE_CASE).findAll(configJson).forEach { sourceMatch ->
+                        val sourceBlock = sourceMatch.value
+                        println("Found sources block: $sourceBlock")
+                        
+                        // Extract file URL from source block
+                        val filePattern = """file\s*:\s*"([^"]+)"""
+                        Regex(filePattern, RegexOption.IGNORE_CASE).findAll(sourceBlock).forEach { fileMatch ->
+                            val fileUrl = fileMatch.groupValues[1]
+                            println("Found file URL in config: $fileUrl")
+                            
+                            // Check if it's a betaplayer.site list URL
+                            if (fileUrl.contains("betaplayer.site/list/")) {
+                                val encodedPart = fileUrl.substringAfter("list/").substringBefore("\"")
+                                if (encodedPart.isNotBlank()) {
+                                    println("Found betaplayer list encoded part: $encodedPart")
+                                    if (decodeBetaPlayerList(encodedPart, referer, callback)) {
+                                        return true
+                                    }
+                                }
+                            } else if (isVideoUrl(fileUrl)) {
+                                createVideoLink(fileUrl, referer, callback, "BetaPlayer Config")
+                                return true
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                println("Error parsing JWPlayer config: ${e.message}")
+            }
+        }
+    }
+    
+    return false
+}
+
+private suspend fun decodeBetaPlayerList(
+    base64String: String,
+    referer: String,
+    callback: (ExtractorLink) -> Unit
+): Boolean {
+    try {
+        println("Decoding BetaPlayer list base64: $base64String")
+        
+        // Clean the base64 string (remove any trailing quotes or special characters)
+        val cleanBase64 = base64String.trim().replace("\"", "").replace("'", "")
+        
+        // Decode the base64 string
+        val decodedBytes = Base64.getDecoder().decode(cleanBase64)
+        val decodedString = String(decodedBytes, Charsets.UTF_8)
+        println("First decode: $decodedString")
+        
+        // The decoded string might be another base64 string
+        if (decodedString.matches(Regex("[A-Za-z0-9+/=]+")) && decodedString.length > 50) {
+            // Try double decoding
+            try {
+                val doubleDecodedBytes = Base64.getDecoder().decode(decodedString)
+                val doubleDecodedString = String(doubleDecodedBytes, Charsets.UTF_8)
+                println("Double decoded: $doubleDecodedString")
+                
+                // Check if this is a valid video URL
+                if (isVideoUrl(doubleDecodedString)) {
+                    println("Found video URL after double decode: $doubleDecodedString")
+                    createVideoLink(doubleDecodedString, referer, callback, "BetaPlayer Double Decode")
+                    return true
+                }
+                
+                // If not a direct URL, it might be a path that needs to be combined with betaplayer.site
+                if (doubleDecodedString.startsWith("/") || !doubleDecodedString.contains("://")) {
+                    val fullUrl = "https://betaplayer.site$doubleDecodedString"
+                    println("Constructed full URL: $fullUrl")
+                    if (isVideoUrl(fullUrl)) {
+                        createVideoLink(fullUrl, referer, callback, "BetaPlayer Constructed")
+                        return true
+                    }
+                }
+            } catch (e: Exception) {
+                println("Double decode failed, trying as direct URL: ${e.message}")
+            }
+        }
+        
+        // Check if the first decoded string is a video URL
+        if (isVideoUrl(decodedString)) {
+            println("Found video URL after first decode: $decodedString")
+            createVideoLink(decodedString, referer, callback, "BetaPlayer Single Decode")
+            return true
+        }
+        
+        // Try to extract m3u8 pattern from decoded content
+        val m3u8Pattern = """(https?://[^"\s]+\.m3u8[^"\s]*)"""
+        Regex(m3u8Pattern, RegexOption.IGNORE_CASE).findAll(decodedString).forEach { match ->
+            val m3u8Url = match.groupValues[1]
+            println("Found m3u8 URL in decoded content: $m3u8Url")
+            if (isVideoUrl(m3u8Url)) {
+                createVideoLink(m3u8Url, referer, callback, "BetaPlayer M3U8")
+                return true
+            }
+        }
+        
+    } catch (e: Exception) {
+        println("Failed to decode BetaPlayer list: ${e.message}")
+    }
+    
+    return false
+}
+
+    // ===== NEW SPECIFIC EXTRACTION FOR BETA PLAYER EMBED PAGES =====
+
+    private suspend fun extractBetaPlayerEmbed(
+        html: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        println("Extracting from BetaPlayer embed page...")
+        
+        // Method 1: Look for the specific base64 pattern in the embed page
+        val base64Patterns = listOf(
+            """file\s*:\s*"https://betaplayer\.site/list/([^"]+)""",
+            """sources\s*:\s*\[\s*{\s*file\s*:\s*"https://betaplayer\.site/list/([^"]+)""",
+            """betaplayer\.site/list/([A-Za-z0-9+/=]+={0,2})"""
+        )
+        
+        for (pattern in base64Patterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val base64String = match.groupValues[1]
+                if (base64String.isNotBlank()) {
+                    println("Found base64 string in embed: $base64String")
+                    if (decodeBetaPlayerList(base64String, referer, callback)) {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        // Method 2: Look for direct m3u8 URLs in the JavaScript
+        val m3u8Patterns = listOf(
+            """(https?://[^"'\s]+\.m3u8(?:\?[^"'\s]*)?)""",
+            """betaplayer\.site/m3u/([A-Za-z0-9+/=]+)""",
+            """(https?://betaplayer\.site/m3u/[^"'\s]+)"""
+        )
+        
+        for (pattern in m3u8Patterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                if (pattern.contains("https?")) {
+                    // Direct m3u8 URL
+                    val m3u8Url = fixUrl(match.groupValues[1])
+                    println("Found direct BetaPlayer m3u8 URL: $m3u8Url")
+                    createVideoLink(m3u8Url, referer, callback, "BetaPlayer M3U8 Direct")
+                    return true
+                } else {
+                    // Base64 encoded m3u8 path
+                    val base64String = match.groupValues[1]
+                    println("Found BetaPlayer m3u8 base64: $base64String")
+                    
+                    try {
+                        val decodedBytes = Base64.getDecoder().decode(base64String)
+                        val decodedPath = String(decodedBytes, Charsets.UTF_8)
+                        val m3u8Url = "https://betaplayer.site/m3u/$decodedPath"
+                        println("Constructed m3u8 URL: $m3u8Url")
+                        
+                        if (isVideoUrl(m3u8Url)) {
+                            createVideoLink(m3u8Url, referer, callback, "BetaPlayer M3U8 Base64")
+                            return true
+                        }
+                    } catch (e: Exception) {
+                        println("Failed to decode m3u8 base64: ${e.message}")
+                    }
+                }
+            }
+        }
+        
+        return false
+    }
+
+    // Update the main BetaPlayer extraction function to include embed page extraction
+    private suspend fun extractBetaPlayerLinks(html: String, referer: String, callback: (ExtractorLink) -> Unit): Boolean {
+        println("BetaPlayer extractor started")
+        
+        // First try embed page extraction (for direct embed pages like the one provided)
+        if (extractBetaPlayerEmbed(html, referer, callback)) {
+            println("BetaPlayer embed extractor found links!")
+            return true
+        }
+        
+        // Then try the original methods for embedded players
+        val playerPatterns = listOf(
+            """(https?://[^"'\s]*betaplayer\.site/embed/[^"'\s]*)""",
+            """(https?://[^"'\s]*betaplayer\.site[^"'\s]*)"""
+        )
+
+        for (pattern in playerPatterns) {
+            Regex(pattern, RegexOption.IGNORE_CASE).findAll(html).forEach { match ->
+                val playerUrl = fixUrl(match.groupValues[1])
+                println("Found BetaPlayer URL: $playerUrl")
+                
+                try {
+                    val response = app.get(playerUrl, referer = referer)
+                    val playerHtml = response.text
+                    
+                    // Method 1: Extract from JWPlayer configuration with base64 sources
+                    if (extractFromJWPlayerConfig(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Method 2: Try embed page extraction on the player page
+                    if (extractBetaPlayerEmbed(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Method 3: Try direct m3u8 URL extraction
+                    if (extractDirectBetaPlayerM3U8(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Method 4: Try YouTube extraction
+                    if (extractYouTubeLinks(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                    // Method 5: Then try direct videos
+                    if (extractDirectVideos(playerHtml, playerUrl, callback)) {
+                        return true
+                    }
+                    
+                } catch (e: Exception) {
+                    println("Error fetching BetaPlayer: ${e.message}")
+                }
+            }
+        }
+        
+        return false
     }
 }
