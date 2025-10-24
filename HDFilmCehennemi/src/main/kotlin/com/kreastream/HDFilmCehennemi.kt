@@ -15,7 +15,7 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import com.lagradost.cloudstream3.MainAPI
 import com.lagradost.cloudstream3.MainPageRequest
-import com.lagradost.cloudstream3.Score
+
 import com.lagradost.cloudstream3.SearchResponse
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.TvType
@@ -36,65 +36,110 @@ import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.getAndUnpack
 import com.lagradost.cloudstream3.utils.loadExtractor
-import com.lagradost.cloudstream3.utils.newExtractorLink
+
+
 import okhttp3.Interceptor
 import okhttp3.Response
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+
 import java.lang.Math.floorMod
 
 class HDFilmCehennemi : MainAPI() {
-    override var mainUrl = "https://www.hdfilmcehennemi.la"
-    override var name = "HDFilmCehennemi"
-    override val hasMainPage = true
-    override var lang = "tr"
-    override val hasQuickSearch = true
-    override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
+    override var mainUrl              = "https://www.hdfilmcehennemi.la"
+    override var name                 = "HDFilmCehennemi"
+    override val hasMainPage          = true
+    override var lang                 = "tr"
+    override val hasQuickSearch       = true
+    override val supportedTypes       = setOf(TvType.Movie, TvType.TvSeries)
 
-    // ! Cf bypass
-    override var sequentialMainPage =
-        true        // * https://recloudstream.github.io/dokka/-cloudstream/com.lagradost.cloudstream3/-main-a-p-i/index.html#-2049735995%2FProperties%2F101969414
-    override var sequentialMainPageDelay = 200L
-    override var sequentialMainPageScrollDelay = 200L
+    // ! CloudFlare bypass
+    override var sequentialMainPage = true        // * https://recloudstream.github.io/dokka/-cloudstream/com.lagradost.cloudstream3/-main-a-p-i/index.html#-2049735995%2FProperties%2F101969414
+    override var sequentialMainPageDelay       = 50L  // ? 0.05 saniye
+    override var sequentialMainPageScrollDelay = 50L  // ? 0.05 saniye
 
-    // ! cf bypass v2
+    // ! CloudFlare v2
     private val cloudflareKiller by lazy { CloudflareKiller() }
-    private val interceptor by lazy { CloudflareInterceptor(cloudflareKiller) }
+    private val interceptor      by lazy { CloudflareInterceptor(cloudflareKiller) }
 
-    class CloudflareInterceptor(private val cloudflareKiller: CloudflareKiller) : Interceptor {
+    class CloudflareInterceptor(private val cloudflareKiller: CloudflareKiller): Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
-            val request = chain.request()
+            val request  = chain.request()
             val response = chain.proceed(request)
-            val doc = Jsoup.parse(response.peekBody(1024 * 1024).string())
+            val doc      = Jsoup.parse(response.peekBody(1024 * 1024).string())
 
-            if (doc.select("title").text() == "Just a moment..." || doc.select("title")
-                    .text() == "Bir dakika lütfen..."
+            if (
+                doc.select("title").text() == "Just a moment..." ||
+                doc.select("title").text() == "Bir dakika lütfen..."
             ) {
                 return cloudflareKiller.intercept(chain)
             }
+ 
             return response
         }
     }
 
+    
+    /*override val mainPage = mainPageOf(
+        mainUrl                                           to "Yeni Eklenen Filmler",
+        "${mainUrl}/yabancidiziizle-2"                    to "Yeni Eklenen Diziler",
+        "${mainUrl}/category/tavsiye-filmler-izle2"       to "Tavsiye Filmler",
+        "${mainUrl}/imdb-7-puan-uzeri-filmler"            to "IMDB 7+ Filmler",
+        "${mainUrl}/dil/turkce-altyazili-filmleri-izle-2" to "Türkçe Altyazılı Filmler",
+        "${mainUrl}/dil/turkce-dublajli-film-izleyin-2"   to "Türkçe Dublaj Filmler",
+        "${mainUrl}/en-cok-yorumlananlar-1"               to "En Çok Yorumlananlar",
+        "${mainUrl}/en-cok-begenilen-filmleri-izle"       to "En Çok Beğenilenler",
+
+        "${mainUrl}/ulke/turkiye-2"                       to "Türk Filmleri",
+
+        "${mainUrl}/tur/aile-filmleri-izleyin-6"          to "Aile Filmleri",
+        "${mainUrl}/tur/aksiyon-filmleri-izleyin-3"       to "Aksiyon Filmleri",
+        "${mainUrl}/tur/animasyon-filmlerini-izleyin-4"   to "Animasyon Filmleri",
+        "${mainUrl}/tur/belgesel-filmlerini-izle-1"       to "Belgesel Filmleri",
+        "${mainUrl}/tur/bilim-kurgu-filmlerini-izleyin-2" to "Bilim Kurgu Filmleri",
+        "${mainUrl}/tur/biyografi-filmleri-izle-3"        to "Biyografi Filmleri",
+        "${mainUrl}/tur/dram-filmlerini-izle-1"           to "Dram Filmleri",
+        "${mainUrl}/tur/fantastik-filmlerini-izleyin-1"   to "Fantastik Filmleri",
+        // "${mainUrl}/tur/film-noir"                        to "Film-Noir Filmleri",
+        // "${mainUrl}/tur/game-show-izle"                   to "Game-Show Filmleri",
+        "${mainUrl}/tur/gerilim-filmlerini-izle-1"        to "Gerilim Filmleri",
+        "${mainUrl}/tur/gizem-filmleri-izle-3"            to "Gizem Filmleri",
+        "${mainUrl}/tur/komedi-filmlerini-izleyin-1"      to "Komedi Filmleri",
+        "${mainUrl}/tur/korku-filmlerini-izle-2"          to "Korku Filmleri",
+        "${mainUrl}/tur/macera-filmlerini-izleyin-1"      to "Macera Filmleri",
+        "${mainUrl}/tur/muzik-filmlerini-izle-1"          to "Müzik Filmleri",
+        // "${mainUrl}/tur/polisiye-filmleri-izle-1"         to "Polisiye Filmleri", - İçerik Yok
+        "${mainUrl}/tur/reality-izle-1"                   to "Reality Filmleri",
+        "${mainUrl}/tur/reality-tv-izle-1"                to "Reality-TV Filmleri",
+        "${mainUrl}/tur/romantik-filmleri-izle-1"         to "Romantik Filmleri",
+        "${mainUrl}/tur/savas-filmleri-izle-1"            to "Savaş Filmleri",
+        // "${mainUrl}/tur/science-fiction"                  to "Science Fiction Filmleri",
+        // "${mainUrl}/tur/short-filmleri"                   to "Short Filmleri",
+        "${mainUrl}/tur/spor-filmleri-izle-1"             to "Spor Filmleri",
+        "${mainUrl}/tur/suc-filmleri-izle-1"              to "Suç Filmleri",
+        "${mainUrl}/tur/tarih-filmleri-izle-1"            to "Tarih Filmleri",
+        // "${mainUrl}/tur/tv-movie"                         to "TV Movie Filmleri",
+        "${mainUrl}/tur/western-filmleri-izle-2"          to "Western Filmleri",
+    )*/
 
     override val mainPage = mainPageOf(
-        "${mainUrl}/load/page/sayfano/home/" to "Yeni Eklenen Filmler",
-        "${mainUrl}/load/page/sayfano/categories/nette-ilk-filmler/" to "Nette İlk Filmler",
-        "${mainUrl}/load/page/sayfano/home-series/" to "Yeni Eklenen Diziler",
-        "${mainUrl}/load/page/sayfano/categories/tavsiye-filmler-izle3/" to "Tavsiye Filmler",
-        "${mainUrl}/load/page/sayfano/imdb7/" to "IMDB 7+ Filmler",
-        "${mainUrl}/load/page/sayfano/mostCommented/" to "En Çok Yorumlananlar",
-        "${mainUrl}/load/page/sayfano/mostLiked/" to "En Çok Beğenilenler",
-        "${mainUrl}/load/page/sayfano/genres/aile-filmleri-izleyin-7/" to "Aile Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/aksiyon-filmleri-izleyin-6/" to "Aksiyon Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/animasyon-filmlerini-izleyin-5/" to "Animasyon Filmleri",
-        //"${mainUrl}/load/page/sayfano/genres/belgesel-filmlerini-izle-1/" to "Belgesel Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/bilim-kurgu-filmlerini-izleyin-4/" to "Bilim Kurgu Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/komedi-filmlerini-izleyin-2/" to "Komedi Filmleri",
-        //"${mainUrl}/load/page/sayfano/genres/korku-filmlerini-izle-4/" to "Korku Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/romantik-filmleri-izle-3/" to "Romantik Filmleri",
-        "${mainUrl}/load/page/sayfano/genres/suc-filmleri-izle-3/" to "Suç Filmleri",
-        //"${mainUrl}/load/page/sayfano/genres/tarih-filmleri-izle-4/" to "Tarih Filmleri"
+        "${mainUrl}/load/page/sayfano/home/"                                    to "Yeni Eklenen Filmler",
+        //"${mainUrl}/load/page/sayfano/categories/nette-ilk-filmler/"            to "Nette İlk Filmler",
+        "${mainUrl}/load/page/sayfano/home-series/"                             to "Yeni Eklenen Diziler",
+        "${mainUrl}/load/page/sayfano/categories/tavsiye-filmler-izle2/"        to "Tavsiye Filmler",
+        "${mainUrl}/load/page/sayfano/imdb7/"                                   to "IMDB 7+ Filmler",
+        //"${mainUrl}/load/page/sayfano/mostCommented/"                           to "En Çok Yorumlananlar",
+        "${mainUrl}/load/page/sayfano/mostLiked/"                               to "En Çok Beğenilenler",
+        //"${mainUrl}/load/page/sayfano/genres/aile-filmleri-izleyin-6/"          to "Aile Filmleri",
+        "${mainUrl}/load/page/sayfano/genres/aksiyon-filmleri-izleyin-5/"       to "Aksiyon Filmleri",
+        "${mainUrl}/load/page/sayfano/genres/animasyon-filmlerini-izleyin-5/"   to "Animasyon Filmleri",
+        //"${mainUrl}/load/page/sayfano/genres/belgesel-filmlerini-izle-1/"       to "Belgesel Filmleri",
+        "${mainUrl}/load/page/sayfano/genres/bilim-kurgu-filmlerini-izleyin-3/" to "Bilim Kurgu Filmleri",
+        "${mainUrl}/load/page/sayfano/genres/komedi-filmlerini-izleyin-1/"      to "Komedi Filmleri",
+        //"${mainUrl}/load/page/sayfano/genres/korku-filmlerini-izle-4/"          to "Korku Filmleri",
+        //"${mainUrl}/load/page/sayfano/genres/romantik-filmleri-izle-2/"         to "Romantik Filmleri",
+        //"${mainUrl}/load/page/sayfano/genres/suc-filmleri-izle-3/"              to "Suç Filmleri",
+        //"${mainUrl}/load/page/sayfano/genres/tarih-filmleri-izle-4/"            to "Tarih Filmleri"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
@@ -102,11 +147,16 @@ class HDFilmCehennemi : MainAPI() {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         val url = request.data.replace("sayfano", page.toString())
         val headers = mapOf(
-            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0",
             "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0",
-            "Accept" to "*/*", "X-Requested-With" to "fetch"
+            "Accept" to "*/*",
+            "X-Requested-With" to "fetch"
         )
-        val doc = app.get(url, headers = headers, referer = mainUrl, interceptor = interceptor)
+        val doc = app.get(
+            url,
+            headers = headers,
+            referer = mainUrl,
+            interceptor = interceptor
+        )
         val home: List<SearchResponse>?
         if (!doc.toString().contains("Sayfa Bulunamadı")) {
             val aa: HDFC = objectMapper.readValue(doc.toString())
@@ -119,22 +169,20 @@ class HDFilmCehennemi : MainAPI() {
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
-        val title = this.attr("title")
-        val href = fixUrlNull(this.attr("href")) ?: return null
+        val title     = this.attr("title")
+        val href      = fixUrlNull(this.attr("href")) ?: return null
         val posterUrl = fixUrlNull(this.selectFirst("img")?.attr("data-src"))
-        val score = this.selectFirst("span.imdb")?.text()?.trim()
-
         return newMovieSearchResponse(title, href, TvType.Movie) {
             this.posterUrl = posterUrl
-            this.score = Score.from10(score)
         }
     }
 
     override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val response = app.get(
+        val response      = app.get(
             "${mainUrl}/search?q=${query}",
+            interceptor = interceptor,
             headers = mapOf("X-Requested-With" to "fetch")
         ).parsedSafe<Results>() ?: return emptyList()
         val searchResults = mutableListOf<SearchResponse>()
@@ -142,11 +190,9 @@ class HDFilmCehennemi : MainAPI() {
         response.results.forEach { resultHtml ->
             val document = Jsoup.parse(resultHtml)
 
-            val title = document.selectFirst("h4.title")?.text() ?: return@forEach
-            val href = fixUrlNull(document.selectFirst("a")?.attr("href")) ?: return@forEach
-            val posterUrl = fixUrlNull(document.selectFirst("img")?.attr("src")) ?: fixUrlNull(
-                document.selectFirst("img")?.attr("data-src")
-            )
+            val title     = document.selectFirst("h4.title")?.text() ?: return@forEach
+            val href      = fixUrlNull(document.selectFirst("a")?.attr("href")) ?: return@forEach
+            val posterUrl = fixUrlNull(document.selectFirst("img")?.attr("src")) ?: fixUrlNull(document.selectFirst("img")?.attr("data-src"))
 
             searchResults.add(
                 newMovieSearchResponse(title, href, TvType.Movie) {
@@ -157,6 +203,7 @@ class HDFilmCehennemi : MainAPI() {
 
         return searchResults
     }
+
 
     override suspend fun load(url: String): LoadResponse? {
         val document = app.get(url, interceptor = interceptor).document
@@ -173,7 +220,7 @@ class HDFilmCehennemi : MainAPI() {
         val description = document.selectFirst("article.post-info-content > p")?.text()?.trim()
         val rating =
             document.selectFirst("div.post-info-imdb-rating span")?.text()?.substringBefore("(")
-                ?.trim()
+                ?.trim()?.toFloatOrNull()?.times(10)?.toInt()
         val actors = document.select("div.post-info-cast a").map {
             Actor(it.selectFirst("strong")!!.text(), it.select("img").attr("data-src"))
         }
@@ -217,7 +264,6 @@ class HDFilmCehennemi : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.score = Score.from10(rating)
                 this.recommendations = recommendations
                 addActors(actors)
                 addTrailer(trailer)
@@ -232,13 +278,14 @@ class HDFilmCehennemi : MainAPI() {
                 this.year = year
                 this.plot = description
                 this.tags = tags
-                this.score = Score.from10(rating)
                 this.recommendations = recommendations
                 addActors(actors)
                 addTrailer(trailer)
             }
         }
     }
+
+
 
     private fun dcHello(base64Input: String): String {
         val decodedOnce = base64Decode(base64Input)
@@ -288,7 +335,6 @@ class HDFilmCehennemi : MainAPI() {
         return String(unmixedBytes, Charsets.ISO_8859_1)
     }
 
-
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
@@ -296,19 +342,22 @@ class HDFilmCehennemi : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         Log.d("HDCH", "data » $data")
-        val document = app.get(data, interceptor = interceptor).document
+        val document = app.get(
+                data,
+                interceptor = interceptor
+            ).document
 
         document.select("div.alternative-links").map { element ->
             element to element.attr("data-lang").uppercase()
         }.forEach { (element, langCode) ->
             element.select("button.alternative-link").map { button ->
-                button.text().replace("(HDrip Xbet)", "")
-                    .trim() + " $langCode" to button.attr("data-video")
+                button.text().replace("(HDrip Xbet)", "").trim() + " $langCode" to button.attr("data-video")
             }.forEach { (source, videoID) ->
                 val apiGet = app.get(
-                    "${mainUrl}/video/$videoID/", interceptor = interceptor,
+                    "${mainUrl}/video/$videoID/",
+                    interceptor = interceptor,
                     headers = mapOf(
-                        "Content-Type" to "application/json",
+                        "Content-Type"     to "application/json",
                         "X-Requested-With" to "fetch"
                     ),
                     referer = data
@@ -326,16 +375,25 @@ class HDFilmCehennemi : MainAPI() {
                 }*/
                 loadExtractor(iframe, data, subtitleCallback, callback)
                 Log.d("HDCH", "$source » $videoID » $iframe")
+                /*
+                var iframe = Regex("""data-src=\\"([^"]+)""").find(apiGet)?.groupValues?.get(1)!!.replace("\\", "")
+                if (iframe.contains("?rapidrame_id=")) {
+                    iframe = "${mainUrl}/playerr/" + iframe.substringAfter("?rapidrame_id=")
+                }
+
+                Log.d("HDCH", "$source » $videoID » $iframe")
+                invokeLocalSource(source, iframe, subtitleCallback, callback)*/
             }
         }
+
         return true
     }
 
     private data class SubSource(
-        @JsonProperty("file") val file: String? = null,
-        @JsonProperty("label") val label: String? = null,
+        @JsonProperty("file")     val file: String? = null,
+        @JsonProperty("label")    val label: String? = null,
         @JsonProperty("language") val language: String? = null,
-        @JsonProperty("kind") val kind: String? = null
+        @JsonProperty("kind")     val kind: String? = null
     )
 
     data class Results(

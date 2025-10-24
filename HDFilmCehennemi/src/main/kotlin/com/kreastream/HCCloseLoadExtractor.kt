@@ -1,5 +1,7 @@
 package com.kreastream
 
+import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.utils.*
 import android.util.Log
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -16,7 +18,7 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.getAndUnpack
-import com.lagradost.cloudstream3.utils.newExtractorLink
+
 import com.lagradost.nicehttp.NiceResponse
 import java.lang.Math.floorMod
 import kotlin.collections.forEach
@@ -27,8 +29,8 @@ open class HCCloseLoadExtractor : ExtractorApi() {
     override val requiresReferer = true
 
     override suspend fun getUrl(url: String, referer: String?, subtitleCallback: (SubtitleFile) -> Unit, callback: (ExtractorLink) -> Unit) {
-        val extRef = referer ?: "https://hdfilmcehennemi.la"
-        Log.d("KreaStream${this.name}", "url » $url")
+        val extRef = referer ?: ""
+        Log.d("Kekik_${this.name}", "url » $url")
 
         val iSource = app.get(url, referer = extRef)
         val obfuscatedScript = iSource.document.select("script").find { it.data().contains("eval(function(p,a,c,k,e") }?.data()?.trim()
@@ -51,11 +53,11 @@ open class HCCloseLoadExtractor : ExtractorApi() {
         }
         val track = obfuscatedScript?.substringAfter("tracks: ")?.substringBefore("]") + "]"
         if (track.startsWith("[") && track.endsWith("]")) {
-            Log.d("KreaStream${this.name}", "track -> $track")
+            Log.d("Kekik_${this.name}", "track -> $track")
             val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             val tracks: List<SubSource> = objectMapper.readValue(track)
-            Log.d("KreaStream${this.name}", "tracks -> $tracks")
+            Log.d("Kekik_${this.name}", "tracks -> $tracks")
             tracks.forEach { it ->
                 subtitleCallback.invoke(
                     SubtitleFile(
@@ -78,28 +80,27 @@ open class HCCloseLoadExtractor : ExtractorApi() {
         val groupValues = match!!.groupValues[1]
 
         val lastUrl = if (helloVarmi) {
-            Log.d("KreaStream${this.name}", "groupValues » $groupValues")
+            Log.d("Kekik_${this.name}", "groupValues » $groupValues")
             val dcUrl = dcHello(groupValues).substringAfter("http")
-            Log.d("KreaStream${this.name}", "dcUrl » $dcUrl")
+            Log.d("Kekik_${this.name}", "dcUrl » $dcUrl")
             dcUrl
         } else{
             val parts = groupValues.split(",")
                 .map { it.trim().removeSurrounding("\"") }
-            Log.d("KreaStream${this.name}", "parts » $parts")
+            Log.d("Kekik_${this.name}", "parts » $parts")
             val dcUrl = dcNew(parts)
-            Log.d("KreaStream${this.name}", "dcUrl » $dcUrl")
+            Log.d("Kekik_${this.name}", "dcUrl » $dcUrl")
             dcUrl
         }
         callback.invoke(
-            newExtractorLink(
-                source  = this.name,
-                name    = this.name,
-                url     = lastUrl,
-                ExtractorLinkType.M3U8
-            ) {
-                this.referer = mainUrl
-                this.quality = Qualities.Unknown.value
-            }
+            ExtractorLink(
+                source = this.name,
+                name = this.name,
+                url = lastUrl,
+                referer = mainUrl,
+                quality = Qualities.Unknown.value,
+                type = ExtractorLinkType.M3U8
+            )
         )
     }
 
