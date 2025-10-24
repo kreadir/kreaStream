@@ -81,7 +81,7 @@ jobs:
             echo "HDFilmCehennemi zaten plugins.json'da mevcut, eklenmedi."
           fi
 
-      - name: Yerli Diziler Eklentisini plugins.json'a Elle Ekle
+      - name: YerelDiziler Eklentisini plugins.json'a Elle Ekle
         run: |
           cd $GITHUB_WORKSPACE/builds
           if ! jq -e '.[] | select(.internalName == "YerelDiziler")' plugins.json > /dev/null; then
