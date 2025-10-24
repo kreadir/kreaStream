@@ -83,17 +83,18 @@
         "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi.com&sz=%size%",
         "apiVersion": 1,
         "repositoryUrl": "https://github.com/kreadir/kreaStream",
-        "fileSize": 28047,
+        "fileSize": 27182,
         "status": 1,
         "language": "tr",
         "authors": [
-            "kreastream"
+            "hexated",
+            "keyiflerolsun"
         ],
         "tvTypes": [
             "Movie",
             "TvSeries"
         ],
-        "version": 36,
+        "version": 26,
         "internalName": "HDFilmCehennemi",
         "description": "T\u00fcrkiye'nin en h\u0131zl\u0131 hd film izleme sitesi",
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/HDFilmCehennemi.cs3",
