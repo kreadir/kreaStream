@@ -28,7 +28,7 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 
 
 class DiziPalOrijinal : MainAPI() {
-    override var mainUrl = "https://dizipal1506.com"
+    override var mainUrl = "https://dizipal1507.com"
     override var name = "DiziPal Orijinal"
     override val hasMainPage = true
     override var lang = "tr"
@@ -62,18 +62,18 @@ class DiziPalOrijinal : MainAPI() {
     override val mainPage = mainPageOf(
         "${mainUrl}/" to "Yeni Eklenen Bölümler",
         "" to "Yeni Eklenenler",
-        "" to "Yüksek Imdb Puanlı Diziler",
+        //"" to "Yüksek Imdb Puanlı Diziler",
         "" to "Yeni Filmler",
-        "1" to "Exxen Dizileri",
-        "6" to "Disney+ Dizileri",
-        "10" to "Netflix Dizileri",
-        "53" to "Amazon Dizileri",
-        "54" to "Apple TV+ Dizileri",
-        "66" to "Max Dizileri",
-        "78" to "Hulu Dizileri",
-        "181" to "TOD Dizileri",
-        "242" to "Tabii Dizileri",
-        "19" to "Anime",
+        "${mainUrl}/kanal/exxen" to "Exxen Dizileri",
+        "${mainUrl}/kanal/disney" to "Disney+ Dizileri",
+        "${mainUrl}/kanal/netflix" to "Netflix Dizileri",
+        "${mainUrl}/kanal/amazon" to "Amazon Dizileri",
+        "${mainUrl}/kanal/apple-tv" to "Apple TV+ Dizileri",
+        "${mainUrl}/kanal/max" to "Max Dizileri",
+        "${mainUrl}/kanal/hulu" to "Hulu Dizileri",
+        "${mainUrl}/kanal/tod" to "TOD Dizileri",
+        "${mainUrl}/kanal/tabii" to "Tabii Dizileri",
+        //"19" to "Anime",
     )
 
     private var sessionCookies: Map<String, String>? = null
