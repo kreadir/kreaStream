@@ -103,56 +103,6 @@ jobs:
             echo "YerelDiziler zaten plugins.json'da mevcut, eklenmedi."
           fi
 
-      - name: Puhu Eklentisini plugins.json'a Elle Ekle
-        run: |
-          cd $GITHUB_WORKSPACE/builds
-          if ! jq -e '.[] | select(.internalName == "Puhu")' plugins.json > /dev/null; then
-            jq '. += [{
-              "repositoryUrl": "https://github.com/kerimmkirac/cs-kerim",
-              "apiVersion": 1,
-              "status": 1,
-              "language": "tr",
-              "authors": ["kerimmkirac"],
-              "tvTypes": ["TvSeries"],
-              "version": 1,
-              "internalName": "Puhu",
-              "description": "Puhu için CloudStream eklentisi",
-              "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/Puhu.cs3",
-              "name": "Puhu",
-              "iconUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/35/c3/b7/35c3b7b0-4a84-cceb-d3e2-349e19712b07/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg"
-            }]' plugins.json > plugins-new.json && mv plugins-new.json plugins.json
-          else
-            echo "Puhu zaten plugins.json'da mevcut, eklenmedi."
-          fi
-
-      - name: JetFilmizle Eklentisini plugins.json'a Elle Ekle
-        run: |
-          cd $GITHUB_WORKSPACE/builds
-          if ! jq -e '.[] | select(.internalName == "JetFilmizle")' plugins.json > /dev/null; then
-            jq '. += [{
-              "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://jetfilmizle.de&size=128",
-              "apiVersion": 1,
-              "repositoryUrl": "https://github.com/Kraptor123/cs-kraptor",
-              "fileSize": 22713,
-              "status": 1,
-              "language": "tr",
-              "authors": [
-              "kraptor",
-              "keyiflerolsun"
-              ],
-              "tvTypes": [
-                "Movie"
-              ],
-              "version": 35,
-              "internalName": "JetFilmizle",
-              "description": "Binlerce Film İzleme Seçeneğiyle En İyi Film İzleme Sitesi",
-              "url": "https://raw.githubusercontent.com/Kraptor123/cs-kraptor/builds/JetFilmizle.cs3",
-              "name": "JetFilmizle"
-            }]' plugins.json > plugins-new.json && mv plugins-new.json plugins.json
-          else
-            echo "Puhu zaten plugins.json'da mevcut, eklenmedi."
-          fi
-
       - name: Derlemeleri Yükle
         run: |
           cd $GITHUB_WORKSPACE/builds
