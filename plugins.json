@@ -121,6 +121,19 @@
     "apiVersion": 1
   },
   {
+    "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Trt1.cs3",
+    "status": 1,
+    "version": 1,
+    "name": "Trt1",
+    "internalName": "Trt1",
+    "authors": [
+      "kreastream"
+    ],
+    "fileSize": 17839,
+    "repositoryUrl": "https://github.com/kreadir/kreaStream",
+    "apiVersion": 1
+  },
+  {
     "repositoryUrl": "https://github.com/kreadir/kreastream",
     "apiVersion": 1,
     "status": 1,
@@ -156,43 +169,5 @@
     "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/YerelDiziler.cs3",
     "name": "YerelDiziler",
     "iconUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/960px-Flag_of_Turkey.svg.png"
-  },
-  {
-    "repositoryUrl": "https://github.com/kerimmkirac/cs-kerim",
-    "apiVersion": 1,
-    "status": 1,
-    "language": "tr",
-    "authors": [
-      "kerimmkirac"
-    ],
-    "tvTypes": [
-      "TvSeries"
-    ],
-    "version": 1,
-    "internalName": "Puhu",
-    "description": "Puhu için CloudStream eklentisi",
-    "url": "https://github.com/kerimmkirac/cs-kerim/raw/refs/heads/builds/Puhu.cs3",
-    "name": "Puhu",
-    "iconUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/35/c3/b7/35c3b7b0-4a84-cceb-d3e2-349e19712b07/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg"
-  },
-  {
-    "iconUrl": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://jetfilmizle.de&size=128",
-    "apiVersion": 1,
-    "repositoryUrl": "https://github.com/Kraptor123/cs-kraptor",
-    "fileSize": 22713,
-    "status": 1,
-    "language": "tr",
-    "authors": [
-      "kraptor",
-      "keyiflerolsun"
-    ],
-    "tvTypes": [
-      "Movie"
-    ],
-    "version": 35,
-    "internalName": "JetFilmizle",
-    "description": "Binlerce Film İzleme Seçeneğiyle En İyi Film İzleme Sitesi",
-    "url": "https://raw.githubusercontent.com/Kraptor123/cs-kraptor/builds/JetFilmizle.cs3",
-    "name": "JetFilmizle"
   }
 ]
