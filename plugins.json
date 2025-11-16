@@ -22,14 +22,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziMom.cs3",
     "status": 1,
-    "version": 28,
+    "version": 29,
     "name": "DiziMom",
     "internalName": "DiziMom",
     "authors": [
       "keyiflerolsun"
     ],
     "description": "Binlerce yerli yabancı dizi arşivi, tüm sezonlar, kesintisiz bölümler. Sadece dizi izle, Dizimom heryerde seninle!",
-    "fileSize": 31508,
+    "fileSize": 31504,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
