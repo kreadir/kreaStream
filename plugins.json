@@ -121,16 +121,23 @@
     "apiVersion": 1
   },
   {
-    "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Trt1.cs3",
+    "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Trt.cs3",
     "status": 1,
-    "version": 1,
-    "name": "Trt1",
-    "internalName": "Trt1",
+    "version": 2,
+    "name": "Trt",
+    "internalName": "Trt",
     "authors": [
       "kreastream"
     ],
-    "fileSize": 17839,
+    "description": "TRT TV & Radyo & Diziler & Programlar",
+    "fileSize": 30953,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
+    "language": "tr",
+    "tvTypes": [
+      "TvSeries",
+      "Live"
+    ],
+    "iconUrl": "https://kariyer.trt.net.tr/wp-content/uploads/2022/01/trt-kariyer-logo.png",
     "apiVersion": 1
   },
   {
