@@ -59,28 +59,6 @@ jobs:
       #- name: jq Araçlarını Kur (GolgeTV ve AnimeciX eklemeleri için)
         #run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: HDFilmCehennemi Eklentisini plugins.json'a Elle Ekle
-        run: |
-          cd $GITHUB_WORKSPACE/builds
-          if ! jq -e '.[] | select(.internalName == "HDFilmCehennemi")' plugins.json > /dev/null; then
-            cat plugins.json | jq '. += [{
-              "repositoryUrl": "https://github.com/kreadir/kreastream",
-              "apiVersion": 1,
-              "status": 1,
-              "language": "tr",
-              "authors": ["kreaStream"],
-              "tvTypes": ["Tv","Movie"],
-              "version": 3,
-              "internalName": "HDFilmCehennemi",
-              "description": "Türkiye'\''nin en hızlı hd film izleme sitesi",
-              "url": "https://raw.githubusercontent.com/Kraptor123/cs-kraptor/builds/HDFilmCehennemi.cs3",
-              "name": "HDFilmCehennemi",
-              "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi.com&sz=%size%"
-            }]' > plugins-new.json && mv plugins-new.json plugins.json
-          else
-            echo "HDFilmCehennemi zaten plugins.json'da mevcut, eklenmedi."
-          fi
-
       - name: YerelDiziler Eklentisini plugins.json'a Elle Ekle
         run: |
           cd $GITHUB_WORKSPACE/builds
