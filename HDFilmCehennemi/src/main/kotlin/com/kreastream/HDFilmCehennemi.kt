@@ -11,6 +11,7 @@ import com.lagradost.cloudstream3.HomePageResponse
 import com.lagradost.cloudstream3.LoadResponse
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
+import com.lagradost.cloudstream3.DubStatus
 import com.lagradost.cloudstream3.MainAPI
 import com.lagradost.cloudstream3.MainPageRequest
 import com.lagradost.cloudstream3.Score
@@ -144,7 +145,7 @@ class HDFilmCehennemi : MainAPI() {
         val hasDub = lang?.contains("Dublaj", ignoreCase = true) == true || lang?.contains("Yerli", ignoreCase = true) == true
         
         // Subtitle status: checks for "Altyazılı"
-        val hasSub = lang?.contains("Altyazılı", ignoreCase = true) == true
+        val hasSub = lang?.contains("Altyaz", ignoreCase = true) == true
         
         val newTitle = if (hasDub) "🇹🇷 ${title}" else title
 
@@ -213,7 +214,8 @@ class HDFilmCehennemi : MainAPI() {
         return newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
             this.posterUrl = data.posterUrl
             this.score = Score.from10(data.score) 
-            this.posterHeaders = finalHeaders // Flags are added here
+            this.posterHeaders = finalHeaders
+            addDubStatus(isDub = true)
         }
     }
 
@@ -255,6 +257,7 @@ class HDFilmCehennemi : MainAPI() {
                     this.posterUrl = data.posterUrl?.replace("/thumb/", "/list/")
                     this.score = Score.from10(data.score)
                     this.posterHeaders = finalHeaders
+                    addDubStatus(if (data.hasDub) DubStatus.Dubbed else DubStatus.Subbed)
                 }
             )
         }
