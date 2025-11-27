@@ -1,4 +1,4 @@
-version = 2
+version = 3
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)

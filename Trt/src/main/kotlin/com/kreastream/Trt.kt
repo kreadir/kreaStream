@@ -10,7 +10,7 @@ import android.util.Log
 import java.util.Locale
 
 class Trt : MainAPI() {
-    override var mainUrl = "https://trt1.com.tr"
+    override var mainUrl = "https://www.trt1.com.tr:443"
     override var name = "TRT"
     override val supportedTypes = setOf(TvType.Live, TvType.TvSeries)
     override var lang = "tr"
