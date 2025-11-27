@@ -211,7 +211,7 @@ class HDFilmCehennemi : MainAPI() {
         
         val finalHeaders = if (headers.isEmpty()) null else headers
 
-        return newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
+        return newAnimeSearchResponse(data.newTitle, data.href, data.tvType) {
             this.posterUrl = data.posterUrl
             this.score = Score.from10(data.score) 
             this.posterHeaders = finalHeaders
@@ -252,7 +252,7 @@ class HDFilmCehennemi : MainAPI() {
             val finalHeaders = if (headers.isEmpty()) null else headers
 
             searchResults.add(
-                newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
+                newAnimeSearchResponse(data.newTitle, data.href, data.tvType) {
                     // FIX: Replaces /thumb/ with /list/ for better poster resolution/loading
                     this.posterUrl = data.posterUrl?.replace("/thumb/", "/list/")
                     this.score = Score.from10(data.score)
