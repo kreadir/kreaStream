@@ -11,7 +11,6 @@ import com.lagradost.cloudstream3.HomePageResponse
 import com.lagradost.cloudstream3.LoadResponse
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
-import com.lagradost.cloudstream3.DubStatus
 import com.lagradost.cloudstream3.MainAPI
 import com.lagradost.cloudstream3.MainPageRequest
 import com.lagradost.cloudstream3.Score
@@ -98,9 +97,7 @@ class HDFilmCehennemi : MainAPI() {
         val description: String?,
         val score: Float?,
         val actors: List<Actor>,
-        val trailer: String?,
-        val hasDub: Boolean,
-        val hasSub: Boolean
+        val trailer: String?
     )
 
     private fun Document.extractLoadData(): LoadData? {
@@ -122,7 +119,7 @@ class HDFilmCehennemi : MainAPI() {
         val trailer = this.selectFirst("div.post-info-trailer button")?.attr("data-modal")
             ?.substringAfter("trailer/")?.let { "https://www.youtube.com/embed/$it" }
 
-        return LoadData(title, newTitle, poster, tags, year, tvType, description, score, actors, trailer, hasDub, hasSub)
+        return LoadData(title, newTitle, poster, tags, year, tvType, description, score, actors, trailer)
     }
 
     private fun Element.extractPosterData(): PosterData? {
@@ -147,7 +144,7 @@ class HDFilmCehennemi : MainAPI() {
         val hasDub = lang?.contains("Dublaj", ignoreCase = true) == true || lang?.contains("Yerli", ignoreCase = true) == true
         
         // Subtitle status: checks for "Altyazılı"
-        val hasSub = lang?.contains("Altyaz", ignoreCase = true) == true
+        val hasSub = lang?.contains("Altyazılı", ignoreCase = true) == true
         
         val newTitle = if (hasDub) "🇹🇷 ${title}" else title
 
@@ -159,9 +156,9 @@ class HDFilmCehennemi : MainAPI() {
 
     override val mainPage = mainPageOf(
         "${mainUrl}/load/page/1/home/"                                    to "Yeni Eklenen Filmler",
-        //"${mainUrl}/load/page/1/categories/nette-ilk-filmler/"            to "Nette İlk Filmler",
+        "${mainUrl}/load/page/1/categories/nette-ilk-filmler/"            to "Nette İlk Filmler",
         "${mainUrl}/load/page/1/home-series/"                             to "Yeni Eklenen Diziler",
-        //"${mainUrl}/load/page/1/categories/tavsiye-filmler-izle2/"        to "Tavsiye Filmler",
+        "${mainUrl}/load/page/1/categories/tavsiye-filmler-izle2/"        to "Tavsiye Filmler",
         "${mainUrl}/load/page/1/imdb7/"                                   to "IMDB 7+ Filmler",
         "${mainUrl}/load/page/1/mostLiked/"                               to "En Çok Beğenilenler",
         "${mainUrl}/load/page/1/genres/aile-filmleri-izleyin-6/"          to "Aile Filmleri",
@@ -255,7 +252,7 @@ class HDFilmCehennemi : MainAPI() {
             searchResults.add(
                 newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
                     // FIX: Replaces /thumb/ with /list/ for better poster resolution/loading
-                    this.posterUrl = data.posterUrl?//.replace("/thumb/", "/list/")
+                    this.posterUrl = data.posterUrl?.replace("/thumb/", "/list/")
                     this.score = Score.from10(data.score)
                     this.posterHeaders = finalHeaders
                 }
