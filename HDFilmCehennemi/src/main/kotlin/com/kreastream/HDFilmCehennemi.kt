@@ -98,7 +98,9 @@ class HDFilmCehennemi : MainAPI() {
         val description: String?,
         val score: Float?,
         val actors: List<Actor>,
-        val trailer: String?
+        val trailer: String?,
+        val hasDub: Boolean,
+        val hasSub: Boolean
     )
 
     private fun Document.extractLoadData(): LoadData? {
@@ -120,7 +122,7 @@ class HDFilmCehennemi : MainAPI() {
         val trailer = this.selectFirst("div.post-info-trailer button")?.attr("data-modal")
             ?.substringAfter("trailer/")?.let { "https://www.youtube.com/embed/$it" }
 
-        return LoadData(title, newTitle, poster, tags, year, tvType, description, score, actors, trailer)
+        return LoadData(title, newTitle, poster, tags, year, tvType, description, score, actors, trailer, hasDub, hasSub)
     }
 
     private fun Element.extractPosterData(): PosterData? {
@@ -161,7 +163,7 @@ class HDFilmCehennemi : MainAPI() {
         "${mainUrl}/load/page/1/home-series/"                             to "Yeni Eklenen Diziler",
         //"${mainUrl}/load/page/1/categories/tavsiye-filmler-izle2/"        to "Tavsiye Filmler",
         "${mainUrl}/load/page/1/imdb7/"                                   to "IMDB 7+ Filmler",
-        //"${mainUrl}/load/page/1/mostLiked/"                               to "En Çok Beğenilenler",
+        "${mainUrl}/load/page/1/mostLiked/"                               to "En Çok Beğenilenler",
         "${mainUrl}/load/page/1/genres/aile-filmleri-izleyin-6/"          to "Aile Filmleri",
         "${mainUrl}/load/page/1/genres/aksiyon-filmleri-izleyin-5/"       to "Aksiyon Filmleri",
         "${mainUrl}/load/page/1/genres/animasyon-filmlerini-izleyin-5/"   to "Animasyon Filmleri",
@@ -186,7 +188,7 @@ class HDFilmCehennemi : MainAPI() {
         try {
             val hdfc: HDFC = objectMapper.readValue(response.text, HDFC::class.java)
             val document = Jsoup.parse(hdfc.html)
-            val results = document.select("a").mapNotNull { it.toSearchResponse() }
+            val results = document.select("a").mapNotNull { it.toSearchResult() }
             return newHomePageResponse(request.name, results)
         } catch (e: Exception) {
             return newHomePageResponse(request.name, emptyList())
@@ -196,7 +198,7 @@ class HDFilmCehennemi : MainAPI() {
     /**
      * FIX: Adds 'Dub'/'Sub' flags (posterHeaders) on posters for main pages.
      */
-    private fun Element.toSearchResponse(): AnimeSearchResponse {
+    private fun Element.toSearchResult(): SearchResponse? {
         val data = this.extractPosterData() ?: return null
         
         val headers = mutableMapOf<String, String>()
@@ -211,11 +213,10 @@ class HDFilmCehennemi : MainAPI() {
         
         val finalHeaders = if (headers.isEmpty()) null else headers
 
-        return newAnimeSearchResponse(data.newTitle, data.href, data.tvType) {
+        return newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
             this.posterUrl = data.posterUrl
             this.score = Score.from10(data.score) 
-            this.posterHeaders = finalHeaders
-            addDubStatus(isDub = true)
+            this.posterHeaders = finalHeaders // Flags are added here
         }
     }
 
@@ -252,12 +253,11 @@ class HDFilmCehennemi : MainAPI() {
             val finalHeaders = if (headers.isEmpty()) null else headers
 
             searchResults.add(
-                newAnimeSearchResponse(data.newTitle, data.href, data.tvType) {
+                newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
                     // FIX: Replaces /thumb/ with /list/ for better poster resolution/loading
-                    this.posterUrl = data.posterUrl?.replace("/thumb/", "/list/")
+                    this.posterUrl = data.posterUrl?//.replace("/thumb/", "/list/")
                     this.score = Score.from10(data.score)
                     this.posterHeaders = finalHeaders
-                    addDubStatus(if (data.hasDub) DubStatus.Dubbed else DubStatus.Subbed)
                 }
             )
         }
