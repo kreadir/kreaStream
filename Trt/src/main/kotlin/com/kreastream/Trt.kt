@@ -10,7 +10,7 @@ import android.util.Log
 import java.util.Locale
 
 class Trt : MainAPI() {
-    override var mainUrl = "https://www.trt1.com.tr:443"
+    override var mainUrl = "https://trt1.com.tr"
     override var name = "TRT"
     override val supportedTypes = setOf(TvType.Live, TvType.TvSeries)
     override var lang = "tr"
@@ -407,9 +407,9 @@ class Trt : MainAPI() {
                 val title = doc.selectFirst("h1")?.text()?.trim()
                     ?: throw ErrorLoadingException("Başlık bulunamadı")
                 val plot = doc.selectFirst("meta[name=description]")?.attr("content") ?: ""
-                var poster = doc.selectFirst("meta[property=og:image]")?.attr("content")
-                poster = poster?.replace(Regex("webp/w\\d+/h\\d+"), "webp/w600/h338")
-                    ?.replace("/q75/", "/q85/")
+                var poster = fixUrlNull(doc.selectFirst("picture.card_card-image__T64bP img")?.attr("src"))
+                poster = poster?.replace(Regex("webp/w\\d+/h\\d+"), "webp/w600/h338")?.replace("/q75/", "/q85/")
+
 
                 val basePath = if (url.contains("/diziler/")) "diziler" else "programlar"
                 val slug = url.removePrefix("$trt1Url/$basePath/").substringBefore("/")

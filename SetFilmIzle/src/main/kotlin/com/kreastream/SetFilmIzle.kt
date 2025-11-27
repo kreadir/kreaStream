@@ -1,33 +1,10 @@
-// ! Bu araç @keyiflerolsun tarafından | @KekikAkademi için yazılmıştır.
-
 package com.kreastream
 
 import android.util.Log
-import com.lagradost.cloudstream3.Actor
-import com.lagradost.cloudstream3.HomePageResponse
-import com.lagradost.cloudstream3.LoadResponse
+import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.addActors
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
-import com.lagradost.cloudstream3.MainAPI
-import com.lagradost.cloudstream3.MainPageRequest
-import com.lagradost.cloudstream3.Score
-import com.lagradost.cloudstream3.SearchResponse
-import com.lagradost.cloudstream3.SubtitleFile
-import com.lagradost.cloudstream3.TvType
-import com.lagradost.cloudstream3.app
-import com.lagradost.cloudstream3.fixUrlNull
-import com.lagradost.cloudstream3.mainPageOf
-import com.lagradost.cloudstream3.newEpisode
-import com.lagradost.cloudstream3.newHomePageResponse
-import com.lagradost.cloudstream3.newMovieLoadResponse
-import com.lagradost.cloudstream3.newMovieSearchResponse
-import com.lagradost.cloudstream3.newTvSeriesLoadResponse
-import com.lagradost.cloudstream3.newTvSeriesSearchResponse
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.ExtractorLinkType
-import com.lagradost.cloudstream3.utils.Qualities
-import com.lagradost.cloudstream3.utils.loadExtractor
-import com.lagradost.cloudstream3.utils.newExtractorLink
+import com.lagradost.cloudstream3.utils.*
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -41,34 +18,20 @@ class SetFilmIzle : MainAPI() {
     override var name = "SetFilmIzle"
     override val hasMainPage = true
     override var lang = "tr"
-    override val hasQuickSearch = false
+    override val hasQuickSearch = true
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
 
     override val mainPage = mainPageOf(
+        "${mainUrl}/film/" to "Yeni Filmler",
+        "${mainUrl}/bolum/" to "Yeni Bölümler",
+        "${mainUrl}/yerli-filmler/" to "Yerli Filmler",
+        "${mainUrl}/dizi/" to "Yeni Diziler",
         "${mainUrl}/tur/aile/" to "Aile",
         "${mainUrl}/tur/aksiyon/" to "Aksiyon",
         "${mainUrl}/tur/animasyon/" to "Animasyon",
-        "${mainUrl}/tur/belgesel/" to "Belgesel",
-        "${mainUrl}/tur/bilim-kurgu/" to "Bilim-Kurgu",
-        "${mainUrl}/tur/biyografi/" to "Biyografi",
-        "${mainUrl}/tur/dini/" to "Dini",
-        "${mainUrl}/tur/dram/" to "Dram",
         "${mainUrl}/tur/fantastik/" to "Fantastik",
-        "${mainUrl}/tur/genclik/" to "Gençlik",
-        "${mainUrl}/tur/gerilim/" to "Gerilim",
-        "${mainUrl}/tur/gizem/" to "Gizem",
         "${mainUrl}/tur/komedi/" to "Komedi",
-        "${mainUrl}/tur/korku/" to "Korku",
-        "${mainUrl}/tur/macera/" to "Macera",
-        "${mainUrl}/tur/mini-dizi/" to "Mini Dizi",
-        "${mainUrl}/tur/muzik/" to "Müzik",
-        "${mainUrl}/tur/program/" to "Program",
-        "${mainUrl}/tur/romantik/" to "Romantik",
-        "${mainUrl}/tur/savas/" to "Savaş",
-        "${mainUrl}/tur/spor/" to "Spor",
-        "${mainUrl}/tur/suc/" to "Suç",
-        "${mainUrl}/tur/tarih/" to "Tarih",
-        "${mainUrl}/tur/western/" to "Western"
+        "${mainUrl}/tur/macera/" to "Macera"
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
@@ -78,21 +41,32 @@ class SetFilmIzle : MainAPI() {
         return newHomePageResponse(request.name, home)
     }
 
+    private fun Element.extractTitleWithDubInfo(): Pair<String, String?> {
+        val title = this.selectFirst("h2")?.text() ?: return "" to null
+        val dubSub = this.selectFirst(".anadil")?.text()?.trim()
+        val hasDub = dubSub?.startsWith("Dublaj", ignoreCase = true) == true || dubSub?.startsWith("Yerli", ignoreCase = true) == true
+        val newTitle = if (hasDub) "🇹🇷 $title" else title
+        return newTitle to dubSub
+    }
+
     private fun Element.toMainPageResult(): SearchResponse? {
-        val title = this.selectFirst("h2")?.text() ?: return null
+        val (newTitle, _) = this.extractTitleWithDubInfo()
         val href = fixUrlNull(this.selectFirst("a")?.attr("href")) ?: return null
         val posterUrl = fixUrlNull(this.selectFirst("img")?.attr("data-src"))
         val score = this.selectFirst("span.rating")?.text()?.trim()
+        val year = this.selectFirst("span.year")?.text()?.trim()?.toIntOrNull()
 
-        return if (href.contains("/dizi/")) {
-            newTvSeriesSearchResponse(title, href, TvType.TvSeries) {
+        return if (href.contains("/dizi/") || href.contains("/bolum/")) {
+            newTvSeriesSearchResponse(newTitle, href, TvType.TvSeries) {
                 this.posterUrl = posterUrl
                 this.score = Score.from10(score)
+                this.year = year
             }
         } else {
-            newMovieSearchResponse(title, href, TvType.Movie) {
+            newMovieSearchResponse(newTitle, href, TvType.Movie) {
                 this.posterUrl = posterUrl
                 this.score = Score.from10(score)
+                this.year = year
             }
         }
     }
@@ -115,14 +89,24 @@ class SetFilmIzle : MainAPI() {
     }
 
     private fun Element.toSearchResult(): SearchResponse? {
-        val title = this.selectFirst("h2")?.text() ?: return null
+        val (newTitle, _) = this.extractTitleWithDubInfo()
         val href = fixUrlNull(this.selectFirst("a")?.attr("href")) ?: return null
         val posterUrl = fixUrlNull(this.selectFirst("img")?.attr("data-src"))
+        val score = this.selectFirst("span.rating")?.text()?.trim()
+        val year = this.selectFirst("span.year")?.text()?.trim()?.toIntOrNull()
 
-        return if (href.contains("/dizi/")) {
-            newTvSeriesSearchResponse(title, href, TvType.TvSeries) { this.posterUrl = posterUrl }
+        return if (href.contains("/dizi/") || href.contains("/bolum/")) {
+            newTvSeriesSearchResponse(newTitle, href, TvType.TvSeries) {
+                this.posterUrl = posterUrl
+                this.score = Score.from10(score)
+                this.year = year
+            }
         } else {
-            newMovieSearchResponse(title, href, TvType.Movie) { this.posterUrl = posterUrl }
+            newMovieSearchResponse(newTitle, href, TvType.Movie) {
+                this.posterUrl = posterUrl
+                this.score = Score.from10(score)
+                this.year = year
+            }
         }
     }
 

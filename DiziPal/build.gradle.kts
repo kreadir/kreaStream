@@ -1,18 +1,10 @@
-version = 31
+version = 24
 
 cloudstream {
-    authors     = listOf("keyiflerolsun", "muratcesmecioglu")
+    authors     = listOf("kreastream")
     language    = "tr"
     description = "en yeni dizileri güvenli ve hızlı şekilde sunar."
-
-    /**
-     * Status int as the following:
-     * 0: Down
-     * 1: Ok
-     * 2: Slow
-     * 3: Beta only
-    **/
-    status  = 1 // will be 3 if unspecified
+    status  = 1
     tvTypes = listOf("TvSeries", "Movie")
-    iconUrl = "https://www.google.com/s2/favicons?domain=https://dizipal1205.com&sz=%size%"
+    iconUrl = "https://www.google.com/s2/favicons?domain=https://dizipal1220.com&sz=%size%"
 }
