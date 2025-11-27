@@ -6,10 +6,10 @@
     "name": "CanliDizi",
     "internalName": "CanliDizi",
     "authors": [
-      "kreaStream"
+      "kreastream"
     ],
     "description": "Canlı Dizi için Cloudstream eklentisi",
-    "fileSize": 43491,
+    "fileSize": 22741,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
@@ -22,14 +22,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziMom.cs3",
     "status": 1,
-    "version": 29,
+    "version": 3,
     "name": "DiziMom",
     "internalName": "DiziMom",
     "authors": [
-      "keyiflerolsun"
+      "kreastream"
     ],
     "description": "Binlerce yerli yabancı dizi arşivi, tüm sezonlar, kesintisiz bölümler. Sadece dizi izle, Dizimom heryerde seninle!",
-    "fileSize": 31504,
+    "fileSize": 31502,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
@@ -41,12 +41,11 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPal.cs3",
     "status": 1,
-    "version": 31,
+    "version": 25,
     "name": "DiziPal",
     "internalName": "DiziPal",
     "authors": [
-      "keyiflerolsun",
-      "muratcesmecioglu"
+      "kreastream"
     ],
     "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
     "fileSize": 20092,
@@ -56,27 +55,46 @@
       "TvSeries",
       "Movie"
     ],
-    "iconUrl": "https://www.google.com/s2/favicons?domain=https://dizipal1205.com&sz=%size%",
+    "iconUrl": "https://www.google.com/s2/favicons?domain=https://dizipal1220.com&sz=%size%",
     "apiVersion": 1
   },
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPalOrijinal.cs3",
     "status": 1,
-    "version": 28,
+    "version": 2,
     "name": "DiziPalOrijinal",
     "internalName": "DiziPalOrijinal",
     "authors": [
-      "kerimmkirac",
-      "kraptor"
+      "kreastream"
     ],
     "description": "DiziPal Orijinal.",
-    "fileSize": 44165,
+    "fileSize": 44161,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
       "TvSeries"
     ],
     "iconUrl": "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dizipal932.com&size=128",
+    "apiVersion": 1
+  },
+  {
+    "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/HDFilmCehennemi.cs3",
+    "status": 1,
+    "version": 3,
+    "name": "HDFilmCehennemi",
+    "internalName": "HDFilmCehennemi",
+    "authors": [
+      "kreastream"
+    ],
+    "description": "Türkiye'nin en hızlı hd film izleme sitesi",
+    "fileSize": 26272,
+    "repositoryUrl": "https://github.com/kreadir/kreaStream",
+    "language": "tr",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi.com&sz=%size%",
     "apiVersion": 1
   },
   {
@@ -101,23 +119,42 @@
     "apiVersion": 1
   },
   {
+    "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/NeonSpor.cs3",
+    "status": 1,
+    "version": 9,
+    "name": "NeonSpor",
+    "internalName": "NeonSpor",
+    "authors": [
+      "sarapcanagii"
+    ],
+    "description": "(Açılmayan Spor Kanallar İçin VPN Gerekebilir.) NeonSpor eklentisinde BeIN Sports, Tabii Spor, S Sports, Exxen Spor, Smart Spor, Tivibu Spor ve Diğer kanallar mevcuttur.",
+    "fileSize": 18712,
+    "repositoryUrl": "https://github.com/kreadir/kreaStream",
+    "language": "tr",
+    "tvTypes": [
+      "Live"
+    ],
+    "iconUrl": "https://www.google.com/s2/favicons?domain=colorhunt.co&sz=%size%",
+    "apiVersion": 1
+  },
+  {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/SetFilmIzle.cs3",
     "status": 1,
-    "version": 14,
+    "version": 15,
     "name": "SetFilmIzle",
     "internalName": "SetFilmIzle",
     "authors": [
       "kreastream"
     ],
     "description": "Setfilmizle sitemizde, donma yaşamadan Türkçe dublaj ve altyazılı filmleri ile dizileri muhteşem 1080p full HD kalitesinde izleyebilirsiniz.",
-    "fileSize": 22975,
+    "fileSize": 22880,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
       "Movie",
       "TvSeries"
     ],
-    "iconUrl": "https://www.google.com/s2/favicons?domain=www.setfilmizle.de&sz=%size%",
+    "iconUrl": "https://www.setfilmizle.uk/wp-content/uploads/2017/05/set-touch.webp",
     "apiVersion": 1
   },
   {
@@ -130,7 +167,7 @@
       "kreastream"
     ],
     "description": "TRT TV & Radyo & Diziler & Programlar",
-    "fileSize": 30964,
+    "fileSize": 31186,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
@@ -139,25 +176,6 @@
     ],
     "iconUrl": "https://kariyer.trt.net.tr/wp-content/uploads/2022/01/trt-kariyer-logo.png",
     "apiVersion": 1
-  },
-  {
-    "repositoryUrl": "https://github.com/kreadir/kreastream",
-    "apiVersion": 1,
-    "status": 1,
-    "language": "tr",
-    "authors": [
-      "kreaStream"
-    ],
-    "tvTypes": [
-      "Tv",
-      "Movie"
-    ],
-    "version": 3,
-    "internalName": "HDFilmCehennemi",
-    "description": "Türkiye'nin en hızlı hd film izleme sitesi",
-    "url": "https://raw.githubusercontent.com/Kraptor123/cs-kraptor/builds/HDFilmCehennemi.cs3",
-    "name": "HDFilmCehennemi",
-    "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi.com&sz=%size%"
   },
   {
     "repositoryUrl": "https://github.com/kerimmkirac/cs-kerim",
