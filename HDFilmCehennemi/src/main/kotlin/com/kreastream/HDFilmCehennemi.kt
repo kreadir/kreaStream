@@ -186,7 +186,7 @@ class HDFilmCehennemi : MainAPI() {
         try {
             val hdfc: HDFC = objectMapper.readValue(response.text, HDFC::class.java)
             val document = Jsoup.parse(hdfc.html)
-            val results = document.select("a").mapNotNull { it.toSearchResult() }
+            val results = document.select("a").mapNotNull { it.toSearchResponse() }
             return newHomePageResponse(request.name, results)
         } catch (e: Exception) {
             return newHomePageResponse(request.name, emptyList())
@@ -196,7 +196,7 @@ class HDFilmCehennemi : MainAPI() {
     /**
      * FIX: Adds 'Dub'/'Sub' flags (posterHeaders) on posters for main pages.
      */
-    private fun Element.toSearchResult(): SearchResponse? {
+    private fun Element.toSearchResponse(): AnimeSearchResponse {
         val data = this.extractPosterData() ?: return null
         
         val headers = mutableMapOf<String, String>()
