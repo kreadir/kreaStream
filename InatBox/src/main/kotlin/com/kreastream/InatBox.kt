@@ -1,4 +1,4 @@
-package com.keyiflerolsun
+package com.kreastream
 
 import com.lagradost.api.Log
 import com.lagradost.cloudstream3.*
@@ -40,10 +40,10 @@ class InatBox : MainAPI() {
         "${contentUrl}/amz/index.php"                               to "Amazon Prime",
         "${contentUrl}/hb/index.php"                                to "HBO Max",
         "${contentUrl}/tbi/index.php"                               to "Tabii",
-        "https://boxbc.icu/CDN/001_STR/boxbc.icu/ccc/index.php"     to "TOD",
+        "https://boxggboxss.cfd/CDN/001_STR/boxggboxss.cfd/ccc/index.php"     to "TOD",
         "${contentUrl}/tv/sinema.php"                               to "Sinema Kanalları",
         "${contentUrl}/tv/ulusal.php"                               to "Ulusal Kanallar",
-        "https://boxbc.icu/CDN/001_STR/boxbc.icu/spor_v2.php"       to "Spor Kanalları",
+        "https://boxggboxss.cfd/CDN/001_STR/boxggboxss.cfd/spor_v2.php"       to "Spor Kanalları",
         
         //"${contentUrl}/film/mubi.php"                             to "Mubi",
         //"${contentUrl}/tv/list1.php"                              to "Kanallar Liste 1 ",
