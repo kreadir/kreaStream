@@ -1,4 +1,4 @@
-package com.keyiflerolsun
+package com.kreastream
 
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.app
