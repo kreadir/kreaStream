@@ -31,6 +31,7 @@ import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.JsUnpacker
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.newExtractorLink
+import com.lagradost.cloudstream3.getQualityFromString
 import okhttp3.Interceptor
 import okhttp3.Response
 import org.jsoup.Jsoup
