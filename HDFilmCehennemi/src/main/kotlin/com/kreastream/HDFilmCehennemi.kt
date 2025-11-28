@@ -212,7 +212,8 @@ class HDFilmCehennemi : MainAPI() {
 
         return newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
             this.posterUrl = data.posterUrl
-            this.score = Score.from10(data.score) 
+            this.score = Score.from10(data.score)
+            this.quality = getQualityFromString(this.year)
             this.posterHeaders = finalHeaders // Flags are added here
         }
     }
