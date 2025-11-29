@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
+import com.lagradost.cloudstream3.LoadResponse.*
 import com.lagradost.cloudstream3.LoadResponse.Companion.*
 
 import okhttp3.Interceptor
@@ -187,7 +188,7 @@ class HDFilmCehennemi : MainAPI() {
         return newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
             this.posterUrl = data.posterUrl
             this.score = Score.from10(data.score)
-            this.quality = "HD"
+            this.quality = data.year.toString()
             this.posterHeaders = finalHeaders
         }
     }
@@ -227,7 +228,6 @@ class HDFilmCehennemi : MainAPI() {
                 newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
                     this.posterUrl = data.posterUrl?.replace("/thumb/", "/list/")
                     this.score = Score.from10(data.score)
-                    this.quality = "HD"
                     this.posterHeaders = finalHeaders
                 }
             )
