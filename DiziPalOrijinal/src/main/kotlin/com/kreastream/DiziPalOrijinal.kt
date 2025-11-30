@@ -61,9 +61,9 @@ class DiziPalOrijinal : MainAPI() {
 
     override val mainPage = mainPageOf(
         "${mainUrl}/"           to "Yeni Eklenen Bölümler",
-        ""                      to "Yeni Eklenenler",
-        ""                      to "Yüksek Imdb Puanlı Diziler",
+        //""                      to "Yüksek Imdb Puanlı Diziler",
         ""                      to "Yeni Filmler",
+        "242"                   to "Tabii Dizileri",
         "1"                     to "Exxen Dizileri",
         "6"                     to "Disney+ Dizileri",
         "10"                    to "Netflix Dizileri",
@@ -72,8 +72,8 @@ class DiziPalOrijinal : MainAPI() {
         "66"                    to "Max Dizileri",
         "78"                    to "Hulu Dizileri",
         "181"                   to "TOD Dizileri",
-        "242"                   to "Tabii Dizileri",
-        "19"                    to "Anime",
+        ""                      to "Yeni Eklenenler",
+        //"19"                    to "Anime",
     )
 
     private var sessionCookies: Map<String, String>? = null
