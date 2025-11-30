@@ -215,9 +215,8 @@ class HDFilmCehennemi : MainAPI() {
         response.results.forEach { resultHtml ->
             val document = Jsoup.parse(resultHtml)
 
-            //val data = document.selectFirst("a")?.extractPosterData() ?: return@forEach
-            val data = this.extractPosterData() ?: return@forEach
-
+            val data = document.selectFirst("a")?.extractPosterData() ?: return@forEach
+            
             searchResults.add(
                 newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
                     this.posterUrl = data.posterUrl?.replace("/thumb/", "/list/")
