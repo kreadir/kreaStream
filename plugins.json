@@ -119,14 +119,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/InatBox.cs3",
     "status": 3,
-    "version": 9,
+    "version": 11,
     "name": "InatBox",
     "internalName": "InatBox",
     "authors": [
       "kerimmkirac"
     ],
     "description": "İnatBox cloudstream eklentisidir. Sevdiğiniz yayın platformlarını ve canlı maçları burada bulabilirsiniz.",
-    "fileSize": 30491,
+    "fileSize": 30485,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
