@@ -10,15 +10,15 @@ on:
     types:
       - completed
   workflow_dispatch:
-  #push:
-    #branches:
-      #- main
-    #paths-ignore:
-      #- "**/*.md"
-      #- "**/*.yml"
-      #- "**/*.jpg"
-      #- "**/*.png"
-      #- "**/*.py"
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/*.md"
+      - "**/*.yml"
+      - "**/*.jpg"
+      - "**/*.png"
+      - "**/*.py"
 
 jobs:
   kreaStreamDerleyici:
