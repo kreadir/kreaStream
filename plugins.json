@@ -41,14 +41,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziMom.cs3",
     "status": 1,
-    "version": 3,
+    "version": 4,
     "name": "DiziMom",
     "internalName": "DiziMom",
     "authors": [
       "kreastream"
     ],
     "description": "Binlerce yerli yabancı dizi arşivi, tüm sezonlar, kesintisiz bölümler. Sadece dizi izle, Dizimom heryerde seninle!",
-    "fileSize": 31502,
+    "fileSize": 31506,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
@@ -60,14 +60,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPal.cs3",
     "status": 1,
-    "version": 25,
+    "version": 26,
     "name": "DiziPal",
     "internalName": "DiziPal",
     "authors": [
       "kreastream"
     ],
     "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
-    "fileSize": 20092,
+    "fileSize": 20091,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
@@ -99,14 +99,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/HDFilmCehennemi.cs3",
     "status": 1,
-    "version": 251205,
+    "version": 251206,
     "name": "HDFilmCehennemi",
     "internalName": "HDFilmCehennemi",
     "authors": [
       "kreastream"
     ],
     "description": "Türkiye'nin en hızlı hd film izleme sitesi",
-    "fileSize": 32591,
+    "fileSize": 32592,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
