@@ -354,29 +354,116 @@ class HDFilmCehennemi : MainAPI() {
             }
         }
 
+        private fun attempt5(encryptedData: String, seed: Int): String {
+            val reversedString = encryptedData.reversed()
+            val rot13edString = applyRot13(reversedString.toByteArray()).toString(Charsets.UTF_8)
+            val decodedBytes = Base64.decode(rot13edString, Base64.DEFAULT)
+            return applyCustomShift(decodedBytes, seed)
+        }
+
+        private fun isValidDecryption(output: String): Boolean {
+            if (output.isBlank()) return false
+            if (output.length < 10) return false
+
+            // Stage 1: starts with known URL schemes
+            if (output.startsWith("http://") || output.startsWith("https://")) return true
+
+            // Stage 2: check if inside contains urls even if prefix is shifted
+            if (output.contains("http")) return true
+            if (output.contains(".m3u8") || output.contains(".mp4")) return true
+
+            // Stage 3: must be printable ASCII mostly
+            val printable = output.count { it.code in 32..126 }
+            if (printable.toDouble() / output.length > 0.85) return true
+
+            return false
+        }
+
+        private fun attemptNew(encrypted: String, seed: Int): String {
+            return try {
+                val reversed = encrypted.reversed()
+                val decoded = Base64.decode(reversed, Base64.DEFAULT)
+
+                val sb = StringBuilder()
+                for (i in decoded.indices) {
+                    val charCode = decoded[i].toInt() and 0xFF
+                    val shift = seed % (i + 5)
+                    sb.append(((charCode - shift + 256) % 256).toChar())
+                }
+                sb.toString()
+            } catch (e: Exception) { "" }
+        }
+
+        private fun attemptDoubleBase64(encryptedData: String, seed: Int): String {
+            return try {
+                // 1. Reverse String
+                val reversedString = encryptedData.reversed()
+                
+                // 2. Base64 Decode Once
+                val onceDecodedBytes = Base64.decode(reversedString, Base64.DEFAULT)
+                
+                // 3. Base64 Decode Twice
+                val twiceDecodedBytes = Base64.decode(onceDecodedBytes, Base64.DEFAULT)
+                
+                // 4. Custom Shift
+                return applyCustomShift(twiceDecodedBytes, seed)
+            } catch (e: Exception) {
+                ""
+            }
+        }
+
         // Main function to try all known orders
-        fun dynamicDecrypt(encryptedData: String, seed: Int): String {
-            val decryptionAttempts = listOf<() -> String>(
-                { attempt4(encryptedData, seed) }, // Try the new JS method first
-                { attempt1(encryptedData, seed) },
-                { attempt2(encryptedData, seed) },
-                { attempt3(encryptedData, seed) }
+        // Main function to try all known orders
+        fun dynamicDecrypt(encrypted: String, seed: Int): String {
+            val attempts = listOf(
+                // 1. New Working Logic from 'Close' link JS (Reverse -> Decode Twice -> Shift)
+                { attemptDoubleBase64(encrypted, seed) },
+                // 2. Previously working NEW logic
+                { attemptNew(encrypted, seed) },   
+                // 3. Old working (Matches JS: atob(x) -> replace(Rot13) -> reverse() -> Shift Loop)
+                { attempt4(encrypted, seed) },     
+                // 4. Other fallback attempts
+                { attempt1(encrypted, seed) },
+                { attempt2(encrypted, seed) },
+                { attempt3(encrypted, seed) }
             )
 
-            for ((index, attempt) in decryptionAttempts.withIndex()) {
+            for (attempt in attempts) {
                 try {
-                    val decryptedUrl = attempt()
-                    // A successful decryption should yield a URL starting with "http"
-                    if (decryptedUrl.startsWith("http")) {
-                        Log.d("HDFC", "Decryption Success with Attempt ${index + 1}")
-                        return decryptedUrl
+                    val result = attempt()
+                    if (isValidDecryption(result)) {
+                        return result
                     }
-                } catch (e: Exception) {
-                    Log.d("HDFC", "Decryption Attempt ${index + 1} failed")
-                }
+                } catch (_: Exception) {}
             }
+
             return ""
         }
+
+        fun decryptNewHDFC(list: List<String>): String {
+            // 1. join fragments
+            val joined = list.joinToString("")
+
+            // 2. reverse
+            val reversed = joined.reversed()
+
+            // 3. base64 decode twice
+            val once = try { Base64.decode(reversed, Base64.DEFAULT) } catch (e: Exception) { return "" }
+            val twice = try { Base64.decode(once, Base64.DEFAULT) } catch (e: Exception) { return "" }
+
+            // 4. unmix loop (new)
+            val sb = StringBuilder()
+            for (i in twice.indices) {
+                val cc = twice[i].toInt() and 0xFF
+                val shift = 256 % (i + 5)
+                val finalChar = (cc - shift + 256) % 256
+                sb.append(finalChar.toChar())
+            }
+
+            return sb.toString()
+        }
+
+
     }
 
     private val seenUrls = mutableSetOf<String>()
@@ -398,9 +485,8 @@ class HDFilmCehennemi : MainAPI() {
             
             // --- NEW: Extract Rapidrame ID for Download ---
             // Look for image: "https://.../aaktqas1ejb1.jpg"
-            val imageRegex = Regex("""image:\s*["'](.*?)["']""")
-            val imageUrl = imageRegex.find(unpacked)?.groupValues?.get(1)
-
+            //val imageRegex = Regex("""image:\s*["'](.*?)["']""")
+            //val imageUrl = imageRegex.find(unpacked)?.groupValues?.get(1)
             
             val callRegex = Regex("""\w+\(\[(.*?)\]\)""")
             val arrayContent = callRegex.find(unpacked)?.groupValues?.get(1) ?: return
@@ -419,6 +505,9 @@ class HDFilmCehennemi : MainAPI() {
 
             if (seenUrls.contains(decryptedUrl)) return
             seenUrls.add(decryptedUrl)
+
+            val potentialRapidrameId = Regex("""/play/([^/]+)""").find(decryptedUrl)?.groupValues?.get(1)
+            ?.takeIf { it.length > 5 }
 
             // 5. Determine if it's HLS 
             val isHls = decryptedUrl.contains(".m3u8") || decryptedUrl.endsWith(".txt")
