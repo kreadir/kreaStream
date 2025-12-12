@@ -179,14 +179,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Trt.cs3",
     "status": 1,
-    "version": 3,
+    "version": 251212,
     "name": "Trt",
     "internalName": "Trt",
     "authors": [
       "kreastream"
     ],
     "description": "TRT TV & Radyo & Diziler & Programlar",
-    "fileSize": 31186,
+    "fileSize": 31192,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
