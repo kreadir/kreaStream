@@ -404,7 +404,7 @@ class Trt : MainAPI() {
         if (url.contains(trt1Url)) {
             try {
                 val doc = app.get(url, timeout = 15).document
-                val title = doc.selectFirst("h1")?.text()?.trim()
+                val title = doc.selectFirst("p.text_title__UMoMd")?.text()?.trim()
                     ?: throw ErrorLoadingException("Başlık bulunamadı")
                 val plot = doc.selectFirst("meta[name=description]")?.attr("content") ?: ""
                 var poster = fixUrlNull(doc.selectFirst("picture.card_card-image__T64bP img")?.attr("src"))
