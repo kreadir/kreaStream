@@ -60,14 +60,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPal.cs3",
     "status": 1,
-    "version": 26,
+    "version": 27,
     "name": "DiziPal",
     "internalName": "DiziPal",
     "authors": [
       "kreastream"
     ],
     "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
-    "fileSize": 20091,
+    "fileSize": 20092,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
@@ -80,14 +80,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPalOrijinal.cs3",
     "status": 1,
-    "version": 3,
+    "version": 4,
     "name": "DiziPalOrijinal",
     "internalName": "DiziPalOrijinal",
     "authors": [
       "kreastream"
     ],
     "description": "DiziPal Orijinal.",
-    "fileSize": 44096,
+    "fileSize": 44094,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
