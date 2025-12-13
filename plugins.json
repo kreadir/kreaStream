@@ -80,14 +80,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPalOrijinal.cs3",
     "status": 1,
-    "version": 4,
+    "version": 5,
     "name": "DiziPalOrijinal",
     "internalName": "DiziPalOrijinal",
     "authors": [
       "kreastream"
     ],
     "description": "DiziPal Orijinal.",
-    "fileSize": 44094,
+    "fileSize": 44097,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
