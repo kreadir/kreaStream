@@ -617,7 +617,7 @@ class HDFilmCehennemi : MainAPI() {
                     }
 
                     rapidrameId = iframe.substringAfter("?rapidrame_id=").takeIf { it.isNotEmpty() }
-
+                    extractDownloadLinks(rapidrameId, callback)
                     invokeLocalSource(finalSourceName, iframe, rapidrameReferer, callback) 
                 }
             }
