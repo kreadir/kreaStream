@@ -620,9 +620,6 @@ class HDFilmCehennemi : MainAPI() {
                     
                     invokeLocalSource(finalSourceName, iframe, rapidrameReferer, callback) 
                 }
-                if (!rapidrameId.isNullOrEmpty()) {
-            extractDownloadLinks(rapidrameId, callback)
-                }
             }
         }
 
