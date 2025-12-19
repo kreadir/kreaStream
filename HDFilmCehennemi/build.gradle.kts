@@ -1,4 +1,4 @@
-version = 251217
+version = 251219
 
 cloudstream {
     authors     = listOf("kreastream")
