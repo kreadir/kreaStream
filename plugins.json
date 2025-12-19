@@ -99,14 +99,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/HDFilmCehennemi.cs3",
     "status": 1,
-    "version": 251217,
+    "version": 251219,
     "name": "HDFilmCehennemi",
     "internalName": "HDFilmCehennemi",
     "authors": [
       "kreastream"
     ],
     "description": "Türkiye'nin en hızlı hd film izleme sitesi",
-    "fileSize": 34122,
+    "fileSize": 34154,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
