@@ -60,14 +60,14 @@
   {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPal.cs3",
     "status": 1,
-    "version": 27,
+    "version": 28,
     "name": "DiziPal",
     "internalName": "DiziPal",
     "authors": [
       "kreastream"
     ],
     "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
-    "fileSize": 20092,
+    "fileSize": 20090,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
