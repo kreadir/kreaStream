@@ -287,13 +287,29 @@ class HDFilmCehennemi : MainAPI() {
      */
 
     private object HDFCHybridDecrypter {
-    
-        // FIXED: Apply ROT13 only to alphabetical characters in the string
+        
+        // NEW: ROT13 on string (before Base64 decode)
+        private fun applyRot13ToString(input: String): String {
+            return input.map { char ->
+                when {
+                    char in 'a'..'z' -> {
+                        val rotated = char.code + 13
+                        if (rotated <= 'z'.code) rotated.toChar() else (rotated - 26).toChar()
+                    }
+                    char in 'A'..'Z' -> {
+                        val rotated = char.code + 13
+                        if (rotated <= 'Z'.code) rotated.toChar() else (rotated - 26).toChar()
+                    }
+                    else -> char
+                }
+            }.joinToString("")
+        }
+        
+        // Keep existing function for text ROT13
         private fun applyRot13ToText(input: String): String {
             return StringBuilder().apply {
                 for (char in input) {
                     when {
-                        // Only apply ROT13 to A-Z and a-z
                         char in 'a'..'z' -> {
                             val rotated = char.code + 13
                             append(if (rotated <= 'z'.code) rotated.toChar() else (rotated - 26).toChar())
@@ -302,33 +318,37 @@ class HDFilmCehennemi : MainAPI() {
                             val rotated = char.code + 13
                             append(if (rotated <= 'Z'.code) rotated.toChar() else (rotated - 26).toChar())
                         }
-                        // Leave all other characters (including non-ASCII) untouched
                         else -> append(char)
                     }
                 }
             }.toString()
         }
         
-        // FIXED: Better URL validation that checks for clean URLs
+        private fun applyCustomShift(input: String, seed: Int): String {
+            val sb = StringBuilder()
+            for (i in input.indices) {
+                val charCode = input[i].code
+                val shift = seed % (i + 5)
+                val newCharCode = (charCode - shift + 256) % 256
+                sb.append(newCharCode.toChar())
+            }
+            return sb.toString()
+        }
+        
         private fun isValidVideoUrl(url: String): Boolean {
             if (url.isEmpty()) return false
-            
-            // Must start with http/https
             if (!url.startsWith("http")) return false
             
-            // Check for clean domain (no special characters in domain)
             val domainPattern = Regex("""https?://([a-zA-Z0-9.-]+)/""")
             val match = domainPattern.find(url)
             if (match == null) return false
             
             val domain = match.groupValues[1]
-            // Domain should only contain letters, numbers, dots, and hyphens
             if (!domain.matches(Regex("""^[a-zA-Z0-9.-]+$"""))) {
                 Log.d("HDFC_VALIDATE", "Invalid domain characters: $domain")
                 return false
             }
             
-            // Check for video file extensions
             val videoExtensions = listOf(".m3u8", ".mp4", ".mkv", ".webm")
             if (!videoExtensions.any { url.contains(it, ignoreCase = true) }) {
                 return false
@@ -337,126 +357,91 @@ class HDFilmCehennemi : MainAPI() {
             return true
         }
         
-        // Updated to check for clean URLs
-        fun decryptCurrentPattern(encrypted: String, seed: Int): String {
+        // NEW PATTERN: Reverse -> ROT13 (on string) -> Base64 decode -> CustomShift
+        fun decryptNewPattern(encrypted: String, seed: Int): String {
             try {
-                Log.d("HDFC_FIXED", "Starting decryption")
+                Log.d("HDFC_NEW", "Starting NEW pattern decryption")
                 
                 // 1. Reverse string
                 val reversed = encrypted.reversed()
-                Log.d("HDFC_FIXED", "After reverse: ${reversed.take(50)}...")
+                Log.d("HDFC_NEW", "After reverse: ${reversed.take(50)}...")
+                
+                // 2. Apply ROT13 to the REVERSED STRING (before Base64!)
+                val rot13String = applyRot13ToString(reversed)
+                Log.d("HDFC_NEW", "After ROT13 on string: ${rot13String.take(50)}...")
+                
+                // 3. Base64 decode
+                val decodedBytes = Base64.decode(rot13String, Base64.DEFAULT)
+                val decodedText = String(decodedBytes, Charsets.UTF_8)
+                Log.d("HDFC_NEW", "After Base64 decode: ${decodedText.take(50)}...")
+                
+                // 4. Apply custom shift
+                val result = applyCustomShift(decodedText, seed)
+                Log.d("HDFC_NEW", "After custom shift: ${result.take(100)}...")
+                
+                if (isValidVideoUrl(result)) {
+                    Log.d("HDFC_NEW", "NEW pattern SUCCESS!")
+                    return result
+                }
+                
+            } catch (e: Exception) {
+                Log.e("HDFC_NEW", "New pattern error: ${e.message}")
+            }
+            
+            return ""
+        }
+        
+        // OLD PATTERN (keep for fallback): Reverse -> Base64 -> ROT13 (on text) -> CustomShift
+        fun decryptOldPattern(encrypted: String, seed: Int): String {
+            try {
+                Log.d("HDFC_OLD", "Starting OLD pattern decryption")
+                
+                // 1. Reverse string
+                val reversed = encrypted.reversed()
                 
                 // 2. Base64 decode
                 val decodedBytes = Base64.decode(reversed, Base64.DEFAULT)
                 val decodedText = String(decodedBytes, Charsets.UTF_8)
-                Log.d("HDFC_FIXED", "After Base64 decode: ${decodedText.take(50)}...")
                 
-                // 3. Apply ROT13 to TEXT characters only
+                // 3. Apply ROT13 to TEXT (after Base64)
                 val rot13Text = applyRot13ToText(decodedText)
-                Log.d("HDFC_FIXED", "After ROT13: ${rot13Text.take(50)}...")
                 
                 // 4. Apply custom shift
-                val result = StringBuilder()
-                for (i in rot13Text.indices) {
-                    val charCode = rot13Text[i].code
-                    val shift = seed % (i + 5)
-                    val newCharCode = (charCode - shift + 256) % 256
-                    result.append(newCharCode.toChar())
-                }
+                val result = applyCustomShift(rot13Text, seed)
                 
-                val finalUrl = result.toString()
-                Log.d("HDFC_FIXED", "After custom shift: ${finalUrl.take(100)}...")
-                
-                // Check if it's a valid URL
-                if (isValidVideoUrl(finalUrl)) {
-                    Log.d("HDFC_FIXED", "Decryption SUCCESS!")
-                    return finalUrl
-                } else {
-                    Log.d("HDFC_FIXED", "URL validation failed")
+                if (isValidVideoUrl(result)) {
+                    Log.d("HDFC_OLD", "OLD pattern SUCCESS!")
+                    return result
                 }
                 
             } catch (e: Exception) {
-                Log.e("HDFC_FIXED", "Decryption error: ${e.message}")
+                Log.e("HDFC_OLD", "Old pattern error: ${e.message}")
             }
             
             return ""
         }
         
-        // Alternative approach: Process as bytes with proper ROT13
-        fun decryptAsBytes(encrypted: String, seed: Int): String {
-            try {
-                Log.d("HDFC_BYTES", "Starting byte-based decryption")
-                
-                // 1. Reverse string
-                val reversed = encrypted.reversed()
-                
-                // 2. Base64 decode to bytes
-                val decodedBytes = Base64.decode(reversed, Base64.DEFAULT)
-                
-                // 3. Apply ROT13 to bytes (treating them as ASCII)
-                val rot13Bytes = ByteArray(decodedBytes.size)
-                for (i in decodedBytes.indices) {
-                    val byte = decodedBytes[i].toInt() and 0xFF
-                    rot13Bytes[i] = when {
-                        // Only apply ROT13 to a-z (97-122) and A-Z (65-90)
-                        byte in 97..122 -> { // a-z
-                            val rotated = byte + 13
-                            (if (rotated <= 122) rotated else rotated - 26).toByte()
-                        }
-                        byte in 65..90 -> { // A-Z
-                            val rotated = byte + 13
-                            (if (rotated <= 90) rotated else rotated - 26).toByte()
-                        }
-                        // Leave all other bytes unchanged
-                        else -> decodedBytes[i]
-                    }
-                }
-                
-                // 4. Apply custom shift
-                val result = StringBuilder()
-                for (i in rot13Bytes.indices) {
-                    val charCode = rot13Bytes[i].toInt() and 0xFF
-                    val shift = seed % (i + 5)
-                    val newCharCode = (charCode - shift + 256) % 256
-                    result.append(newCharCode.toChar())
-                }
-                
-                val finalUrl = result.toString()
-                Log.d("HDFC_BYTES", "Result: ${finalUrl.take(100)}...")
-                
-                if (isValidVideoUrl(finalUrl)) {
-                    Log.d("HDFC_BYTES", "Byte decryption SUCCESS!")
-                    return finalUrl
-                }
-                
-            } catch (e: Exception) {
-                Log.e("HDFC_BYTES", "Byte decryption error: ${e.message}")
-            }
-            
-            return ""
-        }
-        
-        // Main entry point that tries both approaches
+        // Main entry point - tries new pattern first, then old
         fun decrypt(encrypted: String, seed: Int): String {
-            Log.d("HDFC_MAIN", "Decrypting with seed: $seed")
+            Log.d("HDFC_MAIN", "Decrypting with seed: $seed, length: ${encrypted.length}")
             
-            // Try text-based approach first
-            val textResult = decryptCurrentPattern(encrypted, seed)
-            if (textResult.isNotEmpty()) {
-                Log.d("HDFC_MAIN", "Text-based approach succeeded")
-                return textResult
+            // Try NEW pattern first (site changed)
+            val newResult = decryptNewPattern(encrypted, seed)
+            if (newResult.isNotEmpty()) {
+                Log.d("HDFC_MAIN", "Using NEW pattern")
+                return newResult
             }
             
-            Log.d("HDFC_MAIN", "Text approach failed, trying byte-based...")
+            Log.d("HDFC_MAIN", "New pattern failed, trying OLD pattern...")
             
-            // Try byte-based approach
-            val byteResult = decryptAsBytes(encrypted, seed)
-            if (byteResult.isNotEmpty()) {
-                Log.d("HDFC_MAIN", "Byte-based approach succeeded")
-                return byteResult
+            // Try OLD pattern as fallback
+            val oldResult = decryptOldPattern(encrypted, seed)
+            if (oldResult.isNotEmpty()) {
+                Log.d("HDFC_MAIN", "Using OLD pattern")
+                return oldResult
             }
             
-            Log.e("HDFC_MAIN", "Both approaches failed")
+            Log.e("HDFC_MAIN", "Both patterns failed")
             return ""
         }
     }
@@ -487,8 +472,9 @@ class HDFilmCehennemi : MainAPI() {
             val seedRegex = Regex("""charCode-\((\d+)%\(i\+5\)\)""")
             val seed = seedRegex.find(unpacked)?.groupValues?.get(1)?.toIntOrNull() ?: 399756995
 
-            Log.d("HDFC", "Seed: $seed, Encrypted length: ${encryptedString.length}")
+            Log.d("HDFC", "Seed: $seed, Encrypted: ${encryptedString.take(50)}...")
             
+            // Use the updated decrypter
             val decryptedUrl = HDFCHybridDecrypter.decrypt(encryptedString, seed)
             
             if (decryptedUrl.isEmpty()) {
@@ -499,7 +485,7 @@ class HDFilmCehennemi : MainAPI() {
             if (seenUrls.contains(decryptedUrl)) return
             seenUrls.add(decryptedUrl)
 
-            Log.d("HDFC", "Decrypted URL (first 100 chars): ${decryptedUrl.take(100)}...")
+            Log.d("HDFC", "Decrypted URL: ${decryptedUrl.take(100)}...")
             
             val isHls = decryptedUrl.contains(".m3u8") || decryptedUrl.endsWith(".txt")
             
