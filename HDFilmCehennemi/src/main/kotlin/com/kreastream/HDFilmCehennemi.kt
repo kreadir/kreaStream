@@ -523,16 +523,14 @@ class HDFilmCehennemi : MainAPI() {
         val downloadUrl = "https://cehennempass.pw/download/$rapidrameId"
         
         val qualities = mapOf(
-            "low" to Pair("Download SD", "⬇️ DLOAD SD"),
-            "high" to Pair("Download HD", "⬇️ DLOAD HD")
+            "low" to "⬇️ SD",
+            "high" to "⬇️ HD"
         )
 
-        qualities.forEach { (qualityData, names) ->
-            val (playName, downloadName) = names
+        qualities.forEach { (qualityData, qualityName) ->
             val postUrl = "https://cehennempass.pw/process_quality_selection.php"
             
             try {
-                // First get the final link for playback
                 val postBody = okhttp3.FormBody.Builder()
                     .add("video_id", rapidrameId)
                     .add("selected_quality", qualityData)
@@ -548,39 +546,21 @@ class HDFilmCehennemi : MainAPI() {
                 val finalLink = response?.download_link
 
                 if (!finalLink.isNullOrEmpty()) {
-                    // 1. PLAYBACK LINK (fallback)
                     callback.invoke(
                         newExtractorLink(
                             source = name,
-                            name = playName,
+                            name = qualityName,
                             url = finalLink
                         ) {
                             this.quality = if (qualityData == "high") Qualities.P720.value else Qualities.P480.value
                             this.type = ExtractorLinkType.VIDEO
-                            // Removed: this.isDownload = false
                         }
                     )
                     
-                    // 2. DOWNLOAD LINK (encoded POST data)
-                    // Encode all necessary data in the URL
-                    val downloadData = "$rapidrameId|$qualityData|$postUrl|$downloadUrl"
-                    val encodedData = Base64.encodeToString(downloadData.toByteArray(), Base64.NO_WRAP)
-                    
-                    val downloadLink = newExtractorLink(
-                        source = "$name Downloader",
-                        name = downloadName,
-                        url = "$mainUrl/hdfc-download/$encodedData"  // Special URL scheme
-                    ) {
-                        this.quality = if (qualityData == "high") Qualities.P720.value else Qualities.P480.value
-                        this.type = ExtractorLinkType.VIDEO
-                        // Removed: this.isDownload = true
-                    }
-                    
-                    callback.invoke(downloadLink)
-                    Log.d("HDFC_DOWNLOAD", "Created download link: $downloadName")
+                    Log.d("HDFC", "Added download/playback link: $qualityName")
                 }
             } catch (e: Exception) {
-                Log.e("HDFC", "Download extraction failed", e)
+                Log.e("HDFC", "Download extraction failed for $qualityName", e)
             }
         }
     }
@@ -591,68 +571,6 @@ class HDFilmCehennemi : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-                // 1. FIRST: Check if this is a download request
-        if (data.startsWith("$mainUrl/hdfc-download/")) {
-            Log.d("HDFC_DOWNLOAD", "Processing download request: $data")
-            
-            // Extract the encoded data from the URL
-            val encodedData = data.substringAfter("$mainUrl/hdfc-download/")
-            
-            try {
-                // Decode the data
-                val decodedBytes = Base64.decode(encodedData, Base64.DEFAULT)
-                val decodedString = String(decodedBytes, Charsets.UTF_8)
-                val parts = decodedString.split("|")
-                
-                if (parts.size >= 4) {
-                    val rapidrameId = parts[0]
-                    val quality = parts[1]
-                    val postUrl = parts[2]
-                    val referer = parts[3]
-                    
-                    Log.d("HDFC_DOWNLOAD", "Download params: id=$rapidrameId, quality=$quality")
-                    
-                    // Make the POST request to get the actual download URL
-                    val postBody = okhttp3.FormBody.Builder()
-                        .add("video_id", rapidrameId)
-                        .add("selected_quality", quality)
-                        .build()
-                    
-                    val response = app.post(
-                        postUrl,
-                        requestBody = postBody,
-                        headers = standardHeaders,
-                        referer = referer
-                    ).parsedSafe<DownloadResponse>()
-                    
-                    val downloadUrl = response?.download_link
-                    
-                    if (!downloadUrl.isNullOrEmpty()) {
-                        Log.d("HDFC_DOWNLOAD", "Got download URL: ${downloadUrl.take(80)}...")
-                        
-                        // Send the actual file URL to CloudStream's download system
-                        callback.invoke(
-                            newExtractorLink(
-                                source = "$name Downloader",
-                                name = if (quality == "high") "HD Download" else "SD Download",
-                                url = downloadUrl
-                            ) {
-                                this.quality = if (quality == "high") Qualities.P720.value else Qualities.P480.value
-                                this.type = ExtractorLinkType.VIDEO
-                                this.referer = referer
-                            }
-                        )
-                        
-                        return true
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("HDFC_DOWNLOAD", "Download processing failed: ${e.message}")
-            }
-            
-            return false
-        }
-
         val document = app.get(data).document
         val rapidrameReferer = "$mainUrl/"
         var rapidrameId: String? = null
@@ -735,11 +653,8 @@ class HDFilmCehennemi : MainAPI() {
                 }
             }
             ?.takeIf { it.isNotEmpty() }
-
-       // rapidrameD?.let { extractDownloadLinks(it, callback) }
         
         rapidrameD?.let { id ->
-            Log.d("HDFC", "Adding download links for ID: $id")
             extractDownloadLinks(id, callback)
         }
 
