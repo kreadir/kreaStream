@@ -277,19 +277,18 @@ class HDFilmCehennemi : MainAPI() {
         }
     }
 
-    // ============================================
-    // DECRYPTION SYSTEM
-    // ============================================
-
-    /**
-     * Hybrid decrypter that uses current known pattern first,
-     * then falls back to dynamic discovery if needed.
-     */
-
     private object HDFCHybridDecrypter {
+    
+        sealed class Operation {
+            object Reverse : Operation()
+            object Base64Decode : Operation()
+            object Rot13OnString : Operation()      // ROT13 BEFORE Base64
+            object Rot13OnText : Operation()        // ROT13 AFTER Base64  
+            data class CustomShift(val seed: Int) : Operation()
+            object NoOp : Operation()
+        }
         
-        // NEW: ROT13 on string (before Base64 decode)
-        private fun applyRot13ToString(input: String): String {
+        private fun applyRot13(input: String): String {
             return input.map { char ->
                 when {
                     char in 'a'..'z' -> {
@@ -304,26 +303,7 @@ class HDFilmCehennemi : MainAPI() {
                 }
             }.joinToString("")
         }
-        
-        // Keep existing function for text ROT13
-        private fun applyRot13ToText(input: String): String {
-            return StringBuilder().apply {
-                for (char in input) {
-                    when {
-                        char in 'a'..'z' -> {
-                            val rotated = char.code + 13
-                            append(if (rotated <= 'z'.code) rotated.toChar() else (rotated - 26).toChar())
-                        }
-                        char in 'A'..'Z' -> {
-                            val rotated = char.code + 13
-                            append(if (rotated <= 'Z'.code) rotated.toChar() else (rotated - 26).toChar())
-                        }
-                        else -> append(char)
-                    }
-                }
-            }.toString()
-        }
-        
+    
         private fun applyCustomShift(input: String, seed: Int): String {
             val sb = StringBuilder()
             for (i in input.indices) {
@@ -334,115 +314,207 @@ class HDFilmCehennemi : MainAPI() {
             }
             return sb.toString()
         }
-        
+    
         private fun isValidVideoUrl(url: String): Boolean {
             if (url.isEmpty()) return false
             if (!url.startsWith("http")) return false
             
             val domainPattern = Regex("""https?://([a-zA-Z0-9.-]+)/""")
-            val match = domainPattern.find(url)
-            if (match == null) return false
+            val match = domainPattern.find(url) ?: return false
             
             val domain = match.groupValues[1]
-            if (!domain.matches(Regex("""^[a-zA-Z0-9.-]+$"""))) {
-                Log.d("HDFC_VALIDATE", "Invalid domain characters: $domain")
-                return false
-            }
+            if (!domain.matches(Regex("""^[a-zA-Z0-9.-]+$"""))) return false
             
             val videoExtensions = listOf(".m3u8", ".mp4", ".mkv", ".webm")
-            if (!videoExtensions.any { url.contains(it, ignoreCase = true) }) {
-                return false
-            }
-            
-            return true
+            return videoExtensions.any { url.contains(it, ignoreCase = true) }
         }
+    
+        // ============================================
+        // FAST PATH: Known working patterns
+        // ============================================
         
-        // NEW PATTERN: Reverse -> ROT13 (on string) -> Base64 decode -> CustomShift
-        fun decryptNewPattern(encrypted: String, seed: Int): String {
+        // Current pattern (Dec 2024): Reverse → ROT13(string) → Base64 → CustomShift
+        private fun decryptCurrent(encrypted: String, seed: Int): String {
             try {
-                Log.d("HDFC_NEW", "Starting NEW pattern decryption")
-                
-                // 1. Reverse string
                 val reversed = encrypted.reversed()
-                Log.d("HDFC_NEW", "After reverse: ${reversed.take(50)}...")
-                
-                // 2. Apply ROT13 to the REVERSED STRING (before Base64!)
-                val rot13String = applyRot13ToString(reversed)
-                Log.d("HDFC_NEW", "After ROT13 on string: ${rot13String.take(50)}...")
-                
-                // 3. Base64 decode
+                val rot13String = applyRot13(reversed)
                 val decodedBytes = Base64.decode(rot13String, Base64.DEFAULT)
                 val decodedText = String(decodedBytes, Charsets.UTF_8)
-                Log.d("HDFC_NEW", "After Base64 decode: ${decodedText.take(50)}...")
-                
-                // 4. Apply custom shift
-                val result = applyCustomShift(decodedText, seed)
-                Log.d("HDFC_NEW", "After custom shift: ${result.take(100)}...")
-                
-                if (isValidVideoUrl(result)) {
-                    Log.d("HDFC_NEW", "NEW pattern SUCCESS!")
-                    return result
-                }
-                
+                return applyCustomShift(decodedText, seed)
             } catch (e: Exception) {
-                Log.e("HDFC_NEW", "New pattern error: ${e.message}")
+                return ""
             }
-            
-            return ""
         }
-        
-        // OLD PATTERN (keep for fallback): Reverse -> Base64 -> ROT13 (on text) -> CustomShift
-        fun decryptOldPattern(encrypted: String, seed: Int): String {
+    
+        // Previous pattern: Reverse → Base64 → ROT13(text) → CustomShift  
+        private fun decryptPrevious(encrypted: String, seed: Int): String {
             try {
-                Log.d("HDFC_OLD", "Starting OLD pattern decryption")
-                
-                // 1. Reverse string
                 val reversed = encrypted.reversed()
-                
-                // 2. Base64 decode
                 val decodedBytes = Base64.decode(reversed, Base64.DEFAULT)
                 val decodedText = String(decodedBytes, Charsets.UTF_8)
-                
-                // 3. Apply ROT13 to TEXT (after Base64)
-                val rot13Text = applyRot13ToText(decodedText)
-                
-                // 4. Apply custom shift
-                val result = applyCustomShift(rot13Text, seed)
-                
+                val rot13Text = applyRot13(decodedText)
+                return applyCustomShift(rot13Text, seed)
+            } catch (e: Exception) {
+                return ""
+            }
+        }
+    
+        // ============================================
+        // DYNAMIC DECRYPTION: For future changes
+        // ============================================
+        
+        private fun trySequence(encrypted: String, seed: Int, operations: List<Operation>): String {
+            var current: Any = encrypted
+            
+            for (operation in operations) {
+                try {
+                    current = when (operation) {
+                        Operation.Reverse -> {
+                            when (current) {
+                                is String -> (current as String).reversed()
+                                else -> return ""
+                            }
+                        }
+                        Operation.Base64Decode -> {
+                            val str = when (current) {
+                                is String -> current as String
+                                else -> return ""
+                            }
+                            String(Base64.decode(str, Base64.DEFAULT), Charsets.UTF_8)
+                        }
+                        Operation.Rot13OnString, Operation.Rot13OnText -> {
+                            val str = when (current) {
+                                is String -> current as String
+                                else -> return ""
+                            }
+                            applyRot13(str)
+                        }
+                        is Operation.CustomShift -> {
+                            val str = when (current) {
+                                is String -> current as String
+                                else -> return ""
+                            }
+                            applyCustomShift(str, operation.seed)
+                        }
+                        Operation.NoOp -> current
+                    }
+                    
+                    if (current.toString().isEmpty()) return ""
+                } catch (e: Exception) {
+                    return ""
+                }
+            }
+            
+            return current.toString()
+        }
+    
+        private fun generateCommonSequences(seed: Int): List<List<Operation>> {
+            return listOf(
+                // Current (Dec 2024)
+                listOf(Operation.Reverse, Operation.Rot13OnString, Operation.Base64Decode, Operation.CustomShift(seed)),
+                // Previous
+                listOf(Operation.Reverse, Operation.Base64Decode, Operation.Rot13OnText, Operation.CustomShift(seed)),
+                // Other possible variations
+                listOf(Operation.Reverse, Operation.Base64Decode, Operation.CustomShift(seed)),
+                listOf(Operation.Base64Decode, Operation.Reverse, Operation.CustomShift(seed)),
+                listOf(Operation.Rot13OnString, Operation.Reverse, Operation.Base64Decode, Operation.CustomShift(seed)),
+                listOf(Operation.Reverse, Operation.CustomShift(seed), Operation.Base64Decode),
+            )
+        }
+    
+        private fun dynamicDecrypt(encrypted: String, seed: Int): String {
+            Log.d("HDFC_DYNAMIC", "Starting dynamic decryption search")
+            
+            // Try all common sequences
+            val sequences = generateCommonSequences(seed)
+            
+            for ((index, sequence) in sequences.withIndex()) {
+                val result = trySequence(encrypted, seed, sequence)
                 if (isValidVideoUrl(result)) {
-                    Log.d("HDFC_OLD", "OLD pattern SUCCESS!")
+                    Log.d("HDFC_DYNAMIC", "Found working sequence #$index: $sequence")
                     return result
                 }
-                
-            } catch (e: Exception) {
-                Log.e("HDFC_OLD", "Old pattern error: ${e.message}")
             }
             
+            // Brute force: Try all permutations of 3-4 operations
+            val allOps = listOf(
+                Operation.Reverse,
+                Operation.Base64Decode,
+                Operation.Rot13OnString,
+                Operation.Rot13OnText,
+                Operation.NoOp
+            )
+            
+            // Try 3-operation sequences ending with CustomShift
+            for (op1 in allOps) {
+                for (op2 in allOps) {
+                    for (op3 in allOps) {
+                        if (op1 == Operation.NoOp && op2 == Operation.NoOp && op3 == Operation.NoOp) continue
+                        val sequence = listOf(op1, op2, op3, Operation.CustomShift(seed))
+                        val result = trySequence(encrypted, seed, sequence)
+                        if (isValidVideoUrl(result)) {
+                            Log.d("HDFC_DYNAMIC", "Brute force found: $op1 → $op2 → $op3 → CustomShift")
+                            return result
+                        }
+                    }
+                }
+            }
+            
+            Log.d("HDFC_DYNAMIC", "No working sequence found")
             return ""
         }
+    
+        // ============================================
+        // MAIN ENTRY POINT
+        // ============================================
         
-        // Main entry point - tries new pattern first, then old
         fun decrypt(encrypted: String, seed: Int): String {
-            Log.d("HDFC_MAIN", "Decrypting with seed: $seed, length: ${encrypted.length}")
+            Log.d("HDFC", "Decryption attempt, seed: $seed")
             
-            // Try NEW pattern first (site changed)
-            val newResult = decryptNewPattern(encrypted, seed)
-            if (newResult.isNotEmpty()) {
-                Log.d("HDFC_MAIN", "Using NEW pattern")
-                return newResult
+            // 1. FAST PATH: Try current known pattern
+            val currentResult = decryptCurrent(encrypted, seed)
+            if (isValidVideoUrl(currentResult)) {
+                Log.d("HDFC", "✓ Current pattern worked")
+                return currentResult
             }
             
-            Log.d("HDFC_MAIN", "New pattern failed, trying OLD pattern...")
-            
-            // Try OLD pattern as fallback
-            val oldResult = decryptOldPattern(encrypted, seed)
-            if (oldResult.isNotEmpty()) {
-                Log.d("HDFC_MAIN", "Using OLD pattern")
-                return oldResult
+            // 2. Try previous pattern
+            val previousResult = decryptPrevious(encrypted, seed)
+            if (isValidVideoUrl(previousResult)) {
+                Log.d("HDFC", "✓ Previous pattern worked")
+                return previousResult
             }
             
-            Log.e("HDFC_MAIN", "Both patterns failed")
+            // 3. DYNAMIC: Search for new pattern
+            Log.d("HDFC", "Known patterns failed, starting dynamic search...")
+            val dynamicResult = dynamicDecrypt(encrypted, seed)
+            if (isValidVideoUrl(dynamicResult)) {
+                Log.d("HDFC", "✓ Dynamic search found new pattern!")
+                // TODO: Store this successful pattern for future fast path
+                return dynamicResult
+            }
+            
+            Log.e("HDFC", "✗ All decryption attempts failed")
             return ""
+        }
+    
+        // Optional: Pattern learning system
+        private val successfulPatterns = mutableListOf<List<Operation>>()
+        
+        fun learnPattern(encrypted: String, seed: Int, result: String) {
+            if (!isValidVideoUrl(result)) return
+            
+            // Try to deduce which sequence worked
+            for (sequence in generateCommonSequences(seed)) {
+                val testResult = trySequence(encrypted, seed, sequence)
+                if (testResult == result) {
+                    if (sequence !in successfulPatterns) {
+                        successfulPatterns.add(sequence)
+                        Log.d("HDFC_LEARN", "Learned new pattern: $sequence")
+                    }
+                    break
+                }
+            }
         }
     }
 
@@ -477,6 +549,11 @@ class HDFilmCehennemi : MainAPI() {
             // Use the updated decrypter
             val decryptedUrl = HDFCHybridDecrypter.decrypt(encryptedString, seed)
             
+            if (decryptedUrl.isNotEmpty()) {               
+                // Optional: Learn the pattern for future use
+                HDFCHybridDecrypter.learnPattern(encryptedString, seed, decryptedUrl)
+            }
+
             if (decryptedUrl.isEmpty()) {
                 Log.e("HDFC", "Decryption failed")
                 return
