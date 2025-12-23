@@ -1,25 +1,5 @@
 [
   {
-    "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/CanliDizi.cs3",
-    "status": 1,
-    "version": 2,
-    "name": "CanliDizi",
-    "internalName": "CanliDizi",
-    "authors": [
-      "kreastream"
-    ],
-    "description": "Canlı Dizi için Cloudstream eklentisi",
-    "fileSize": 22741,
-    "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "language": "tr",
-    "tvTypes": [
-      "TvSeries",
-      "Movie"
-    ],
-    "iconUrl": "https://www.canlidizi14.com/favicon.ico",
-    "apiVersion": 1
-  },
-  {
     "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Ddizi.cs3",
     "status": 1,
     "version": 251219,
@@ -36,25 +16,6 @@
       "TvSeries"
     ],
     "iconUrl": "https://www.ddizi.im/favicon.ico",
-    "apiVersion": 1
-  },
-  {
-    "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Dizilla.cs3",
-    "status": 1,
-    "version": 10,
-    "name": "Dizilla",
-    "internalName": "Dizilla",
-    "authors": [
-      "kreastream"
-    ],
-    "description": "Dizilla tüm yabancı dizileri ücretsiz olarak Türkçe Dublaj ve altyazılı seçenekleri ile 1080P kalite izleyebileceğiniz yeni nesil yabancı dizi izleme siteniz.",
-    "fileSize": 48184,
-    "repositoryUrl": "https://github.com/kreadir/kreaStream",
-    "language": "tr",
-    "tvTypes": [
-      "TvSeries"
-    ],
-    "iconUrl": "https://www.google.com/s2/favicons?domain=dizilla40.com&sz=%size%",
     "apiVersion": 1
   },
   {
@@ -125,7 +86,7 @@
       "kreastream"
     ],
     "description": "Türkiye'nin en hızlı hd film izleme sitesi",
-    "fileSize": 34979,
+    "fileSize": 37286,
     "repositoryUrl": "https://github.com/kreadir/kreaStream",
     "language": "tr",
     "tvTypes": [
