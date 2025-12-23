@@ -519,52 +519,6 @@ class HDFilmCehennemi : MainAPI() {
         }
     }
 
-    private suspend fun extractDownloadLinks(rapidrameId: String, callback: (ExtractorLink) -> Unit) {
-        val downloadUrl = "https://cehennempass.pw/download/$rapidrameId"
-        
-        val qualities = mapOf(
-            "low" to "⬇️ SD",
-            "high" to "⬇️ HD"
-        )
-
-        qualities.forEach { (qualityData, qualityName) ->
-            val postUrl = "https://cehennempass.pw/process_quality_selection.php"
-            
-            try {
-                val postBody = okhttp3.FormBody.Builder()
-                    .add("video_id", rapidrameId)
-                    .add("selected_quality", qualityData)
-                    .build()
-                
-                val response = app.post(
-                    postUrl,
-                    requestBody = postBody,
-                    headers = standardHeaders,
-                    referer = downloadUrl
-                ).parsedSafe<DownloadResponse>()
-
-                val finalLink = response?.download_link
-
-                if (!finalLink.isNullOrEmpty()) {
-                    callback.invoke(
-                        newExtractorLink(
-                            source = name,
-                            name = qualityName,
-                            url = finalLink
-                        ) {
-                            this.quality = if (qualityData == "high") Qualities.P720.value else Qualities.P480.value
-                            this.type = ExtractorLinkType.VIDEO
-                        }
-                    )
-                    
-                    Log.d("HDFC", "Added download/playback link: $qualityName")
-                }
-            } catch (e: Exception) {
-                Log.e("HDFC", "Download extraction failed for $qualityName", e)
-            }
-        }
-    }
-
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
@@ -573,8 +527,13 @@ class HDFilmCehennemi : MainAPI() {
     ): Boolean {
         val document = app.get(data).document
         val rapidrameReferer = "$mainUrl/"
-        var rapidrameId: String? = null
-
+        
+        // Use a queue to collect and sort links
+        val linkQueue = mutableListOf<Pair<Int, ExtractorLink>>()
+        
+        // Priority values: 1=Rapidrame, 2=Close, 3=DownloadSD, 4=DownloadHD
+        
+        // 1. Add Rapidrame links (priority 1)
         document.select("div.alternative-links").forEach { element ->
             val langCode = element.attr("data-lang").uppercase()
             element.select("button.alternative-link").forEach { button ->
@@ -605,13 +564,21 @@ class HDFilmCehennemi : MainAPI() {
                         "$sourceNameRaw $langCode"
                     }
 
-                    rapidrameId = iframe.substringAfter("?rapidrame_id=").takeIf { it.isNotEmpty() }
-                    
-                    invokeLocalSource(finalSourceName, iframe, rapidrameReferer, callback) 
+                    val rapidrameLink = newExtractorLink(
+                        source = name,
+                        name = finalSourceName,
+                        url = iframe
+                    ) {
+                        this.referer = rapidrameReferer
+                        this.quality = Qualities.Unknown.value
+                        this.type = ExtractorLinkType.VIDEO
+                    }
+                    linkQueue.add(Pair(1, rapidrameLink))
                 }
             }
         }
 
+        // 2. Add Close link (priority 2)
         val defaultSourceUrl = fixUrlNull(document.selectFirst(".close")?.attr("data-src"))
 
         if (defaultSourceUrl != null) {
@@ -638,11 +605,20 @@ class HDFilmCehennemi : MainAPI() {
                 }
             }
 
-            rapidrameId = defaultSourceUrl.substringAfter("?rapidrame_id=").takeIf { it.isNotEmpty() }
-
-            invokeLocalSource(sourceName, defaultSourceUrl, referer, callback) 
+            val closeLink = newExtractorLink(
+                source = name,
+                name = sourceName,
+                url = defaultSourceUrl
+            ) {
+                this.referer = referer
+                this.quality = Qualities.Unknown.value
+                this.type = ExtractorLinkType.VIDEO
+            }
+            linkQueue.add(Pair(2, closeLink))
         }
 
+        // 3. PROCESS DOWNLOAD LINKS DIRECTLY HERE (priority 3 & 4)
+        // =========================================================
         var rapidrameD = document.selectFirst("iframe.rapidrame, iframe.close")
             ?.attr("data-src")
             ?.let { src ->
@@ -653,14 +629,86 @@ class HDFilmCehennemi : MainAPI() {
                 }
             }
             ?.takeIf { it.isNotEmpty() }
-        
+
         rapidrameD?.let { id ->
-            extractDownloadLinks(id, callback)
+            Log.d("HDFC", "Processing download links for ID: $id")
+            
+            // Process SD (priority 3) and HD (priority 4) separately
+            val downloadUrl = "https://cehennempass.pw/download/$id"
+            
+            // Process SD link first (priority 3)
+            try {
+                val postBodySD = okhttp3.FormBody.Builder()
+                    .add("video_id", id)
+                    .add("selected_quality", "low")
+                    .build()
+                
+                val responseSD = app.post(
+                    "https://cehennempass.pw/process_quality_selection.php",
+                    requestBody = postBodySD,
+                    headers = standardHeaders,
+                    referer = downloadUrl
+                ).parsedSafe<DownloadResponse>()
+
+                val finalLinkSD = responseSD?.download_link
+
+                if (!finalLinkSD.isNullOrEmpty()) {
+                    val sdLink = newExtractorLink(
+                        source = name,
+                        name = "⬇️ SD",
+                        url = finalLinkSD
+                    ) {
+                        this.quality = Qualities.P480.value
+                        this.type = ExtractorLinkType.VIDEO
+                    }
+                    linkQueue.add(Pair(3, sdLink))
+                    Log.d("HDFC", "Added SD download link")
+                }
+            } catch (e: Exception) {
+                Log.e("HDFC", "SD download extraction failed", e)
+            }
+
+            // Process HD link second (priority 4)
+            try {
+                val postBodyHD = okhttp3.FormBody.Builder()
+                    .add("video_id", id)
+                    .add("selected_quality", "high")
+                    .build()
+                
+                val responseHD = app.post(
+                    "https://cehennempass.pw/process_quality_selection.php",
+                    requestBody = postBodyHD,
+                    headers = standardHeaders,
+                    referer = downloadUrl
+                ).parsedSafe<DownloadResponse>()
+
+                val finalLinkHD = responseHD?.download_link
+
+                if (!finalLinkHD.isNullOrEmpty()) {
+                    val hdLink = newExtractorLink(
+                        source = name,
+                        name = "⬇️ HD",
+                        url = finalLinkHD
+                    ) {
+                        this.quality = Qualities.P720.value
+                        this.type = ExtractorLinkType.VIDEO
+                    }
+                    linkQueue.add(Pair(4, hdLink))
+                    Log.d("HDFC", "Added HD download link")
+                }
+            } catch (e: Exception) {
+                Log.e("HDFC", "HD download extraction failed", e)
+            }
+        }
+        // =========================================================
+
+        // Sort by priority and send to callback
+        linkQueue.sortedBy { it.first }.forEach { (_, link) ->
+            callback.invoke(link)
         }
 
         return true
     }
-
     data class Results(@JsonProperty("results") val results: List<String> = arrayListOf())
     data class HDFC(@JsonProperty("html") val html: String)
     data class DownloadResponse(
