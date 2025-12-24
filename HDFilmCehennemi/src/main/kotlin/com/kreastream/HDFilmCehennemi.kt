@@ -591,62 +591,105 @@ class HDFilmCehennemi : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         val document = app.get(data).document
+        val rapidrameReferer = "$mainUrl/"
         
         // Use a queue to collect and sort links with proper priorities
         val linkQueue = mutableListOf<Pair<Int, ExtractorLink>>()
         
         // Priority values: 
         // 1 = Rapidrame HD
-        // 2 = Rapidrame SD
+        // 2 = Rapidrame SD  
         // 3 = Close HD
         // 4 = Close SD
         // 5 = Download HD
         // 6 = Download SD
 
-        // Process all alternative links (Rapidrame and Close sources)
+        // Process RAPIDRAME links
         document.select("div.alternative-links").forEach { element ->
             val langCode = element.attr("data-lang").uppercase()
             element.select("button.alternative-link").forEach { button ->
                 val sourceNameRaw = button.text().replace("(HDrip Xbet)", "").trim()
-                val videoID = button.attr("data-video")
 
-                if (videoID.isNotEmpty()) {
-                    // Check if it's Rapidrame or Close
-                    val isRapidrame = sourceNameRaw.contains("rapidrame", ignoreCase = true) || 
-                                    sourceNameRaw.contains("rapid", ignoreCase = true)
-                    val isClose = sourceNameRaw.equals("close", ignoreCase = true)
+                // Skip 'Close' here as we handle it separately
+                if (sourceNameRaw.equals("close", ignoreCase = true)) {
+                    return@forEach
+                }
+                
+                val videoID = button.attr("data-video")
+                
+                val apiGet = app.get(
+                    "${mainUrl}/video/$videoID/",
+                    headers = mapOf("Content-Type" to "application/json", "X-Requested-With" to "fetch"),
+                    referer = data
+                ).text
+
+                var iframe = Regex("""data-src=\\"([^"]+)""").find(apiGet)?.groupValues?.get(1)?.replace("\\", "") ?: ""
+                
+                if (iframe.contains("?rapidrame_id=")) {
+                    iframe = "${mainUrl}/playerr/" + iframe.substringAfter("?rapidrame_id=")
+                }
+
+                if (iframe.isNotEmpty()) {
+                    val finalSourceName = if (sourceNameRaw.contains("rapidrame", ignoreCase = true)) {
+                        "Rapidrame $langCode"
+                    } else {
+                        "$sourceNameRaw $langCode"
+                    }
+
+                    // Determine priority based on quality
+                    val isHD = sourceNameRaw.contains("hd", ignoreCase = true) || 
+                            sourceNameRaw.contains("1080", ignoreCase = true) ||
+                            sourceNameRaw.contains("720", ignoreCase = true)
+                    val priority = if (isHD) 1 else 2
                     
-                    if (isRapidrame || isClose) {
-                        val sourceType = if (isRapidrame) "Rapidrame" else "Close"
-                        val quality = when {
-                            sourceNameRaw.contains("hd", ignoreCase = true) -> "HD"
-                            sourceNameRaw.contains("sd", ignoreCase = true) -> "SD"
-                            else -> "Unknown"
-                        }
-                        
-                        // Build the source URL to extract
-                        val sourceUrl = "${mainUrl}/video/$videoID/"
-                        
-                        // Extract using invokeLocalSource which handles the decryption
-                        invokeLocalSource("$sourceType $quality $langCode", sourceUrl, data) { link ->
-                            // Set priority based on source type and quality
-                            val priority = when {
-                                isRapidrame && quality == "SD" -> 1
-                                isRapidrame && quality == "HD" -> 2
-                                isClose && quality == "SD" -> 3
-                                isClose && quality == "HD" -> 4
-                                isRapidrame -> 1  // Default Rapidrame to priority 2
-                                isClose -> 3      // Default Close to priority 4
-                                else -> 5
-                            }
-                            linkQueue.add(Pair(priority, link))
-                        }
+                    // Extract via invokeLocalSource
+                    invokeLocalSource(finalSourceName, iframe, rapidrameReferer) { link ->
+                        linkQueue.add(Pair(priority, link))
                     }
                 }
             }
         }
 
-        // PROCESS DOWNLOAD LINKS (priority 5 & 6)
+        // Process CLOSE link
+        val defaultSourceUrl = fixUrlNull(document.selectFirst(".close")?.attr("data-src"))
+
+        if (defaultSourceUrl != null) {
+            val sourceName = "Close"
+            var referer = "$mainUrl/" 
+            
+            // Extract subtitles if available
+            if (defaultSourceUrl.contains("hdfilmcehennemi.mobi")) {
+                try {
+                    val iframedoc = app.get(defaultSourceUrl, referer = mainUrl).document
+                    val baseUri = iframedoc.location().substringBefore("/", "https://www.hdfilmcehennemi.mobi")
+                    referer = baseUri
+                    
+                    iframedoc.select("track[kind=captions]").forEach { track ->
+                        val lang = when (track.attr("srclang")) {
+                            "tr" -> "Türkçe"
+                            "en" -> "İngilizce"
+                            else -> track.attr("srclang")
+                        }
+                        val subUrl = track.attr("src").let { 
+                            if (it.startsWith("http")) it else "$baseUri/$it".replace("//", "/") 
+                        }
+                        subtitleCallback(newSubtitleFile(lang, subUrl))
+                    }
+                } catch (e: Exception) { 
+                    Log.e("HDFC", "Sub extraction error for default source", e) 
+                }
+            }
+
+            // Default Close to priority 3 (SD)
+            val priority = 4
+            
+            // Extract via invokeLocalSource
+            invokeLocalSource(sourceName, defaultSourceUrl, referer) { link ->
+                linkQueue.add(Pair(priority, link))
+            }
+        }
+
+        // PROCESS DOWNLOAD LINKS
         val rapidrameD = document.selectFirst("iframe.rapidrame, iframe.close")
             ?.attr("data-src")
             ?.let { src ->
@@ -660,16 +703,16 @@ class HDFilmCehennemi : MainAPI() {
 
         rapidrameD?.let { id ->
             Log.d("HDFC", "Processing download links for ID: $id")
-
+            
             val downloadUrl = "https://cehennempass.pw/download/$id"
-
-            // Process HD link first (priority 5)
+            
+            // Process HD download link (priority 5)
             try {
                 val postBodyHD = okhttp3.FormBody.Builder()
                     .add("video_id", id)
                     .add("selected_quality", "high")
                     .build()
-
+                
                 val responseHD = app.post(
                     "https://cehennempass.pw/process_quality_selection.php",
                     requestBody = postBodyHD,
@@ -688,20 +731,20 @@ class HDFilmCehennemi : MainAPI() {
                         this.quality = Qualities.P720.value
                         this.type = ExtractorLinkType.VIDEO
                     }
-                    linkQueue.add(Pair(6, hdLink))
+                    linkQueue.add(Pair(5, hdLink))
                     Log.d("HDFC", "Added HD download link")
                 }
             } catch (e: Exception) {
                 Log.e("HDFC", "HD download extraction failed", e)
             }
 
-            // Process SD link second (priority 6)
+            // Process SD download link (priority 6)
             try {
                 val postBodySD = okhttp3.FormBody.Builder()
                     .add("video_id", id)
                     .add("selected_quality", "low")
                     .build()
-
+                
                 val responseSD = app.post(
                     "https://cehennempass.pw/process_quality_selection.php",
                     requestBody = postBodySD,
@@ -720,7 +763,7 @@ class HDFilmCehennemi : MainAPI() {
                         this.quality = Qualities.P480.value
                         this.type = ExtractorLinkType.VIDEO
                     }
-                    linkQueue.add(Pair(5, sdLink))
+                    linkQueue.add(Pair(6, sdLink))
                     Log.d("HDFC", "Added SD download link")
                 }
             } catch (e: Exception) {
@@ -728,7 +771,7 @@ class HDFilmCehennemi : MainAPI() {
             }
         }
 
-        // Wait a bit for async source extraction to complete
+        // Wait for async extraction to complete
         kotlinx.coroutines.delay(200)
 
         // Sort by priority and send to callback
@@ -737,6 +780,73 @@ class HDFilmCehennemi : MainAPI() {
         }
 
         return linkQueue.isNotEmpty()
+    }
+
+    // Helper function for download links
+    private suspend fun extractDownloadLinks(id: String, callback: (ExtractorLink) -> Unit) {
+        val downloadUrl = "https://cehennempass.pw/download/$id"
+        
+        // Process HD download
+        try {
+            val postBodyHD = okhttp3.FormBody.Builder()
+                .add("video_id", id)
+                .add("selected_quality", "high")
+                .build()
+            
+            val responseHD = app.post(
+                "https://cehennempass.pw/process_quality_selection.php",
+                requestBody = postBodyHD,
+                headers = standardHeaders,
+                referer = downloadUrl
+            ).parsedSafe<DownloadResponse>()
+
+            val finalLinkHD = responseHD?.download_link
+
+            if (!finalLinkHD.isNullOrEmpty()) {
+                val hdLink = newExtractorLink(
+                    source = name,
+                    name = "⬇️ HD",
+                    url = finalLinkHD
+                ) {
+                    this.quality = Qualities.P720.value
+                    this.type = ExtractorLinkType.VIDEO
+                }
+                callback.invoke(hdLink)
+            }
+        } catch (e: Exception) {
+            Log.e("HDFC", "HD download extraction failed", e)
+        }
+
+        // Process SD download
+        try {
+            val postBodySD = okhttp3.FormBody.Builder()
+                .add("video_id", id)
+                .add("selected_quality", "low")
+                .build()
+            
+            val responseSD = app.post(
+                "https://cehennempass.pw/process_quality_selection.php",
+                requestBody = postBodySD,
+                headers = standardHeaders,
+                referer = downloadUrl
+            ).parsedSafe<DownloadResponse>()
+
+            val finalLinkSD = responseSD?.download_link
+
+            if (!finalLinkSD.isNullOrEmpty()) {
+                val sdLink = newExtractorLink(
+                    source = name,
+                    name = "⬇️ SD",
+                    url = finalLinkSD
+                ) {
+                    this.quality = Qualities.P480.value
+                    this.type = ExtractorLinkType.VIDEO
+                }
+                callback.invoke(sdLink)
+            }
+        } catch (e: Exception) {
+            Log.e("HDFC", "SD download extraction failed", e)
+        }
     }
 
     data class Results(@JsonProperty("results") val results: List<String> = arrayListOf())
