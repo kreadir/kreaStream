@@ -18,27 +18,28 @@ import org.jsoup.nodes.Element
 import kotlin.text.Charsets
 
 class HDFilmCehennemi : MainAPI() {
-    override var mainUrl = "https://www.hdfilmcehennemi.ws"
-    override var name = "HDFilmCehennemi"
-    override val hasMainPage = true
-    override var lang = "tr"
-    override val hasQuickSearch = true
-    override var hasDownloadSupport = true
-    override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
+    override var mainUrl              = "https://www.hdfilmcehennemi.ws"
+    override var name                 = "HDFilmCehennemi"
+    override val hasMainPage          = true
+    override var lang                 = "tr"
+    override val hasQuickSearch       = true
+    override var hasDownloadSupport   = true 
+    override val supportedTypes       = setOf(TvType.Movie, TvType.TvSeries)
 
-    override var sequentialMainPage = true
-    override var sequentialMainPageDelay = 50L
-    override var sequentialMainPageScrollDelay = 50L
+
+    override var sequentialMainPage             = true
+    override var sequentialMainPageDelay        = 50L
+    override var sequentialMainPageScrollDelay  = 50L
 
     private val cloudflareKiller by lazy { CloudflareKiller() }
-
-    class CloudflareKiller {
-        fun intercept(chain: Interceptor.Chain): Response = chain.proceed(chain.request())
+    
+    class CloudflareKiller { 
+        fun intercept(chain: Interceptor.Chain): Response = chain.proceed(chain.request()) 
     }
-
-    class CloudflareInterceptor(private val cloudflareKiller: CloudflareKiller) : Interceptor {
+    
+    class CloudflareInterceptor(private val cloudflareKiller: CloudflareKiller): Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
-            val request = chain.request()
+            val request  = chain.request()
             val response = chain.proceed(request)
             return response
         }
@@ -65,7 +66,7 @@ class HDFilmCehennemi : MainAPI() {
         val score: Float?,
         val tvType: TvType,
         val hasDub: Boolean,
-        val hasSub: Boolean
+        val hasSub: Boolean 
     )
 
     private data class LoadData(
@@ -88,8 +89,7 @@ class HDFilmCehennemi : MainAPI() {
         val year = this.selectFirst("div.post-info-year-country a")?.text()?.trim()?.toIntOrNull()
         val tvType = if (this.select("div.seasons").isEmpty()) TvType.Movie else TvType.TvSeries
         val description = this.selectFirst("article.post-info-content > p")?.text()?.trim()
-        val score = this.selectFirst("div.post-info-imdb-rating span")?.text()?.substringBefore("(")?.trim()
-            ?.toFloatOrNull()
+        val score = this.selectFirst("div.post-info-imdb-rating span")?.text()?.substringBefore("(")?.trim()?.toFloatOrNull()
         val lang = this.selectFirst(".language-link")?.text()?.trim()
         val hasDub = lang?.contains("Dublaj", ignoreCase = true) == true
         val newTitle = if (hasDub) "🇹🇷 ${title}" else title
@@ -114,45 +114,49 @@ class HDFilmCehennemi : MainAPI() {
         val href = fixUrlNull(this.attr("href")) ?: return null
         val posterUrl = fixUrlNull(this.selectFirst("img[data-src], img[src]")?.attr("data-src")
             ?: this.selectFirst("img")?.attr("src"))
+            // FIX: Apply image path correction globally for standard posters
             ?.replace("/list/", "/")
             ?.replace("/thumb/", "/")
 
         val year = this.selectFirst(".poster-meta span")?.text()?.trim()?.toIntOrNull()
         val score = this.selectFirst(".poster-meta .imdb")?.ownText()?.trim()?.toFloatOrNull()
-
+        
+        // Use .poster-lang or .poster-meta for language info
         val lang = this.selectFirst(".poster-lang span, .poster-meta-genre span")?.text()?.trim()
-
+        
+        // Dubbed status: checks for "Dublaj" or "Yerli"
         val hasDub = lang?.contains("Dublaj", ignoreCase = true) == true || lang?.contains("Yerli", ignoreCase = true) == true
+        
+        // Subtitle status: checks for "Altyazılı"
         val hasSub = lang?.contains("Altyazılı", ignoreCase = true) == true
-
+        
         val newTitle = if (hasDub) "🇹🇷 ${title}" else title
 
-        val typeCheck =
-            this.attr("href").contains("/dizi/", ignoreCase = true) || this.attr("href").contains("/series", ignoreCase = true)
+        val typeCheck = this.attr("href").contains("/dizi/", ignoreCase = true) || this.attr("href").contains("/series", ignoreCase = true)
         val tvType = if (typeCheck) TvType.TvSeries else TvType.Movie
 
         return PosterData(title, newTitle, href, posterUrl, lang, year, score, tvType, hasDub, hasSub)
     }
 
     override val mainPage = mainPageOf(
-        "${mainUrl}/load/page/1/home/" to "Yeni Filmler",
-        "${mainUrl}/load/page/1/languages/turkce-dublajli-film-izleyin-3/" to "Türkçe Dublaj Filmler",
-        "${mainUrl}/load/page/1/countries/turkiye-2/" to "Türk Filmleri",
-        "${mainUrl}/load/page/1/recent-episodes/" to "Yeni Bölümler",
-        "${mainUrl}/load/page/1/home-series/" to "Yeni Diziler",
-        "${mainUrl}/load/page/1/categories/tavsiye-filmler-izle2/" to "Tavsiye Filmler",
-        "${mainUrl}/load/page/1/genres/aksiyon-filmleri-izleyin-5/" to "Aksiyon Filmleri",
-        "${mainUrl}/load/page/1/genres/animasyon-filmlerini-izleyin-5/" to "Animasyon Filmleri",
+        "${mainUrl}/load/page/1/home/"                                      to "Yeni Filmler",
+        "${mainUrl}/load/page/1/languages/turkce-dublajli-film-izleyin-3/"   to "Türkçe Dublaj Filmler",
+        "${mainUrl}/load/page/1/countries/turkiye-2/"                        to "Türk Filmleri",
+        "${mainUrl}/load/page/1/recent-episodes/"                            to "Yeni Bölümler",
+        "${mainUrl}/load/page/1/home-series/"                                to "Yeni Diziler",
+        "${mainUrl}/load/page/1/categories/tavsiye-filmler-izle2/"           to "Tavsiye Filmler",
+        "${mainUrl}/load/page/1/genres/aksiyon-filmleri-izleyin-5/"          to "Aksiyon Filmleri",
+        "${mainUrl}/load/page/1/genres/animasyon-filmlerini-izleyin-5/"      to "Animasyon Filmleri",
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         val url = if (page == 1) {
             request.data
-                .replace("/load/page/1/genres/", "/tur/")
-                .replace("/load/page/1/categories/", "/category/")
-                .replace("/load/page/1/imdb7/", "/imdb-7-puan-uzeri-filmler/")
-                .replace("/load/page/1/languages/", "/dil/")
-                .replace("/load/page/1/countries/", "/ulke/")
+                .replace("/load/page/1/genres/","/tur/")
+                .replace("/load/page/1/categories/","/category/")
+                .replace("/load/page/1/imdb7/","/imdb-7-puan-uzeri-filmler/")
+                .replace("/load/page/1/languages/","/dil/")
+                .replace("/load/page/1/countries/","/ulke/")
         } else {
             request.data.replace("/page/1/", "/page/${page}/")
         }
@@ -166,6 +170,7 @@ class HDFilmCehennemi : MainAPI() {
         try {
             val hdfc: HDFC = objectMapper.readValue(response.text, HDFC::class.java)
             val document = Jsoup.parse(hdfc.html)
+            // Select all relevant link elements
             val results = document.select("a.poster, a.mini-poster").mapNotNull { it.toSearchResult() }
             return newHomePageResponse(request.name, results)
         } catch (e: Exception) {
@@ -181,18 +186,20 @@ class HDFilmCehennemi : MainAPI() {
             val episodeInfo = this.selectFirst(".mini-poster-episode-info")?.text()?.trim() ?: ""
             val posterUrl = fixUrlNull(this.selectFirst("img[data-src], img[src]")?.attr("data-src")
                 ?: this.selectFirst("img")?.attr("src"))
-                ?.replace("/list/", "/")
+                ?.replace("/list/", "/") 
                 ?.replace("/thumb/", "/")
 
+            // Format title to show episode info for easier identification
             val newName = "$seriesTitle - $episodeInfo"
-
+            
             return newTvSeriesSearchResponse(newName, href, TvType.TvSeries) {
                 this.posterUrl = posterUrl
             }
         }
-
+        
+        // Handle standard posters for "Yeni Eklenen Diziler" and movies
         val data = this.extractPosterData() ?: return null
-
+        
         return newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
             this.posterUrl = data.posterUrl
             this.score = Score.from10(data.score)
@@ -213,7 +220,7 @@ class HDFilmCehennemi : MainAPI() {
             val document = Jsoup.parse(resultHtml)
 
             val data = document.selectFirst("a")?.extractPosterData() ?: return@forEach
-
+            
             searchResults.add(
                 newMovieSearchResponse(data.newTitle, data.href, data.tvType) {
                     this.posterUrl = data.posterUrl
@@ -225,28 +232,28 @@ class HDFilmCehennemi : MainAPI() {
         }
         return searchResults
     }
-
+    
     override suspend fun load(url: String): LoadResponse? {
         val document = app.get(url).document
         val data = document.extractLoadData() ?: return null
 
         val recommendations = document.select("div.section-slider-container div.slider-slide").mapNotNull {
-            val recName = it.selectFirst("a")?.attr("title") ?: return@mapNotNull null
-            val recHref = fixUrlNull(it.selectFirst("a")?.attr("href")) ?: return@mapNotNull null
+            val recName      = it.selectFirst("a")?.attr("title") ?: return@mapNotNull null
+            val recHref      = fixUrlNull(it.selectFirst("a")?.attr("href")) ?: return@mapNotNull null
             val recPosterUrl = fixUrlNull(it.selectFirst("img")?.attr("data-src")) ?:
             fixUrlNull(it.selectFirst("img")?.attr("src"))
 
-            newTvSeriesSearchResponse(recName, recHref, data.tvType) {
+            newTvSeriesSearchResponse(recName, recHref, data.tvType) { 
                 this.posterUrl = recPosterUrl
             }
         }
 
         return if (data.tvType == TvType.TvSeries) {
             val episodes = document.select("div.seasons-tab-content a").mapNotNull {
-                val epName = it.selectFirst("h4")?.text()?.trim() ?: return@mapNotNull null
-                val epHref = fixUrlNull(it.attr("href")) ?: return@mapNotNull null
+                val epName    = it.selectFirst("h4")?.text()?.trim() ?: return@mapNotNull null
+                val epHref    = fixUrlNull(it.attr("href")) ?: return@mapNotNull null
                 val epEpisode = Regex("""(\d+)\. ?Bölüm""").find(epName)?.groupValues?.get(1)?.toIntOrNull()
-                val epSeason = Regex("""(\d+)\. ?Sezon""").find(epName)?.groupValues?.get(1)?.toIntOrNull() ?: 1
+                val epSeason  = Regex("""(\d+)\. ?Sezon""").find(epName)?.groupValues?.get(1)?.toIntOrNull() ?: 1
 
                 newEpisode(epHref) {
                     this.name = epName
@@ -256,375 +263,312 @@ class HDFilmCehennemi : MainAPI() {
             }
 
             newTvSeriesLoadResponse(data.newTitle, url, data.tvType, episodes) {
-                this.posterUrl = data.poster
-                this.year = data.year
-                this.plot = data.description
-                this.tags = data.tags
-                this.score = Score.from10(data.score)
+                this.posterUrl       = data.poster
+                this.year            = data.year
+                this.plot            = data.description
+                this.tags            = data.tags
+                this.score           = Score.from10(data.score)
                 this.recommendations = recommendations
                 addActors(data.actors)
                 addTrailer(data.trailer)
             }
         } else {
             newMovieLoadResponse(data.newTitle, url, data.tvType, url) {
-                this.posterUrl = data.poster
-                this.year = data.year
-                this.plot = data.description
-                this.tags = data.tags
-                this.score = Score.from10(data.score)
+                this.posterUrl       = data.poster
+                this.year            = data.year
+                this.plot            = data.description
+                this.tags            = data.tags
+                this.score           = Score.from10(data.score)
                 this.recommendations = recommendations
                 addActors(data.actors)
                 addTrailer(data.trailer)
             }
         }
     }
-
-private object HDFCHybridDecrypter {
-    sealed class Operation {
-        object Reverse : Operation()
-        object Base64Decode : Operation()
-        object Rot13OnString : Operation() // ROT13 BEFORE Base64
-        object Rot13OnText : Operation() // ROT13 AFTER Base64
-        data class CustomShift(val seed: Int) : Operation()
-        object NoOp : Operation()
-    }
-
-    private fun applyRot13(input: String): String {
-        return input.map { char ->
-            when {
-                char in 'a'..'z' -> {
-                    val rotated = char.code + 13
-                    if (rotated <= 'z'.code) rotated.toChar() else (rotated - 26).toChar()
+    
+    private object HDFCDecrypter {
+        
+        private fun applyRot13(inputBytes: ByteArray): ByteArray {
+            val rot13edBytes = ByteArray(inputBytes.size)
+            for (i in inputBytes.indices) {
+                val charCode = inputBytes[i].toInt()
+                val char = charCode.toChar()
+                rot13edBytes[i] = when (char) {
+                    in 'a'..'z' -> (((charCode - 'a'.code + 13) % 26 + 'a'.code).toChar()).code.toByte()
+                    in 'A'..'Z' -> (((charCode - 'A'.code + 13) % 26 + 'A'.code).toChar()).code.toByte()
+                    else -> inputBytes[i]
                 }
-                char in 'A'..'Z' -> {
-                    val rotated = char.code + 13
-                    if (rotated <= 'Z'.code) rotated.toChar() else (rotated - 26).toChar()
-                }
-                else -> char
             }
-        }.joinToString("")
-    }
-
-    private fun applyCustomShift(input: String, seed: Int): String {
-        val sb = StringBuilder()
-        for (i in input.indices) {
-            val charCode = input[i].code
-            val shift = seed % (i + 5)
-            val newCharCode = (charCode - shift + 256) % 256
-            sb.append(newCharCode.toChar())
+            return rot13edBytes
         }
-        return sb.toString()
-    }
 
-    private fun isValidVideoUrl(url: String): Boolean {
-        if (url.isEmpty()) return false
-        if (!url.startsWith("http")) return false
-        val domainPattern = Regex("""https?://([a-zA-Z0-9.-]+)/""")
-        val match = domainPattern.find(url) ?: return false
-        val domain = match.groupValues[1]
-        if (!domain.matches(Regex("""^[a-zA-Z0-9.-]+$"""))) return false
-        val videoExtensions = listOf(".m3u8", ".mp4", ".mkv", ".webm")
-        return videoExtensions.any { url.contains(it, ignoreCase = true) }
-    }
-
-    // ============================================
-    // FAST PATH: Known working patterns
-    // ============================================
-    // Current pattern (Dec 2024): Reverse → ROT13(string) → Base64 → CustomShift
-    private fun decryptCurrent(encrypted: String, seed: Int): String {
-        try {
-            val reversed = encrypted.reversed()
-            val rot13String = applyRot13(reversed)
-            val decodedBytes = Base64.decode(rot13String, Base64.DEFAULT)
-            val decodedText = String(decodedBytes, Charsets.UTF_8)
-            return applyCustomShift(decodedText, seed)
-        } catch (e: Exception) {
-            return ""
+        private fun applyCustomShift(inputBytes: ByteArray, seed: Int): String {
+            val sb = StringBuilder()
+            for (i in inputBytes.indices) {
+                val charCode = inputBytes[i].toInt() and 0xFF // Unsigned conversion
+                val shift = seed % (i + 5)
+                val newChar = (charCode - shift + 256) % 256
+                sb.append(newChar.toChar())
+            }
+            return sb.toString()
         }
-    }
 
-    // Previous pattern: Reverse → Base64 → ROT13(text) → CustomShift
-    private fun decryptPrevious(encrypted: String, seed: Int): String {
-        try {
-            val reversed = encrypted.reversed()
-            val decodedBytes = Base64.decode(reversed, Base64.DEFAULT)
-            val decodedText = String(decodedBytes, Charsets.UTF_8)
-            val rot13Text = applyRot13(decodedText)
-            return applyCustomShift(rot13Text, seed)
-        } catch (e: Exception) {
-            return ""
+        // Attempt 1: Reverse String -> Base64 Decode -> ROT13 on Bytes -> Custom Shift
+        private fun attempt1(encryptedData: String, seed: Int): String {
+            val reversedString = encryptedData.reversed()
+            val decodedBytes = Base64.decode(reversedString, Base64.DEFAULT)
+            val rot13edBytes = applyRot13(decodedBytes)
+            return applyCustomShift(rot13edBytes, seed)
         }
-    }
 
-    // ============================================
-    // DYNAMIC DECRYPTION: For future changes
-    // ============================================
-    private fun trySequence(encrypted: String, seed: Int, operations: List<Operation>): String {
-        var current: Any = encrypted
-        for (operation in operations) {
+        // Attempt 2: ROT13 on String -> Reverse String -> Base64 Decode -> Custom Shift
+        private fun attempt2(encryptedData: String, seed: Int): String {
+            val rot13edString = applyRot13(encryptedData.toByteArray()).toString(Charsets.UTF_8)
+            val reversedString = rot13edString.reversed()
+            val decodedBytes = Base64.decode(reversedString, Base64.DEFAULT)
+            return applyCustomShift(decodedBytes, seed)
+        }
+
+        // Attempt 3: Reverse String -> ROT13 on String -> Base64 Decode -> Custom Shift
+        private fun attempt3(encryptedData: String, seed: Int): String {
+            val reversedString = encryptedData.reversed()
+            val rot13edString = applyRot13(reversedString.toByteArray()).toString(Charsets.UTF_8)
+            val decodedBytes = Base64.decode(rot13edString, Base64.DEFAULT)
+            return applyCustomShift(decodedBytes, seed)
+        }
+
+        // Attempt 4: Base64 Decode -> ROT13 on Bytes -> Reverse Bytes -> Custom Shift
+        // Matches JS: atob(x) -> replace(Rot13) -> reverse() -> Shift Loop
+        private fun attempt4(encryptedData: String, seed: Int): String {
             try {
-                current = when (operation) {
-                    Operation.Reverse -> {
-                        when (current) {
-                            is String -> (current as String).reversed()
-                            else -> return ""
-                        }
-                    }
-                    Operation.Base64Decode -> {
-                        val str = when (current) {
-                            is String -> current as String
-                            else -> return ""
-                        }
-                        String(Base64.decode(str, Base64.DEFAULT), Charsets.UTF_8)
-                    }
-                    Operation.Rot13OnString, Operation.Rot13OnText -> {
-                        val str = when (current) {
-                            is String -> current as String
-                            else -> return ""
-                        }
-                        applyRot13(str)
-                    }
-                    is Operation.CustomShift -> {
-                        val str = when (current) {
-                            is String -> current as String
-                            else -> return ""
-                        }
-                        applyCustomShift(str, operation.seed)
-                    }
-                    Operation.NoOp -> current
-                }
-                if (current.toString().isEmpty()) return ""
+                // 1. Base64 Decode
+                val decodedBytes = Base64.decode(encryptedData, Base64.DEFAULT)
+                // 2. ROT13
+                val rot13edBytes = applyRot13(decodedBytes)
+                // 3. Reverse
+                val reversedBytes = rot13edBytes.reversedArray()
+                // 4. Custom Shift
+                return applyCustomShift(reversedBytes, seed)
             } catch (e: Exception) {
                 return ""
             }
         }
-        return current.toString()
-    }
 
-    private fun generateCommonSequences(seed: Int): List<List<Operation>> {
-        return listOf(
-            // Current (Dec 2024)
-            listOf(Operation.Reverse, Operation.Rot13OnString, Operation.Base64Decode, Operation.CustomShift(seed)),
-            // Previous
-            listOf(Operation.Reverse, Operation.Base64Decode, Operation.Rot13OnText, Operation.CustomShift(seed)),
-            // Other possible variations
-            listOf(Operation.Reverse, Operation.Base64Decode, Operation.CustomShift(seed)),
-            listOf(Operation.Base64Decode, Operation.Reverse, Operation.CustomShift(seed)),
-            listOf(Operation.Rot13OnString, Operation.Reverse, Operation.Base64Decode, Operation.CustomShift(seed)),
-            listOf(Operation.Reverse, Operation.CustomShift(seed), Operation.Base64Decode),
-            // Variations with CustomShift in different positions
-            listOf(Operation.CustomShift(seed), Operation.Reverse, Operation.Rot13OnString, Operation.Base64Decode),
-            listOf(Operation.Reverse, Operation.CustomShift(seed), Operation.Rot13OnText, Operation.Base64Decode),
-            listOf(Operation.Base64Decode, Operation.CustomShift(seed), Operation.Reverse),
-            // Variations with NoOp for padding
-            listOf(Operation.NoOp, Operation.Reverse, Operation.Rot13OnString, Operation.Base64Decode, Operation.CustomShift(seed)),
-            listOf(Operation.Reverse, Operation.NoOp, Operation.Base64Decode, Operation.Rot13OnText, Operation.CustomShift(seed))
-        )
-    }
-
-    private fun dynamicDecrypt(encrypted: String, seed: Int): String {
-        Log.d("HDFC_DYNAMIC", "Starting dynamic decryption search")
-
-        // Step 1: Try learned successful patterns first
-        for ((index, sequence) in successfulPatterns.withIndex()) {
-            val result = trySequence(encrypted, seed, sequence)
-            if (isValidVideoUrl(result)) {
-                Log.d("HDFC_DYNAMIC", "Found working learned sequence #$index: $sequence")
-                return result
-            }
+        private fun attempt5(encryptedData: String, seed: Int): String {
+            val reversedString = encryptedData.reversed()
+            val rot13edString = applyRot13(reversedString.toByteArray()).toString(Charsets.UTF_8)
+            val decodedBytes = Base64.decode(rot13edString, Base64.DEFAULT)
+            return applyCustomShift(decodedBytes, seed)
         }
 
-        // Step 2: Try all common sequences
-        val sequences = generateCommonSequences(seed)
-        for ((index, sequence) in sequences.withIndex()) {
-            val result = trySequence(encrypted, seed, sequence)
-            if (isValidVideoUrl(result)) {
-                Log.d("HDFC_DYNAMIC", "Found working common sequence #$index: $sequence")
-                learnPattern(encrypted, seed, result) // Learn it if not already
-                return result
-            }
+        private fun isValidDecryption(output: String): Boolean {
+            if (output.isBlank()) return false
+            if (output.length < 10) return false
+
+            // Stage 1: starts with known URL schemes
+            if (output.startsWith("http://") || output.startsWith("https://")) return true
+
+            // Stage 2: check if inside contains urls even if prefix is shifted
+            if (output.contains("http")) return true
+            if (output.contains(".m3u8") || output.contains(".mp4")) return true
+
+            // Stage 3: must be printable ASCII mostly
+            val printable = output.count { it.code in 32..126 }
+            if (printable.toDouble() / output.length > 0.85) return true
+
+            return false
         }
 
-        // Step 3: Brute force - Generate permutations for varying lengths (2-5 ops including CustomShift)
-        val allOps = listOf(
-            Operation.Reverse,
-            Operation.Base64Decode,
-            Operation.Rot13OnString,
-            Operation.Rot13OnText,
-            Operation.NoOp,
-            Operation.CustomShift(seed)
-        )
+        private fun attemptNew(encrypted: String, seed: Int): String {
+            return try {
+                val reversed = encrypted.reversed()
+                val decoded = Base64.decode(reversed, Base64.DEFAULT)
 
-        // Helper to generate permutations without too much repetition
-        fun generatePermutations(ops: List<Operation>, length: Int): List<List<Operation>> {
-            if (length == 1) return ops.map { listOf(it) }
-            val result = mutableListOf<List<Operation>>()
-            val shorter = generatePermutations(ops, length - 1)
-            for (op in ops) {
-                for (short in shorter) {
-                    result.add(listOf(op) + short)
+                val sb = StringBuilder()
+                for (i in decoded.indices) {
+                    val charCode = decoded[i].toInt() and 0xFF
+                    val shift = seed % (i + 5)
+                    sb.append(((charCode - shift + 256) % 256).toChar())
                 }
-            }
-            return result
+                sb.toString()
+            } catch (e: Exception) { "" }
         }
 
-        for (length in 2..5) { // Try sequences of length 2 to 5
-            val perms = generatePermutations(allOps, length)
-            for (sequence in perms) {
-                // Skip if all NoOp or invalid combos (e.g., multiple CustomShift unless desired)
-                if (sequence.all { it is Operation.NoOp }) continue
-                if (sequence.count { it is Operation.CustomShift } > 1) continue // Assume at most one CustomShift
-                if (sequence.count { it is Operation.Base64Decode } > 1) continue // Assume at most one decode
-                val result = trySequence(encrypted, seed, sequence)
-                if (isValidVideoUrl(result)) {
-                    Log.d("HDFC_DYNAMIC", "Brute force found sequence (len $length): $sequence")
-                    learnPattern(encrypted, seed, result)
-                    return result
-                }
-            }
-        }
-
-        Log.d("HDFC_DYNAMIC", "No working sequence found after brute force")
-        return ""
-    }
-
-    // ============================================
-    // MAIN ENTRY POINT
-    // ============================================
-    fun decrypt(encrypted: String, seed: Int): String {
-        Log.d("HDFC", "Decryption attempt, seed: $seed")
-
-        // 1. FAST PATH: Try current known pattern
-        val currentResult = decryptCurrent(encrypted, seed)
-        if (isValidVideoUrl(currentResult)) {
-            Log.d("HDFC", "✓ Current pattern worked")
-            learnPattern(encrypted, seed, currentResult) // Learn if not already
-            return currentResult
-        }
-
-        // 2. Try previous pattern
-        val previousResult = decryptPrevious(encrypted, seed)
-        if (isValidVideoUrl(previousResult)) {
-            Log.d("HDFC", "✓ Previous pattern worked")
-            learnPattern(encrypted, seed, previousResult)
-            return previousResult
-        }
-
-        // 3. DYNAMIC: Search for new pattern
-        Log.d("HDFC", "Known patterns failed, starting dynamic search...")
-        val dynamicResult = dynamicDecrypt(encrypted, seed)
-        if (isValidVideoUrl(dynamicResult)) {
-            Log.d("HDFC", "✓ Dynamic search found new pattern!")
-            return dynamicResult
-        }
-
-        Log.e("HDFC", "✗ All decryption attempts failed")
-        return ""
-    }
-
-    // Pattern learning system (in-memory cache)
-    private val successfulPatterns = mutableListOf<List<Operation>>()
-
-    private fun learnPattern(encrypted: String, seed: Int, result: String) {
-        if (!isValidVideoUrl(result)) return
-
-        // Deduce which sequence worked by testing against input
-        val testSequences = generateCommonSequences(seed) + successfulPatterns
-        for (sequence in testSequences) {
-            val testResult = trySequence(encrypted, seed, sequence)
-            if (testResult == result) {
-                if (sequence !in successfulPatterns) {
-                    successfulPatterns.add(0, sequence) // Add to front for priority
-                    Log.d("HDFC_LEARN", "Learned new pattern (added to cache): $sequence")
-                }
-                return
+        private fun attemptDoubleBase64(encryptedData: String, seed: Int): String {
+            return try {
+                // 1. Reverse String
+                val reversedString = encryptedData.reversed()
+                
+                // 2. Base64 Decode Once
+                val onceDecodedBytes = Base64.decode(reversedString, Base64.DEFAULT)
+                
+                // 3. Base64 Decode Twice
+                val twiceDecodedBytes = Base64.decode(onceDecodedBytes, Base64.DEFAULT)
+                
+                // 4. Custom Shift
+                return applyCustomShift(twiceDecodedBytes, seed)
+            } catch (e: Exception) {
+                ""
             }
         }
 
-        // If not in common, brute force to find the exact sequence and learn it
-        val allOps = listOf(
-            Operation.Reverse,
-            Operation.Base64Decode,
-            Operation.Rot13OnString,
-            Operation.Rot13OnText,
-            Operation.NoOp,
-            Operation.CustomShift(seed)
-        )
-        for (length in 2..5) {
-            val perms = mutableListOf<List<Operation>>()
-            // Simplified permutation generation for learning
-            fun permute(current: List<Operation>, remaining: List<Operation>, targetLength: Int) {
-                if (current.size == targetLength) {
-                    perms.add(current)
-                    return
-                }
-                for (op in remaining) {
-                    permute(current + op, remaining, targetLength)
-                }
-            }
-            permute(emptyList(), allOps, length)
-            for (sequence in perms) {
-                val testResult = trySequence(encrypted, seed, sequence)
-                if (testResult == result) {
-                    if (sequence !in successfulPatterns) {
-                        successfulPatterns.add(0, sequence)
-                        Log.d("HDFC_LEARN", "Learned new brute-forced pattern: $sequence")
+        // Main function to try all known orders
+        // Main function to try all known orders
+        fun dynamicDecrypt(encrypted: String, seed: Int): String {
+            val attempts = listOf(
+                // 1. New Working Logic from 'Close' link JS (Reverse -> Decode Twice -> Shift)
+                { attemptDoubleBase64(encrypted, seed) },
+                // 2. Previously working NEW logic
+                { attemptNew(encrypted, seed) },   
+                // 3. Old working (Matches JS: atob(x) -> replace(Rot13) -> reverse() -> Shift Loop)
+                { attempt4(encrypted, seed) },     
+                // 4. Other fallback attempts
+                { attempt1(encrypted, seed) },
+                { attempt2(encrypted, seed) },
+                { attempt3(encrypted, seed) }
+            )
+
+            for (attempt in attempts) {
+                try {
+                    val result = attempt()
+                    if (isValidDecryption(result)) {
+                        return result
                     }
-                    return
+                } catch (_: Exception) {}
+            }
+
+            return ""
+        }
+
+        fun decryptNewHDFC(list: List<String>): String {
+            // 1. join fragments
+            val joined = list.joinToString("")
+
+            // 2. reverse
+            val reversed = joined.reversed()
+
+            // 3. base64 decode twice
+            val once = try { Base64.decode(reversed, Base64.DEFAULT) } catch (e: Exception) { return "" }
+            val twice = try { Base64.decode(once, Base64.DEFAULT) } catch (e: Exception) { return "" }
+
+            // 4. unmix loop (new)
+            val sb = StringBuilder()
+            for (i in twice.indices) {
+                val cc = twice[i].toInt() and 0xFF
+                val shift = 256 % (i + 5)
+                val finalChar = (cc - shift + 256) % 256
+                sb.append(finalChar.toChar())
+            }
+
+            return sb.toString()
+        }
+
+
+    }
+
+    private val seenUrls = mutableSetOf<String>()
+
+    private suspend fun invokeLocalSource(
+        source: String,
+        url: String,
+        referer: String,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        try {
+            val response = app.get(url, referer = "$mainUrl/")
+            val script = response.document.select("script").find { 
+                it.data().contains("eval(function(p,a,c,k,e,d)") 
+            }?.data() ?: return
+
+            // 1. Unpack the javascript
+            val unpacked = JsUnpacker(script).unpack() ?: return
+            
+            val callRegex = Regex("""\w+\(\[(.*?)\]\)""")
+            val arrayContent = callRegex.find(unpacked)?.groupValues?.get(1) ?: return
+            
+            // Clean it up to get the single Base64 string
+            val encryptedString = arrayContent.replace("\"", "").replace("'", "").replace(",", "").replace("\\s".toRegex(), "")
+
+            // 3. Extract the math seed
+            val seedRegex = Regex("""charCode-\((\d+)%\(i\+5\)\)""")
+            val seed = seedRegex.find(unpacked)?.groupValues?.get(1)?.toIntOrNull() ?: 399756995
+
+            // 4. Decrypt dynamically
+            val decryptedUrl = HDFCDecrypter.dynamicDecrypt(encryptedString, seed)
+            
+            if (decryptedUrl.isEmpty()) return
+
+            if (seenUrls.contains(decryptedUrl)) return
+            seenUrls.add(decryptedUrl)
+
+            val potentialRapidrameId = Regex("""/play/([^/]+)""").find(decryptedUrl)?.groupValues?.get(1)
+            ?.takeIf { it.length > 5 }
+
+            // 5. Determine if it's HLS 
+            val isHls = decryptedUrl.contains(".m3u8") || decryptedUrl.endsWith(".txt")
+            
+            callback.invoke(
+                newExtractorLink(
+                    source  = source,
+                    name    = source,
+                    url     = decryptedUrl
+                ){
+                    this.referer = referer
+                    this.quality = Qualities.Unknown.value
+                    this.type    = if(isHls) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
                 }
+            )
+        } catch (e: Exception) {
+            Log.e("HDFC", "Error extracting local source", e)
+        }
+    }
+
+    private suspend fun extractDownloadLinks(rapidrameId: String, callback: (ExtractorLink) -> Unit) {
+        val downloadUrl = "https://cehennempass.pw/download/$rapidrameId" // Updated domain based on snippet
+        
+        val qualities = mapOf(
+            "low" to "⬇️ SD", 
+            "high" to "⬇️ HD"   
+        )
+
+        qualities.forEach { (qualityData, qualityName) ->
+            // The process URL might also need updating or staying as cehennempass.pw
+            // Trying the new domain for processing as well based on common patterns
+            val postUrl = "https://cehennempass.pw/process_quality_selection.php" 
+            
+            val postBody = okhttp3.FormBody.Builder()
+                .add("video_id", rapidrameId)
+                .add("selected_quality", qualityData)
+                .build()
+            
+            try {
+                val response = app.post(
+                    postUrl,
+                    requestBody = postBody,
+                    headers = standardHeaders,
+                    referer = downloadUrl 
+                ).parsedSafe<DownloadResponse>()
+
+                val finalLink = response?.download_link
+
+                if (!finalLink.isNullOrEmpty()) {
+                    callback.invoke(
+                        newExtractorLink(
+                            source = name, 
+                            name = qualityName,
+                            url = finalLink
+                        ) {
+                            this.quality = Qualities.Unknown.value
+                            this.type = ExtractorLinkType.VIDEO
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                // Fallback to old domain if new one fails
+                 Log.e("HDFC", "Download extraction failed", e)
             }
         }
     }
-}
-
-private val seenUrls = mutableSetOf<String>()
-
-private suspend fun invokeLocalSource(
-    source: String,
-    url: String,
-    referer: String,
-    callback: (ExtractorLink) -> Unit
-) {
-    try {
-        Log.d("HDFC", "Extracting source: $source")
-        val response = app.get(url, referer = "$mainUrl/")
-        val script = response.document.select("script").find {
-            it.data().contains("eval(function(p,a,c,k,e,d)")
-        }?.data() ?: return
-        val unpacked = JsUnpacker(script).unpack() ?: return
-        val callRegex = Regex("""\w+\(\[(.*?)\]\)""")
-        val arrayContent = callRegex.find(unpacked)?.groupValues?.get(1) ?: return
-        val encryptedString = arrayContent.replace("\"", "").replace("'", "").replace(",", "").replace("\\s".toRegex(), "")
-        val seedRegex = Regex("""charCode-\((\d+)%\(i\+5\)\)""")
-        val seed = seedRegex.find(unpacked)?.groupValues?.get(1)?.toIntOrNull() ?: 399756995
-        Log.d("HDFC", "Seed: $seed, Encrypted: ${encryptedString.take(50)}...")
-        // Use the updated decrypter
-        val decryptedUrl = HDFCHybridDecrypter.decrypt(encryptedString, seed)
-        if (decryptedUrl.isNotEmpty()) {
-            // Learning is now handled inside decrypt if successful
-        }
-        if (decryptedUrl.isEmpty()) {
-            Log.e("HDFC", "Decryption failed")
-            return
-        }
-        if (seenUrls.contains(decryptedUrl)) return
-        seenUrls.add(decryptedUrl)
-        Log.d("HDFC", "Decrypted URL: ${decryptedUrl.take(100)}...")
-        val isHls = decryptedUrl.contains(".m3u8") || decryptedUrl.endsWith(".txt")
-        val link = newExtractorLink(
-            source = source,
-            name = source,
-            url = decryptedUrl
-        ) {
-            this.referer = referer
-            this.quality = Qualities.Unknown.value
-            this.type = if (isHls) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-        }
-        callback.invoke(link)
-    } catch (e: Exception) {
-        Log.e("HDFC", "Error extracting local source", e)
-    }
-}
 
     override suspend fun loadLinks(
         data: String,
@@ -634,25 +578,14 @@ private suspend fun invokeLocalSource(
     ): Boolean {
         val document = app.get(data).document
         val rapidrameReferer = "$mainUrl/"
-        
-        // Use a queue to collect and sort links with proper priorities
-        val linkQueue = mutableListOf<Pair<Int, ExtractorLink>>()
-        
-        // Priority values: 
-        // 1 = Rapidrame HD
-        // 2 = Rapidrame SD  
-        // 3 = Close HD
-        // 4 = Close SD
-        // 5 = Download HD
-        // 6 = Download SD
+        var rapidrameId: String? = null
 
-        // Process RAPIDRAME links
         document.select("div.alternative-links").forEach { element ->
             val langCode = element.attr("data-lang").uppercase()
             element.select("button.alternative-link").forEach { button ->
                 val sourceNameRaw = button.text().replace("(HDrip Xbet)", "").trim()
 
-                // Skip 'Close' here as we handle it separately
+                // Skip 'Close' here as we handle it separately (or if it appears in list)
                 if (sourceNameRaw.equals("close", ignoreCase = true)) {
                     return@forEach
                 }
@@ -678,28 +611,19 @@ private suspend fun invokeLocalSource(
                         "$sourceNameRaw $langCode"
                     }
 
-                    // Determine priority based on quality
-                    val isHD = sourceNameRaw.contains("hd", ignoreCase = true) || 
-                            sourceNameRaw.contains("1080", ignoreCase = true) ||
-                            sourceNameRaw.contains("720", ignoreCase = true)
-                    val priority = if (isHD) 2 else 1
+                    rapidrameId = iframe.substringAfter("?rapidrame_id=").takeIf { it.isNotEmpty() }
                     
-                    // Extract via invokeLocalSource
-                    invokeLocalSource(finalSourceName, iframe, rapidrameReferer) { link ->
-                        linkQueue.add(Pair(priority, link))
-                    }
+                    invokeLocalSource(finalSourceName, iframe, rapidrameReferer, callback) 
                 }
             }
         }
 
-        // Process CLOSE link
         val defaultSourceUrl = fixUrlNull(document.selectFirst(".close")?.attr("data-src"))
 
         if (defaultSourceUrl != null) {
             val sourceName = "Close"
             var referer = "$mainUrl/" 
             
-            // Extract subtitles if available
             if (defaultSourceUrl.contains("hdfilmcehennemi.mobi")) {
                 try {
                     val iframedoc = app.get(defaultSourceUrl, referer = mainUrl).document
@@ -712,9 +636,7 @@ private suspend fun invokeLocalSource(
                             "en" -> "İngilizce"
                             else -> track.attr("srclang")
                         }
-                        val subUrl = track.attr("src").let { 
-                            if (it.startsWith("http")) it else "$baseUri/$it".replace("//", "/") 
-                        }
+                        val subUrl = track.attr("src").let { if (it.startsWith("http")) it else "$baseUri/$it".replace("//", "/") }
                         subtitleCallback(newSubtitleFile(lang, subUrl))
                     }
                 } catch (e: Exception) { 
@@ -722,17 +644,12 @@ private suspend fun invokeLocalSource(
                 }
             }
 
-            // Default Close to priority 3 (SD)
-            val priority = 3
-            
-            // Extract via invokeLocalSource
-            invokeLocalSource(sourceName, defaultSourceUrl, referer) { link ->
-                linkQueue.add(Pair(priority, link))
-            }
+            rapidrameId = defaultSourceUrl.substringAfter("?rapidrame_id=").takeIf { it.isNotEmpty() }
+
+            invokeLocalSource(sourceName, defaultSourceUrl, referer, callback) 
         }
 
-        // PROCESS DOWNLOAD LINKS
-        val rapidrameD = document.selectFirst("iframe.rapidrame, iframe.close")
+        var rapidrameD = document.selectFirst("iframe.rapidrame, iframe.close")
             ?.attr("data-src")
             ?.let { src ->
                 when {
@@ -743,152 +660,9 @@ private suspend fun invokeLocalSource(
             }
             ?.takeIf { it.isNotEmpty() }
 
-        rapidrameD?.let { id ->
-            Log.d("HDFC", "Processing download links for ID: $id")
-            
-            val downloadUrl = "https://cehennempass.pw/download/$id"
-            
-            // Process HD download link (priority 5)
-            try {
-                val postBodyHD = okhttp3.FormBody.Builder()
-                    .add("video_id", id)
-                    .add("selected_quality", "high")
-                    .build()
-                
-                val responseHD = app.post(
-                    "https://cehennempass.pw/process_quality_selection.php",
-                    requestBody = postBodyHD,
-                    headers = standardHeaders,
-                    referer = downloadUrl
-                ).parsedSafe<DownloadResponse>()
+        rapidrameD?.let { extractDownloadLinks(it, callback) }
 
-                val finalLinkHD = responseHD?.download_link
-
-                if (!finalLinkHD.isNullOrEmpty()) {
-                    val hdLink = newExtractorLink(
-                        source = name,
-                        name = "⬇️ HD",
-                        url = finalLinkHD
-                    ) {
-                        this.quality = Qualities.P720.value
-                        this.type = ExtractorLinkType.VIDEO
-                    }
-                    linkQueue.add(Pair(6, hdLink))
-                    Log.d("HDFC", "Added HD download link")
-                }
-            } catch (e: Exception) {
-                Log.e("HDFC", "HD download extraction failed", e)
-            }
-
-            // Process SD download link (priority 6)
-            try {
-                val postBodySD = okhttp3.FormBody.Builder()
-                    .add("video_id", id)
-                    .add("selected_quality", "low")
-                    .build()
-                
-                val responseSD = app.post(
-                    "https://cehennempass.pw/process_quality_selection.php",
-                    requestBody = postBodySD,
-                    headers = standardHeaders,
-                    referer = downloadUrl
-                ).parsedSafe<DownloadResponse>()
-
-                val finalLinkSD = responseSD?.download_link
-
-                if (!finalLinkSD.isNullOrEmpty()) {
-                    val sdLink = newExtractorLink(
-                        source = name,
-                        name = "⬇️ SD",
-                        url = finalLinkSD
-                    ) {
-                        this.quality = Qualities.P480.value
-                        this.type = ExtractorLinkType.VIDEO
-                    }
-                    linkQueue.add(Pair(5, sdLink))
-                    Log.d("HDFC", "Added SD download link")
-                }
-            } catch (e: Exception) {
-                Log.e("HDFC", "SD download extraction failed", e)
-            }
-        }
-
-        // Wait for async extraction to complete
-        kotlinx.coroutines.delay(200)
-
-        // Sort by priority and send to callback
-        linkQueue.sortedBy { it.first }.forEach { (_, link) ->
-            callback.invoke(link)
-        }
-
-        return linkQueue.isNotEmpty()
-    }
-
-    // Helper function for download links
-    private suspend fun extractDownloadLinks(id: String, callback: (ExtractorLink) -> Unit) {
-        val downloadUrl = "https://cehennempass.pw/download/$id"
-        
-        // Process HD download
-        try {
-            val postBodyHD = okhttp3.FormBody.Builder()
-                .add("video_id", id)
-                .add("selected_quality", "high")
-                .build()
-            
-            val responseHD = app.post(
-                "https://cehennempass.pw/process_quality_selection.php",
-                requestBody = postBodyHD,
-                headers = standardHeaders,
-                referer = downloadUrl
-            ).parsedSafe<DownloadResponse>()
-
-            val finalLinkHD = responseHD?.download_link
-
-            if (!finalLinkHD.isNullOrEmpty()) {
-                val hdLink = newExtractorLink(
-                    source = name,
-                    name = "⬇️ HD",
-                    url = finalLinkHD
-                ) {
-                    this.quality = Qualities.P720.value
-                    this.type = ExtractorLinkType.VIDEO
-                }
-                callback.invoke(hdLink)
-            }
-        } catch (e: Exception) {
-            Log.e("HDFC", "HD download extraction failed", e)
-        }
-
-        // Process SD download
-        try {
-            val postBodySD = okhttp3.FormBody.Builder()
-                .add("video_id", id)
-                .add("selected_quality", "low")
-                .build()
-            
-            val responseSD = app.post(
-                "https://cehennempass.pw/process_quality_selection.php",
-                requestBody = postBodySD,
-                headers = standardHeaders,
-                referer = downloadUrl
-            ).parsedSafe<DownloadResponse>()
-
-            val finalLinkSD = responseSD?.download_link
-
-            if (!finalLinkSD.isNullOrEmpty()) {
-                val sdLink = newExtractorLink(
-                    source = name,
-                    name = "⬇️ SD",
-                    url = finalLinkSD
-                ) {
-                    this.quality = Qualities.P480.value
-                    this.type = ExtractorLinkType.VIDEO
-                }
-                callback.invoke(sdLink)
-            }
-        } catch (e: Exception) {
-            Log.e("HDFC", "SD download extraction failed", e)
-        }
+        return true
     }
 
     data class Results(@JsonProperty("results") val results: List<String> = arrayListOf())
