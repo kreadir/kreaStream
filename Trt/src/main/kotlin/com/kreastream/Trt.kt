@@ -10,11 +10,12 @@ import android.util.Log
 import java.util.Locale
 
 class Trt : MainAPI() {
-    override var mainUrl = "https://www.trt1.com.tr:443"
+    override var mainUrl = "https://www.trt1.com.tr"
     override var name = "TRT"
-    override val supportedTypes = setOf(TvType.Live, TvType.TvSeries)
     override var lang = "tr"
+    override val supportedTypes = setOf(TvType.Live, TvType.TvSeries)
     override var hasMainPage = true
+    override val hasQuickSearch = true
 
     private val tabiiUrl = "https://www.tabii.com/tr"
     private val trt1Url   = "https://www.trt1.com.tr"
@@ -299,7 +300,7 @@ class Trt : MainAPI() {
     private fun fixTrtUrl(url: String): String = if (url.startsWith("http")) url else "$trt1Url$url"
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        Log.d("TRT_DEBUG", "🏠 getMainPage called: data=${request.data}, page=$page")
+        //Log.d("TRT_DEBUG", "🏠 getMainPage called: data=${request.data}, page=$page")
         
         val items = when (request.data) {
             "live" -> listOf(
@@ -404,7 +405,7 @@ class Trt : MainAPI() {
         if (url.contains(trt1Url)) {
             try {
                 val doc = app.get(url, timeout = 15).document
-                val title = doc.selectFirst("p.text_title__UMoMd")?.text()?.trim()
+                val title = doc.selectFirst("h1.text_title__UMoMd")?.text()?.trim()
                     ?: throw ErrorLoadingException("Başlık bulunamadı")
                 val plot = doc.selectFirst("meta[name=description]")?.attr("content") ?: ""
                 var poster = fixUrlNull(doc.selectFirst("picture.card_card-image__T64bP img")?.attr("src"))

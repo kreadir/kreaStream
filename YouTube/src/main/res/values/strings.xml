@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="header_tw">YouTube Ayarları</string>
+    <string name="changeLocalizationHeader_tw">Dil değiştir</string>
+    <string name="changeHomepageHeader_tw">Change homepage sections</string>
+    <string name="homepage_tw">Change homepage sections</string>
+    <string name="localization_tw">Dil değiştir</string>
+    <string name="language_tw">Dil</string>
+    <string name="country_tw">Ülke</string>
+    <string name="country_hint">TR</string>
+    <string name="language_hint">tr</string>
+    <string name="trending_text">Trendler</string>
+    <string name="addPlaylist_tw">Oynatma listesi veya kanal ekle</string>
+    <string name="add_playlist_hint">URL</string>
+    <string name="hls">Use single source with mulitple tracks?</string>
+</resources>
