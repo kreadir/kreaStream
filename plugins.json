@@ -185,7 +185,7 @@
             "kreastream"
         ],
         "description": "General IPTV player. Add a list in the settings and you'll see it in the plugins list in the home",
-        "fileSize": 52075,
+        "fileSize": 44497,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
@@ -275,7 +275,7 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/TurkTV.cs3",
         "status": 1,
-        "version": 251230,
+        "version": 260101,
         "name": "TurkTV",
         "internalName": "TurkTV",
         "authors": [
@@ -302,7 +302,7 @@
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 87150,
+        "fileSize": 87170,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -322,7 +322,7 @@
             "kreastream"
         ],
         "description": "Videos, playlists and channels from YouTube",
-        "fileSize": 67735,
+        "fileSize": 59613,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Others"
