@@ -295,14 +295,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/TurkTVke.cs3",
         "status": 1,
-        "version": 251231,
+        "version": 260101,
         "name": "TurkTVke",
         "internalName": "TurkTVke",
         "authors": [
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 60733,
+        "fileSize": 87150,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
