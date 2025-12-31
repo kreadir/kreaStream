@@ -79,14 +79,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/DiziPal.cs3",
         "status": 1,
-        "version": 25,
+        "version": 251230,
         "name": "DiziPal",
         "internalName": "DiziPal",
         "authors": [
             "kreastream"
         ],
         "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
-        "fileSize": 20123,
+        "fileSize": 20128,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -158,14 +158,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/HDFilmCehennemi.cs3",
         "status": 1,
-        "version": 251228,
+        "version": 251230,
         "name": "HDFilmCehennemi",
         "internalName": "HDFilmCehennemi",
         "authors": [
             "kreastream"
         ],
         "description": "Türkiye'nin en hızlı hd film izleme sitesi",
-        "fileSize": 36303,
+        "fileSize": 36302,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
@@ -275,14 +275,34 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/TurkTV.cs3",
         "status": 1,
-        "version": 251229,
+        "version": 251230,
         "name": "TurkTV",
         "internalName": "TurkTV",
         "authors": [
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 55962,
+        "fileSize": 56100,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Live"
+        ],
+        "iconUrl": "https://m.media-amazon.com/images/I/41fJO1NxFxL.png",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/TurkTVke.cs3",
+        "status": 1,
+        "version": 251231,
+        "name": "TurkTVke",
+        "internalName": "TurkTVke",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
+        "fileSize": 60733,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -295,14 +315,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/YouTube.cs3",
         "status": 1,
-        "version": 251227,
+        "version": 251231,
         "name": "YouTube",
         "internalName": "YouTube",
         "authors": [
             "kreastream"
         ],
         "description": "Videos, playlists and channels from YouTube",
-        "fileSize": 83018,
+        "fileSize": 67735,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Others"
