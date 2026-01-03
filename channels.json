@@ -325,7 +325,7 @@
     "id": "nowtv",
     "name": "Now TV",
     "base_url": "https://www.nowtv.com.tr",
-    "active": false,
+    "active": true,
     "listings": [
       {
         "title": "Güncel Diziler",

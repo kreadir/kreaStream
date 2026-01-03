@@ -185,12 +185,30 @@
             "kreastream"
         ],
         "description": "General IPTV player. Add a list in the settings and you'll see it in the plugins list in the home",
-        "fileSize": 44497,
+        "fileSize": 52075,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
         ],
         "iconUrl": "https://www.shutterstock.com/image-vector/iptv-vector-line-icon-ip-260nw-1841427610.jpg",
+        "apiVersion": 1
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/KreaTube.cs3",
+        "status": 1,
+        "version": 260104,
+        "name": "KreaTube",
+        "internalName": "KreaTube",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Videos, playlists and channels from YouTube",
+        "fileSize": 58015,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Others"
+        ],
+        "iconUrl": "https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_144x144.png",
         "apiVersion": 1
     },
     {
@@ -253,6 +271,26 @@
         "language": "tr"
     },
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Tabii.cs3",
+        "status": 1,
+        "version": 260103,
+        "name": "Tabii",
+        "internalName": "Tabii",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
+        "fileSize": 23034,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Live"
+        ],
+        "iconUrl": "https://cms-tabii-public-image.tabii.com/int/webp/26087.jpeg",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Trt.cs3",
         "status": 1,
         "version": 251228,
@@ -282,7 +320,7 @@
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 56100,
+        "fileSize": 56045,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -302,7 +340,7 @@
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 87170,
+        "fileSize": 87333,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -315,14 +353,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/YouTube.cs3",
         "status": 1,
-        "version": 251231,
+        "version": 260104,
         "name": "YouTube",
         "internalName": "YouTube",
         "authors": [
             "kreastream"
         ],
         "description": "Videos, playlists and channels from YouTube",
-        "fileSize": 59613,
+        "fileSize": 26453,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Others"
