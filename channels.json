@@ -3,7 +3,7 @@
     "id": "trt1",
     "name": "TRT 1",
     "base_url": "https://www.trt1.com.tr",
-    "active": false,
+    "active": true,
     "listings": [
       {
         "title": "Güncel Diziler",
@@ -86,7 +86,7 @@
     "id": "kanald",
     "name": "Kanal D",
     "base_url": "https://www.kanald.com.tr",
-    "active": false,
+    "active": true,
     "headers": {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
       "Referer": "https://www.kanald.com.tr/"
@@ -258,7 +258,7 @@
     "id": "startv",
     "name": "Star TV",
     "base_url": "https://www.startv.com.tr",
-    "active": false,
+    "active": true,
     "listings": [
       {
         "title": "Diziler",
@@ -416,7 +416,7 @@
     "id": "showtv",
     "name": "Show TV",
     "base_url": "https://www.showtv.com.tr",
-    "active": false,
+    "active": true,
     "listings": [
       {
         "title": "Diziler",
