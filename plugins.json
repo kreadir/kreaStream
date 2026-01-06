@@ -273,14 +273,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/builds/Tabii.cs3",
         "status": 1,
-        "version": 260105,
+        "version": 260106,
         "name": "Tabii",
         "internalName": "Tabii",
         "authors": [
             "kreastream"
         ],
         "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
-        "fileSize": 38315,
+        "fileSize": 47223,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
