@@ -1,0 +1,391 @@
+[
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Ddizi.cs3",
+        "status": 1,
+        "version": 251219,
+        "name": "Ddizi",
+        "internalName": "Ddizi",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "DDizi.im için Cloudstream eklentisi",
+        "fileSize": 15477,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.ddizi.im/favicon.ico",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziBox.cs3",
+        "status": 1,
+        "version": 6,
+        "name": "DiziBox",
+        "internalName": "DiziBox",
+        "authors": [
+            "keyiflerolsun"
+        ],
+        "description": "Yabancı Dizi izle, Tüm yabancı dizilerin yeni ve eski sezonlarını full hd izleyebileceğiniz elit site.",
+        "fileSize": 22861,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizibox.de&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziMom.cs3",
+        "status": 1,
+        "version": 3,
+        "name": "DiziMom",
+        "internalName": "DiziMom",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Binlerce yerli yabancı dizi arşivi, tüm sezonlar, kesintisiz bölümler. Sadece dizi izle, Dizimom heryerde seninle!",
+        "fileSize": 36015,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizimom.plus&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziPal.cs3",
+        "status": 1,
+        "version": 260212,
+        "name": "DiziPal",
+        "internalName": "DiziPal",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
+        "fileSize": 22354,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=https://dizipal1220.com&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziPalOrijinal.cs3",
+        "status": 1,
+        "version": 260211,
+        "name": "DiziPalOrijinal",
+        "internalName": "DiziPalOrijinal",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "DiziPal Orijinal.",
+        "fileSize": 52219,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dizipal932.com&size=128",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Dizilla.cs3",
+        "status": 1,
+        "version": 10,
+        "name": "Dizilla",
+        "internalName": "Dizilla",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Dizilla tüm yabancı dizileri ücretsiz olarak Türkçe Dublaj ve altyazılı seçenekleri ile 1080P kalite izleyebileceğiniz yeni nesil yabancı dizi izleme siteniz.",
+        "fileSize": 57717,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=dizilla40.com&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/FilmMakinesi.cs3",
+        "status": 1,
+        "version": 260115,
+        "name": "FilmMakinesi",
+        "internalName": "FilmMakinesi",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Film Makinesi, en yeni ve en güncel filmleri sitemizde full HD kalite farkı ile izleyebilirsiniz. HD film izle denildiğinde akla gelen en kaliteli film izleme sitesi.",
+        "fileSize": 24563,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=filmmakinesi.film&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/HDFilmCehennemi.cs3",
+        "status": 1,
+        "version": 260210,
+        "name": "HDFilmCehennemi",
+        "internalName": "HDFilmCehennemi",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Türkiye'nin en hızlı hd film izleme sitesi",
+        "fileSize": 43845,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi.com&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/HDFilmIzle.cs3",
+        "status": 1,
+        "version": 260207,
+        "name": "HDFilmIzle",
+        "internalName": "HDFilmIzle",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "HDFilmizle.life",
+        "fileSize": 30877,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmizle.life",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/IPTV.cs3",
+        "status": 1,
+        "version": 251226,
+        "name": "IPTV",
+        "internalName": "IPTV",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "General IPTV player. Add a list in the settings and you'll see it in the plugins list in the home",
+        "fileSize": 53475,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Live"
+        ],
+        "iconUrl": "https://www.shutterstock.com/image-vector/iptv-vector-line-icon-ip-260nw-1841427610.jpg",
+        "apiVersion": 1
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/InatBox.cs3",
+        "status": 3,
+        "version": 260130,
+        "name": "InatBox",
+        "internalName": "InatBox",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "İnatBox cloudstream eklentisidir. Sevdiğiniz yayın platformlarını ve canlı maçları burada bulabilirsiniz.",
+        "fileSize": 35557,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Live"
+        ],
+        "iconUrl": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh3vCp6N1K4bECoYRQD-cisJF2_6V_Hk01ZhDmoPR2JuM8O5qr4MqrPO1munM9cRlleBBSK6odYhLtDBWv4E3vhPhynlmS5hVVtJZShHoGA5REQ8_3v8SIlccTEqzVQu2UJyNYQdJNrKIfWy66RQeT0D-CcmFCbHPz5023H6p2v5fv4NVloZ5Rqo_yGrIY/s320/iNat-Box-App.png",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaTube.cs3",
+        "status": 1,
+        "version": 260114,
+        "name": "KreaTube",
+        "internalName": "KreaTube",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Videos, playlists and channels from YouTube",
+        "fileSize": 49499,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Others"
+        ],
+        "iconUrl": "https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_144x144.png",
+        "apiVersion": 1
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/NeonSpor.cs3",
+        "status": 1,
+        "version": 9,
+        "name": "NeonSpor",
+        "internalName": "NeonSpor",
+        "authors": [
+            "sarapcanagii"
+        ],
+        "description": "(Açılmayan Spor Kanallar İçin VPN Gerekebilir.) NeonSpor eklentisinde BeIN Sports, Tabii Spor, S Sports, Exxen Spor, Smart Spor, Tivibu Spor ve Diğer kanallar mevcuttur.",
+        "fileSize": 19671,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Live"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=colorhunt.co&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/SetFilmIzle.cs3",
+        "status": 1,
+        "version": 260213,
+        "name": "SetFilmIzle",
+        "internalName": "SetFilmIzle",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Setfilmizle sitemizde, donma yaşamadan Türkçe dublaj ve altyazılı filmleri ile dizileri muhteşem 1080p full HD kalitesinde izleyebilirsiniz.",
+        "fileSize": 26348,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.setfilmizle.uk/wp-content/uploads/2017/05/set-touch.webp",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/SineWix.cs3",
+        "status": 1,
+        "version": 260213,
+        "name": "SineWix",
+        "internalName": "SineWix",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "SineWix - Ücretsiz Film, Dizi ve Anime İzleme Uygulaması 5000+ HD İçerik, Türkçe Altyazılı, Otaku Dostu Anime Arşivi, Premium Kalite Yabancı Yapımlar",
+        "fileSize": 39690,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Anime",
+            "AsianDrama",
+            "Cartoon"
+        ],
+        "iconUrl": "https://play-lh.googleusercontent.com/brwGNmr7IjA_MKk_TTPs0va10hdKE_bD_a1lnKoiMuCayW98EHpRv55edA6aEoJlmwfX=w240-h480",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Tabii.cs3",
+        "status": 1,
+        "version": 260106,
+        "name": "Tabii",
+        "internalName": "Tabii",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
+        "fileSize": 46325,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Live"
+        ],
+        "iconUrl": "https://cms-tabii-public-image.tabii.com/int/webp/26087.jpeg",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Trt.cs3",
+        "status": 1,
+        "version": 251228,
+        "name": "Trt",
+        "internalName": "Trt",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "TRT TV & Radyo & Diziler & Programlar",
+        "fileSize": 34146,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Live"
+        ],
+        "iconUrl": "https://kariyer.trt.net.tr/wp-content/uploads/2022/01/trt-kariyer-logo.png",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/TurkTV.cs3",
+        "status": 1,
+        "version": 260211,
+        "name": "TurkTV",
+        "internalName": "TurkTV",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
+        "fileSize": 103283,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Live"
+        ],
+        "iconUrl": "https://m.media-amazon.com/images/I/41fJO1NxFxL.png",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/YouTube.cs3",
+        "status": 1,
+        "version": 260104,
+        "name": "YouTube",
+        "internalName": "YouTube",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Videos, playlists and channels from YouTube",
+        "fileSize": 27798,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Others"
+        ],
+        "iconUrl": "https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_144x144.png",
+        "apiVersion": 1
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/YouTubeOld.cs3",
+        "status": 1,
+        "version": 260203,
+        "name": "YouTubeOld",
+        "internalName": "YouTubeOld",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Videos, playlists and channels from YouTube",
+        "fileSize": 41170,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Others"
+        ],
+        "iconUrl": "https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_144x144.png",
+        "apiVersion": 1
+    }
+]
