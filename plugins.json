@@ -341,11 +341,10 @@
         "authors": [
             "kreastream"
         ],
-        "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
+        "description": "TRT Dinle: Müzik, Radyo ve Sesli Kitap.",
         "fileSize": 27669,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
-            "TvSeries",
             "Live"
         ],
         "iconUrl": "https://www.trtdinle.com/icon-192x192.png",
