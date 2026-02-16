@@ -342,13 +342,13 @@
             "kreastream"
         ],
         "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
-        "fileSize": 21985,
+        "fileSize": 27669,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
             "Live"
         ],
-        "iconUrl": "https://cms-tabii-public-image.tabii.com/int/webp/26087.jpeg",
+        "iconUrl": "https://www.trtdinle.com/icon-192x192.png",
         "apiVersion": 1,
         "language": "tr"
     },
