@@ -59,14 +59,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziPal.cs3",
         "status": 1,
-        "version": 260212,
+        "version": 260215,
         "name": "DiziPal",
         "internalName": "DiziPal",
         "authors": [
             "kreastream"
         ],
         "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
-        "fileSize": 22354,
+        "fileSize": 22229,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -302,7 +302,7 @@
             "kreastream"
         ],
         "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
-        "fileSize": 46325,
+        "fileSize": 52960,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -329,6 +329,26 @@
             "Live"
         ],
         "iconUrl": "https://kariyer.trt.net.tr/wp-content/uploads/2022/01/trt-kariyer-logo.png",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/TrtDinle.cs3",
+        "status": 1,
+        "version": 260216,
+        "name": "TrtDinle",
+        "internalName": "TrtDinle",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
+        "fileSize": 21985,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Live"
+        ],
+        "iconUrl": "https://cms-tabii-public-image.tabii.com/int/webp/26087.jpeg",
         "apiVersion": 1,
         "language": "tr"
     },
