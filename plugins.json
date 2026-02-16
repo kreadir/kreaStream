@@ -2,14 +2,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Ddizi.cs3",
         "status": 1,
-        "version": 251219,
+        "version": 260216,
         "name": "Ddizi",
         "internalName": "Ddizi",
         "authors": [
             "kreastream"
         ],
         "description": "DDizi.im için Cloudstream eklentisi",
-        "fileSize": 15477,
+        "fileSize": 19828,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -342,7 +342,7 @@
             "kreastream"
         ],
         "description": "TRT Dinle: Müzik, Radyo ve Sesli Kitap.",
-        "fileSize": 27866,
+        "fileSize": 31155,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
