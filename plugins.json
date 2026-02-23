@@ -59,14 +59,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziPal.cs3",
         "status": 1,
-        "version": 260215,
+        "version": 260224,
         "name": "DiziPal",
         "internalName": "DiziPal",
         "authors": [
             "kreastream"
         ],
         "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
-        "fileSize": 22229,
+        "fileSize": 23294,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -79,14 +79,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziPalOrijinal.cs3",
         "status": 1,
-        "version": 260211,
+        "version": 260224,
         "name": "DiziPalOrijinal",
         "internalName": "DiziPalOrijinal",
         "authors": [
             "kreastream"
         ],
         "description": "DiziPal Orijinal.",
-        "fileSize": 52219,
+        "fileSize": 52217,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
