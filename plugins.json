@@ -33,7 +33,7 @@
         "tvTypes": [
             "TvSeries"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizibox.de&sz=%size%",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizibox.de&sz=128",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -52,7 +52,7 @@
         "tvTypes": [
             "TvSeries"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizimom.plus&sz=%size%",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizimom.plus&sz=128",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -72,7 +72,7 @@
             "TvSeries",
             "Movie"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=https://dizipal1220.com&sz=%size%",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=https://dizipal.bar&sz=128",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -91,7 +91,7 @@
         "tvTypes": [
             "TvSeries"
         ],
-        "iconUrl": "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://dizipal932.com&size=128",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=https://dizipal1540.com&sz=128",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -110,7 +110,7 @@
         "tvTypes": [
             "TvSeries"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=dizilla40.com&sz=%size%",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=dizilla40.com&sz=128",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -129,7 +129,7 @@
         "tvTypes": [
             "Movie"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=filmmakinesi.film&sz=%size%",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=filmmakinesi.film&sz=128",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -149,7 +149,7 @@
             "Movie",
             "TvSeries"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi.com&sz=%size%",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi.com&sz=128",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -264,7 +264,7 @@
         "tvTypes": [
             "Live"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=colorhunt.co&sz=%size%",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=colorhunt.co&sz=128",
         "apiVersion": 1,
         "language": "tr"
     },
