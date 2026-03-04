@@ -40,7 +40,7 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziMom.cs3",
         "status": 1,
-        "version": 3,
+        "version": 260304,
         "name": "DiziMom",
         "internalName": "DiziMom",
         "authors": [
@@ -79,7 +79,7 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziPalOrijinal.cs3",
         "status": 1,
-        "version": 260228,
+        "version": 260304,
         "name": "DiziPalOrijinal",
         "internalName": "DiziPalOrijinal",
         "authors": [
@@ -222,7 +222,7 @@
             "kreastream"
         ],
         "description": "Binlerce Film İzleme Seçeneğiyle En İyi Film İzleme Sitesi",
-        "fileSize": 23266,
+        "fileSize": 34917,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie"
