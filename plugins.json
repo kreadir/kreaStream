@@ -47,7 +47,7 @@
             "kreastream"
         ],
         "description": "Binlerce yerli yabancı dizi arşivi, tüm sezonlar, kesintisiz bölümler. Sadece dizi izle, Dizimom heryerde seninle!",
-        "fileSize": 36015,
+        "fileSize": 36016,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -86,7 +86,7 @@
             "kreastream"
         ],
         "description": "DiziPal Orijinal.",
-        "fileSize": 52217,
+        "fileSize": 52278,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -194,14 +194,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/InatBox.cs3",
         "status": 3,
-        "version": 260130,
+        "version": 260306,
         "name": "InatBox",
         "internalName": "InatBox",
         "authors": [
             "kreastream"
         ],
         "description": "İnatBox cloudstream eklentisidir. Sevdiğiniz yayın platformlarını ve canlı maçları burada bulabilirsiniz.",
-        "fileSize": 35557,
+        "fileSize": 32975,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
@@ -215,14 +215,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/JetFilmizle.cs3",
         "status": 1,
-        "version": 260304,
+        "version": 260305,
         "name": "JetFilmizle",
         "internalName": "JetFilmizle",
         "authors": [
             "kreastream"
         ],
         "description": "Binlerce Film İzleme Seçeneğiyle En İyi Film İzleme Sitesi",
-        "fileSize": 34917,
+        "fileSize": 45864,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie"
@@ -373,14 +373,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/TurkTV.cs3",
         "status": 1,
-        "version": 260211,
+        "version": 260310,
         "name": "TurkTV",
         "internalName": "TurkTV",
         "authors": [
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 103283,
+        "fileSize": 104098,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
