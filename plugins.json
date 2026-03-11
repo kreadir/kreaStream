@@ -332,26 +332,6 @@
         "language": "tr"
     },
     {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Trt.cs3",
-        "status": 1,
-        "version": 251228,
-        "name": "Trt",
-        "internalName": "Trt",
-        "authors": [
-            "kreastream"
-        ],
-        "description": "TRT TV & Radyo & Diziler & Programlar",
-        "fileSize": 34146,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "TvSeries",
-            "Live"
-        ],
-        "iconUrl": "https://kariyer.trt.net.tr/wp-content/uploads/2022/01/trt-kariyer-logo.png",
-        "apiVersion": 1,
-        "language": "tr"
-    },
-    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/TrtDinle.cs3",
         "status": 1,
         "version": 260216,
@@ -380,7 +360,7 @@
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 104098,
+        "fileSize": 134577,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -389,41 +369,5 @@
         "iconUrl": "https://m.media-amazon.com/images/I/41fJO1NxFxL.png",
         "apiVersion": 1,
         "language": "tr"
-    },
-    {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/YouTube.cs3",
-        "status": 1,
-        "version": 260104,
-        "name": "YouTube",
-        "internalName": "YouTube",
-        "authors": [
-            "kreastream"
-        ],
-        "description": "Videos, playlists and channels from YouTube",
-        "fileSize": 27798,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "Others"
-        ],
-        "iconUrl": "https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_144x144.png",
-        "apiVersion": 1
-    },
-    {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/YouTubeOld.cs3",
-        "status": 1,
-        "version": 260203,
-        "name": "YouTubeOld",
-        "internalName": "YouTubeOld",
-        "authors": [
-            "kreastream"
-        ],
-        "description": "Videos, playlists and channels from YouTube",
-        "fileSize": 41170,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "Others"
-        ],
-        "iconUrl": "https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_144x144.png",
-        "apiVersion": 1
     }
 ]
