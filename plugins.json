@@ -79,7 +79,7 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziPalOrijinal.cs3",
         "status": 1,
-        "version": 260304,
+        "version": 260320,
         "name": "DiziPalOrijinal",
         "internalName": "DiziPalOrijinal",
         "authors": [
@@ -222,7 +222,7 @@
             "kreastream"
         ],
         "description": "Binlerce Film İzleme Seçeneğiyle En İyi Film İzleme Sitesi",
-        "fileSize": 45864,
+        "fileSize": 55061,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie"
