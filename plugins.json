@@ -156,20 +156,20 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/HDFilmIzle.cs3",
         "status": 1,
-        "version": 260207,
+        "version": 260321,
         "name": "HDFilmIzle",
         "internalName": "HDFilmIzle",
         "authors": [
             "kreastream"
         ],
-        "description": "HDFilmizle.life",
+        "description": "HDFilmizle.nl",
         "fileSize": 30877,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
             "TvSeries"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmizle.life",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmizle.nl",
         "apiVersion": 1,
         "language": "tr"
     },
