@@ -40,7 +40,7 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziMom.cs3",
         "status": 1,
-        "version": 260321,
+        "version": 260322,
         "name": "DiziMom",
         "internalName": "DiziMom",
         "authors": [
@@ -52,7 +52,7 @@
         "tvTypes": [
             "TvSeries"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizimom.plus&sz=%size%",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizimom.fit",
         "apiVersion": 1,
         "language": "tr"
     },
