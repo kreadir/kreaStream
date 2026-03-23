@@ -50,7 +50,8 @@
         "fileSize": 38243,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
-            "TvSeries"
+            "TvSeries",
+            "Movie"
         ],
         "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizimom.fit",
         "apiVersion": 1,
@@ -215,7 +216,7 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/JetFilmizle.cs3",
         "status": 1,
-        "version": 260321,
+        "version": 260323,
         "name": "JetFilmizle",
         "internalName": "JetFilmizle",
         "authors": [
@@ -228,6 +229,28 @@
             "Movie"
         ],
         "iconUrl": "https://www.google.com/s2/favicons?domain=https://jetfilmizle.net&sz=128",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
+        "status": 1,
+        "version": 260323,
+        "name": "KreaStream",
+        "internalName": "KreaStream",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "AIO Filmler & Diziler / Movies & Series",
+        "fileSize": 0,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Movie",
+            "Torrent",
+            "Live"
+        ],
+        "iconUrl": "https://files.catbox.moe/ol63rm.png",
         "apiVersion": 1,
         "language": "tr"
     },
