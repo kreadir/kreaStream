@@ -241,13 +241,12 @@
         "authors": [
             "kreastream"
         ],
-        "description": "AIO Filmler & Diziler / Movies & Series",
+        "description": "Film, Dizi, Canlı TV",
         "fileSize": 0,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
             "Movie",
-            "Torrent",
             "Live"
         ],
         "iconUrl": "https://files.catbox.moe/ol63rm.png",
