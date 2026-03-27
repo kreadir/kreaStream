@@ -38,6 +38,25 @@
         "language": "tr"
     },
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziMag.cs3",
+        "status": 1,
+        "version": 260327,
+        "name": "DiziMag",
+        "internalName": "DiziMag",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "En son çıkan yabancı dizi ve filmleri DiziMag farkıyla full hd 1080p kalitede izle. Dizimag Geniş ve güncel arşiviyle dizi ve filmlerin tadını çıkartın.",
+        "fileSize": 33976,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://dizimag.nl/uploads/logo/original/logo-5063.webp",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziMom.cs3",
         "status": 1,
         "version": 260322,
@@ -97,6 +116,25 @@
         "language": "tr"
     },
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziYou.cs3",
+        "status": 1,
+        "version": 260327,
+        "name": "DiziYou",
+        "internalName": "DiziYou",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Diziyou en kaliteli Türkçe dublaj ve altyazılı yabancı dizi izleme sitesidir. Güncel ve efsanevi dizileri 1080p Full HD kalitede izlemek için hemen tıkla!",
+        "fileSize": 15419,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.diziyou.co&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Dizilla.cs3",
         "status": 1,
         "version": 260321,
@@ -112,6 +150,25 @@
             "TvSeries"
         ],
         "iconUrl": "https://www.google.com/s2/favicons?domain=dizilla40.com&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/FilmEkseni.cs3",
+        "status": 1,
+        "version": 260327,
+        "name": "FilmEkseni",
+        "internalName": "FilmEkseni",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Film Ekseni ⚡ Vizyonda ki, en güncel ve en yeni filmleri full hd kalitesinde türkçe dublaj ve altyazı seçenekleriyle 1080p olarak izleyebileceğiniz adresiniz.",
+        "fileSize": 25913,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie"
+        ],
+        "iconUrl": "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://filmekseni.net/&size=128",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -235,14 +292,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260326,
+        "version": 260327,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 177925,
+        "fileSize": 239215,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -308,6 +365,25 @@
             "TvSeries"
         ],
         "iconUrl": "https://www.setfilmizle.uk/wp-content/uploads/2017/05/set-touch.webp",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/SezonlukDizi.cs3",
+        "status": 1,
+        "version": 260327,
+        "name": "SezonlukDizi",
+        "internalName": "SezonlukDizi",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Güncel ve eski dizileri en iyi görüntü kalitesiyle bulabileceğiniz yabancı dizi izleme siteniz.",
+        "fileSize": 32527,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=sezonlukdizi8.com&sz=%size%",
         "apiVersion": 1,
         "language": "tr"
     },

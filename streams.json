@@ -1,0 +1,746 @@
+[
+  {
+    "id": "trt1",
+    "title": "TRT 1",
+    "group": "TV",
+    "url": "https://tv-trt1.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-1-televizyon-kanali.4c9c3dd.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Ulusal"
+  },
+  {
+    "id": "atv_live",
+    "title": "ATV",
+    "group": "TV",
+    "url": "https://trkvz.daioncdn.net/atv/atv.m3u8?ce=3&app=d1ce2d40-5256-4550-b02e-e73c185a314e&st=2vSnp6WUP4-9MWnZF39HLw&e=1765453029&ppid=21d804be91b8e91f11bb3789ff83f0b4",
+    "poster": "https://iatv.tmgrup.com.tr/site/v2/i/atv-logo.png",
+    "type": "Live",
+    "headers": {
+      "Referer": "https://www.atv.com.tr/",
+      "Origin": "https://www.atv.com.tr"
+    },
+    "is_audio": false,
+    "genres": "Ulusal"
+  },
+  {
+    "id": "showtv",
+    "title": "Show TV",
+    "group": "TV",
+    "url": "https://ciner.daioncdn.net/showtv/showtv.m3u8?ce=3&app=4bc856ef-4c68-4a94-bc87-37dfaaa66558&st=RBzhSuGauna0OGld-DJUVA&e=1664766175&tv=1&ppid=8582634a455f4cf72d132c75dc389bdb",
+    "poster": "https://www.showtv.com.tr/assets/images/other/showtv_social_media.jpg",
+    "type": "tv",
+    "headers": {
+      "Referer": "https://www.showtv.com.tr/",
+      "Origin": "https://www.showtv.com.tr"
+    },
+    "genres": "Ulusal"
+  },
+  {
+    "id": "startv",
+    "title": "Start TV",
+    "group": "TV",
+    "url": "https://dogus.daioncdn.net/startv/startv.m3u8?ce=3&app=a20ac41e-bdc3-4aa1-934d-26b484480ac9&ppid=8da08b73a240ae4239b8cec6dbc09aab",
+    "poster": "https://media.startv.com.tr/star-tv/images/logopic.jpg?height=320",
+    "type": "tv",
+    "headers": {
+      "Referer": "https://www.startv.com.tr/",
+      "Origin": "https://www.startv.com.tr"
+    },
+    "genres": "Ulusal"
+  },
+  {
+    "id": "kanald",
+    "title": "Kanal D",
+    "group": "TV",
+    "url": "https://demiroren.daioncdn.net/kanald/kanald.m3u8?app=kanald_web",
+    "poster": "https://image.kanald.com.tr/i/kanald/100/1200x630/5b8c55b5e94fb71488087b88.jpg",
+    "type": "tv",
+    "headers": {
+      "Referer": "https://www.kanald.com.tr/",
+      "Origin": "https://www.kanald.com.tr"
+    },
+    "genres": "Ulusal"
+  },
+  {
+    "id": "nowtv",
+    "title": "NOW TV",
+    "group": "TV",
+    "url": "https://nowtv-live-ad.ercdn.net/nowtv/playlist.m3u8?st=hQavnOrdag9DcU0kDZHntQ&e=1765453349",
+    "poster": "https://images.seeklogo.com/logo-png/51/1/now-tv-turkey-logo-png_seeklogo-519520.png",
+    "type": "tv",
+    "headers": {
+      "Referer": "https://www.nowtv.com.tr/",
+      "Origin": "https://www.nowtv.com.tr"
+    },
+    "genres": "Ulusal",
+    "is_audio": false
+  },
+  {
+    "id": "tv360",
+    "title": "TV360",
+    "group": "TV",
+    "url": "https://turkmedya-live.ercdn.net/tv360/tv360.m3u8",
+    "poster": "https://www.turkmedya.com.tr/assets/img/logo/logo_360tv.png",
+    "type": "tv",
+    "headers": {
+      "Referer": "https://www.turkmedya.com.tr/",
+      "Origin": "https://www.turkmedya.com.tr"
+    },
+    "genres": "Ulusal"
+  },
+  {
+    "id": "tv4",
+    "title": "TV4",
+    "group": "TV",
+    "url": "https://turkmedya-live.ercdn.net/tv4/tv4.m3u8",
+    "poster": "https://www.turkmedya.com.tr/assets/img/logo/logo_tv4_yeni_2.png",
+    "type": "tv",
+    "headers": {
+      "Referer": "https://www.turkmedya.com.tr/",
+      "Origin": "https://www.turkmedya.com.tr"
+    },
+    "genres": "Ulusal"
+  },
+  {
+    "id": "teve2",
+    "title": "Teve2",
+    "group": "TV",
+    "url": "https://demiroren.daioncdn.net/teve2/teve2.m3u8?ce=3&app=6aab838a-437e-4a1b-bbd0-e30f79cdbbbd&ppid=e936547d1ced8f112aa026ae1a3883d0",
+    "poster": "https://static.teve2.com.tr/assets/img/teve2logo.png",
+    "type": "tv",
+    "headers": {
+      "Referer": "https://www.teve2.com.tr/",
+      "Origin": "https://www.teve2.com.tr"
+    },
+    "genres": "Ulusal",
+    "is_audio": false
+  },
+  {
+    "id": "a2",
+    "title": "A2",
+    "group": "TV",
+    "url": "https://trkvz.daioncdn.net/a2tv/a2tv.m3u8?ce=3&app=59363a60-be96-4f73-9eff-355d0ff2c758&st=xLA_Zq8mMDEaDR5z7b1YPQ&e=1765485064&ppid=21d4112e81c7911b93794107903433f1",
+    "poster": "https://iatv.tmgrup.com.tr/site/v2/a2tv/i/a2tv-logo.png",
+    "type": "tv",
+    "headers": {
+      "Referer": "https://www.atv.com.tr/",
+      "Origin": "https://www.atv.com.tr"
+    },
+    "genres": "Ulusal",
+    "is_audio": false
+  },
+  {
+    "id": "trtcocuk",
+    "title": "TRT Çocuk",
+    "group": "TV",
+    "url": "https://tv-trtcocuk.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-cocuk-televizyon-kanali.aa78d7b.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Çocuk"
+  },
+  {
+    "id": "trtdiyanetcocuk",
+    "title": "TRT Diyanet Çocuk",
+    "group": "TV",
+    "url": "https://tv-trtdiyanetcocuk.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-diyanet-cocuk.06e24aa.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Çocuk"
+  },
+  {
+    "id": "trtbelgesel",
+    "title": "TRT Belgesel",
+    "group": "TV",
+    "url": "https://tv-trtbelgesel.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-belgesel-televizyon-kanali.0baaa5a.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Belgesel"
+  },
+  {
+    "id": "trthaber",
+    "title": "TRT Haber",
+    "group": "TV",
+    "url": "https://tv-trthaber.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-haber-televizyon-kanali.3fee2de.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Haber"
+  },
+  {
+    "id": "trtmuzik",
+    "title": "TRT Müzik",
+    "group": "TV",
+    "url": "https://tv-trtmuzik.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-muzik-televizyon-kanali.4fe1e86.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Müzik"
+  },
+  {
+    "id": "trtspor1",
+    "title": "TRT Spor 1",
+    "group": "TV",
+    "url": "https://tv-trtspor1.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-spor-televizyon-kanali.0fcf904.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Spor"
+  },
+  {
+    "id": "trtsporyildiz",
+    "title": "TRT Spor Yıldız",
+    "group": "TV",
+    "url": "https://tv-trtspor2.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-spor-yildiz-televizyon-kanali.588596f.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Spor"
+  },
+  {
+    "id": "trt2",
+    "title": "TRT 2",
+    "group": "TV",
+    "url": "https://tv-trt2.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-2-televizyon-kanali.ca9ed7b.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Ulusal"
+  },
+  {
+    "id": "trtturk",
+    "title": "TRT Türk",
+    "group": "TV",
+    "url": "https://tv-trtturk.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-turk-televizyon-kanali.188e2ef.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Ulusal"
+  },
+  {
+    "id": "trtavaz",
+    "title": "TRT Avaz",
+    "group": "TV",
+    "url": "https://tv-trtavaz.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-avaz-televizyon-kanali.d1a84fd.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Ulusal"
+  },
+  {
+    "id": "trtarabi",
+    "title": "TRT Arabi",
+    "group": "TV",
+    "url": "https://tv-trtarabi.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-arabi-televizyon-kanali.e9524cc.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Haber"
+  },
+  {
+    "id": "trtworld",
+    "title": "TRT World",
+    "group": "TV",
+    "url": "https://tv-trtworld.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-world-televizyon-kanali.3b79eeb.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Haber"
+  },
+  {
+    "id": "trtkurdi",
+    "title": "TRT Kurdi",
+    "group": "TV",
+    "url": "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8",
+    "poster": "https://www.trt.net.tr/_nuxt/img/trt-kurdi-televizyon-kanali.3f1cba4.png",
+    "type": "tv",
+    "headers": {},
+    "is_audio": false,
+    "genres": "Ulusal"
+  },
+  {
+    "id": "Nr1Tv",
+    "title": "Nr1 TV",
+    "group": "TV",
+    "url": "https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/broadcast_5c9e17cd59e8b.smil/playlist.m3u8?md5=d2YLTWbheiukRfMtHsE2Dw",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2015/12/nr1-tv-logo.jpg",
+    "type": "tv",
+    "headers": {},
+    "genres": "Müzik"
+  },
+  {
+    "id": "Nr1TvAsk",
+    "title": "Number1 Aşk Tv",
+    "group": "TV",
+    "url": "https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/broadcast_5c9e18f9c54e6.smil/playlist.m3u8?md5=tk4gzHZAybQOxGgzavddHA",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2017/10/ask-tv-web.jpg",
+    "type": "tv",
+    "headers": {},
+    "genres": "Müzik"
+  },
+  {
+    "id": "Nr1TurkTv",
+    "title": "Nr1 Türk Tv",
+    "group": "TV",
+    "url": "https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/broadcast_5c9e187770143.smil/playlist.m3u8?md5=kFLJQfFHiuG9a_6N1_Rdug",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2015/12/turk-tv-logo.jpg",
+    "type": "tv",
+    "headers": {},
+    "genres": "Müzik"
+  },
+  {
+    "id": "Nr1RapTV",
+    "title": "Number1 Rap TV",
+    "group": "TV",
+    "url": "https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/broadcast_5c9e19877b340.smil/playlist.m3u8?md5=ahnQby7bxYCogFTrF--h2A",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2017/10/damar-tv-web.jpg",
+    "type": "tv",
+    "headers": {},
+    "genres": "Müzik"
+  },
+  {
+    "id": "Nr1DanceTV",
+    "title": "Number1 Dance TV",
+    "group": "TV",
+    "url": "https://b01c02nl.mediatriple.net/videoonlylive/mtkgeuihrlfwlive/broadcast_5c9e2aa89e721.smil/playlist.m3u8?md5=Qxx6nus_YV2ixEdEXdztJQ",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2017/10/dance-tv-web.jpg",
+    "type": "tv",
+    "headers": {},
+    "genres": "Müzik"
+  },
+  {
+    "id": "minikago",
+    "title": "Minika GO",
+    "url": "https://trkvz.daioncdn.net/minikago/minikago.m3u8?app=web&ce=3&st=waBfw0pqgvAYQ0tuNJD_Dw&e=1765485182&ppid=21d4112e81c7911b93794107903433f1",
+    "group": "TV",
+    "genres": "Çocuk",
+    "headers": {},
+    "poster": "https://ia.tmgrup.com.tr/852040/64/64/0/0/64/64?u=https://i.tmgrup.com.tr/724izle/2023/06/14/1686755550790.png",
+    "is_audio": false
+  },
+  {
+    "id": "minikacocuk",
+    "title": "Minika Çocuk",
+    "url": "https://trkvz.daioncdn.net/minikago_cocuk/minikago_cocuk.m3u8?app=web&ce=3&st=z3SA3tUfn86dxHwBKxTNMg&e=1765485367&ppid=21d4112e81c7911b93794107903433f1",
+    "group": "TV",
+    "genres": "Çocuk",
+    "headers": {},
+    "poster": "https://ia.tmgrup.com.tr/b8b0e1/64/64/0/0/64/64?u=https://i.tmgrup.com.tr/724izle/2023/06/14/1686755575352.png",
+    "is_audio": false
+  },
+  {
+    "id": "trt-fm",
+    "title": "TRT FM",
+    "group": "Radio",
+    "url": "https://trt.radyotvonline.net/trt_fm.aac",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467418.jpeg",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Yerli Müzik"
+  },
+  {
+    "id": "pop90",
+    "title": "Pop 90",
+    "url": "https://27953.live.streamtheworld.com/POP90128AAC.aac?dist=https%3A%2F%2Fkarnaval.com%2Fradyolar%2Fjoyturk&tdsdk=js-2.9&swm=false&pname=TDSdk&pversion=2.9&banners=300x250&gender=F&age=34_45%2C45%2B&ses=AB%2CC1&title=B%2CMK%2CSM%2CE%2CEH&burst-time=15&sbmid=4c1695ad-b9e8-413e-cc1e-14a27a090349",
+    "group": "Radio",
+    "poster": "https://mediacdns.karnaval.com/media/station_media/41/logos/android_default_logo.png?v=041022033335",
+    "is_audio": true,
+    "headers": {},
+    "genres": "Yerli Müzik"
+  },
+  {
+    "id": "metrofm",
+    "title": "Metro FM",
+    "group": "Radio",
+    "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/METRO_FM128AAC.aac?/;stream.mp3",
+    "poster": "https://mediacdns.karnaval.com/media/station_media/2/logos/meta_image.png",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Yabancı Müzik"
+  },
+  {
+    "id": "power-fm",
+    "title": "Power FM",
+    "group": "Radio",
+    "url": "https://live.powerapp.com.tr/powerfmadver/abr/playlist.m3u8",
+    "poster": "https://cdn.powergroup.com.tr/powerapp/channels/big/powerFM.png?v=932",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Yabancı Müzik"
+  },
+  {
+    "id": "number1fm",
+    "title": "Number 1 FM",
+    "group": "Radio",
+    "url": "https://eustr75.mediatriple.net//Number1Media/01_Number1Fm.stream/playlist.m3u8",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2015/12/N1_FM-1.png",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Yabancı Müzik"
+  },
+  {
+    "id": "kral-fm",
+    "title": "Kral FM",
+    "group": "Radio",
+    "url": "https://dygedge2.radyotvonline.net/kralfm/playlist.m3u8",
+    "poster": "https://cdn1.kralmuzik.com.tr/media/content/19-05/17/kralfm.png",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Yerli Müzik"
+  },
+  {
+    "id": "kral-pop",
+    "title": "Kral Pop",
+    "group": "Radio",
+    "url": "https://dygedge.radyotvonline.net/kralpop/playlist.m3u8",
+    "poster": "https://cdn1.kralmuzik.com.tr/media/content/19-05/20/kralpop.png",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Yerli Müzik"
+  },
+  {
+    "id": "super-fm",
+    "title": "Süper FM",
+    "group": "Radio",
+    "url": "https://27823.live.streamtheworld.com/SUPER_FM128AAC.aac",
+    "poster": "https://mediacdns.karnaval.com/media/station_media/1/logos/android_default_logo.png?v=301024040744",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Yerli Müzik"
+  },
+  {
+    "id": "alem-fm",
+    "title": "Alem FM",
+    "group": "Radio",
+    "url": "https://alemfm.radyotvonline.net/alemfmaac",
+    "poster": "https://www.turkmedya.com.tr/assets/img/logo/logo_alem_fm.png",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "best-fm",
+    "title": "Best FM",
+    "group": "Radio",
+    "url": "https://ssldyg.radyotvonline.com/best/bestfm.stream/playlist.m3u8",
+    "poster": "https://www.bestfm.com.tr/wp-content/uploads/2024/12/LOGOWHITE-2-1.png",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Yerli Müzik"
+  },
+  {
+    "id": "joy-turk",
+    "title": "Joy Türk",
+    "group": "Radio",
+    "url": "https://28933.live.streamtheworld.com/VIRGIN_RADIO128AAC.aac?dist=https%3A%2F%2Fkarnaval.com%2Fradyolar%2Fjoyturk&tdsdk=js-2.9&swm=false&pname=TDSdk&pversion=2.9&banners=300x250&gender=M&age=12_34&ses=C1&title=B%2CNW%2CS%2CGAM%2CSME%2CANR%2CCAF%2CSH%2CHF%2CSF&burst-time=15&sbmid=eecdf31b-4e01-453b-f89f-199ea30d77e2",
+    "poster": "https://mediacdns.karnaval.com/media/station_media/4/logos/android_default_logo.png?v=290425114642",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Yerli Müzik"
+  },
+  {
+    "id": "trt-turku",
+    "title": "TRT Türkü",
+    "group": "Radio",
+    "url": "https://rd-trtturku.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467466.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "memleketim-fm",
+    "title": "Memleketim FM",
+    "group": "Radio",
+    "url": "https://radio-trtmemleketimfm.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467512.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "trt-radyo-1",
+    "title": "TRT Radyo 1",
+    "group": "Radio",
+    "url": "https://trt.radyotvonline.net/trt_1.aac",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467415.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "trt-nagme",
+    "title": "TRT Nağme",
+    "group": "Radio",
+    "url": "https://rd-trtnagme.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467465.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "trt-radyo-haber",
+    "title": "TRT Radyo Haber",
+    "group": "Radio",
+    "url": "https://trt.radyotvonline.net/trt_haber.aac",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12530424_0-0-2048-1536.jpeg",
+    "type": "radio",
+    "headers": {},
+    "is_audio": true,
+    "genres": "Haber"
+  },
+  {
+    "id": "trt-radyo-3",
+    "title": "TRT Radyo 3",
+    "group": "Radio",
+    "url": "https://rd-trtradyo3.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467462.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "erzurum-radyosu",
+    "title": "Erzurum Radyosu",
+    "group": "Radio",
+    "url": "https://radio-trterzurum.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467502.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "antalya-radyosu",
+    "title": "Antalya Radyosu",
+    "group": "Radio",
+    "url": "https://radio-trtantalya.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467521.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "cukurova-radyosu",
+    "title": "Çukurova Radyosu",
+    "group": "Radio",
+    "url": "https://radio-trtcukurova.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467486.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "trabzon-radyosu",
+    "title": "Trabzon Radyosu",
+    "group": "Radio",
+    "url": "https://radio-trttrabzon.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467470.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "gap-radyosu",
+    "title": "Gap Radyosu",
+    "group": "Radio",
+    "url": "https://radio-trtgap.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467503.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "trt-kurdi",
+    "title": "TRT Kurdi",
+    "group": "Radio",
+    "url": "https://radio-trtradyo6.medya.trt.com.tr/master_128.m3u8",
+    "poster": "https://cdn-i.pr.trt.com.tr/trtdinle/w480/h360/q70/12467484.jpeg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "radyo-1",
+    "title": "Radyo 1",
+    "group": "Radio",
+    "url": "https://live.radyo1.com.tr/;*.mp3",
+    "poster": "https://radyo1.com.tr/wp-content/uploads/2024/01/radyo1-logo.png",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "radyo-7",
+    "title": "Radyo 7",
+    "group": "Radio",
+    "url": "https://live.radyo7.com.tr/;*.mp3",
+    "poster": "https://radyo7.com.tr/wp-content/uploads/2023/05/radyo7-logo.png",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yerli Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "number1Best",
+    "title": "Number1 Best Of",
+    "group": "Radio",
+    "url": "https://eustr75.mediatriple.net/Number1Media/29_Number1_BEST_OF.stream/playlist.m3u8",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2017/08/N1_BestOf.png",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yabancı Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "number1Slow",
+    "title": "Number1 Slow",
+    "group": "Radio",
+    "url": "https://eustr75.mediatriple.net/Number1Media/16_Number1_Slow.stream/playlist.m3u8",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2015/12/N1_Slow-1.png",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yabancı Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "number1Lounge",
+    "title": "Number1 Lounge",
+    "group": "Radio",
+    "url": "https://eustr75.mediatriple.net/Number1Media/12_Number1_Lounge.stream/playlist.m3u8",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2016/03/nr1lounge-300x300.jpg",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yabancı Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "number1Dance",
+    "title": "Number1 Dance",
+    "group": "Radio",
+    "url": "https://eustr75.mediatriple.net/Number1Media/06_Number1_Dance.stream/playlist.m3u8",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2015/12/N1_Dance-1.png",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yabancı Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "number1Heart",
+    "title": "Number1 Heart",
+    "group": "Radio",
+    "url": "https://eustr75.mediatriple.net/Number1Media/10_Number1_Heart.stream/playlist.m3u8",
+    "poster": "https://www.numberone.com.tr/wp-content/uploads/2015/12/N1_Heart-1.png",
+    "type": "radio",
+    "headers": {},
+    "genres": "Yabancı Müzik",
+    "is_audio": true
+  },
+  {
+    "id": "cizgifilmtv",
+    "title": "Çizgi Film TV",
+    "url": "https://playlist.fasttvcdn.com/pl/rfrk9821hdy9dayo8wfyha/cizgi-film-tv/playlist.m3u8?st=fBSPUlk8x1U2UaKhSQyd9A&e=1765485438",
+    "group": "TV",
+    "genres": "Çocuk",
+    "headers": {},
+    "poster": "https://ia.tmgrup.com.tr/e7cdaa/64/64/0/0/282/282?u=https://i.tmgrup.com.tr/rt/2023/05/08/1683553211327.png",
+    "is_audio": false
+  },
+  {
+    "id": "dizitv",
+    "title": "Dizi TV",
+    "url": "https://playlist.fasttvcdn.com/pl/rfrk9821hdy9dayo8wfyha/dizi-tv/playlist.m3u8?st=nJ-WND2vt019iNTi_TAwpQ&e=1765485512",
+    "group": "TV",
+    "genres": "Dizi",
+    "headers": {},
+    "poster": "https://ia.tmgrup.com.tr/71ce44/64/64/0/0/336/336?u=https://i.tmgrup.com.tr/rt/2023/06/02/1685720299762.png",
+    "is_audio": false
+  },
+  {
+    "id": "belgeseltv",
+    "title": "Belgesel TV",
+    "url": "https://playlist.fasttvcdn.com/pl/rfrk9821hdy9dayo8wfyha/belgesel-tv/playlist.m3u8?st=PaMJMHFkTKHlhU6hko4y0Q&e=1765485598",
+    "group": "TV",
+    "genres": "Belgesel",
+    "headers": {},
+    "poster": "https://ia.tmgrup.com.tr/b33f11/64/64/0/0/542/542?u=https://i.tmgrup.com.tr/rt/2023/09/11/1694412613091.png",
+    "is_audio": false
+  },
+  {
+    "id": "turkuvaznostalji",
+    "title": "Turkuvaz Nostalji",
+    "url": "https://trkvz-radyolar.ercdn.net/turkuvaznostalji/playlist.m3u8",
+    "group": "Radio",
+    "genres": "Yerli Müzik",
+    "headers": {},
+    "poster": "https://ia.tmgrup.com.tr/7b2ecf/510/510/0/0/567/567?u=https://i.tmgrup.com.tr/724dinle/2021/02/09/1612856386331.jpg",
+    "is_audio": true
+  },
+  {
+    "id": "radyoenerji",
+    "title": "Radyo Enerji",
+    "url": "https://trkvz-radyolar.ercdn.net/radyoenergy/playlist.m3u8",
+    "group": "Radio",
+    "genres": "Müzik",
+    "headers": {},
+    "poster": "https://ia.tmgrup.com.tr/b99853/510/510/0/0/567/567?u=https://i.tmgrup.com.tr/724dinle/2021/02/09/1612856191355.jpg",
+    "is_audio": true
+  },
+  {
+    "id": "tukuvazanadolu",
+    "title": "Turkuvaz Anadolu",
+    "url": "https://trkvz-radyolar.ercdn.net/turkuvazanadolu/playlist.m3u8",
+    "group": "Radio",
+    "genres": "Yerli Müzik",
+    "headers": {},
+    "poster": "https://ia.tmgrup.com.tr/bda3a2/510/510/0/0/1020/1020?u=https://i.tmgrup.com.tr/724dinle/2021/02/09/1612856249170.png",
+    "is_audio": true
+  },
+  {
+    "id": "radyoturkuvaz",
+    "title": "Radyo Turkuvaz",
+    "url": "https://trkvz-radyolar.ercdn.net/radyoturkuvaz/playlist.m3u8",
+    "group": "Radio",
+    "genres": "Yerli Müzik",
+    "headers": {},
+    "poster": "https://ia.tmgrup.com.tr/a8ef94/510/510/0/0/567/567?u=https://i.tmgrup.com.tr/724dinle/2021/02/09/1612850622106.jpg",
+    "is_audio": true
+  }
+]
