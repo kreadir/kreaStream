@@ -19,25 +19,6 @@
         "language": "tr"
     },
     {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziBox.cs3",
-        "status": 1,
-        "version": 260321,
-        "name": "DiziBox",
-        "internalName": "DiziBox",
-        "authors": [
-            "keyiflerolsun"
-        ],
-        "description": "Yabancı Dizi izle, Tüm yabancı dizilerin yeni ve eski sezonlarını full hd izleyebileceğiniz elit site.",
-        "fileSize": 25200,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "TvSeries"
-        ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=www.dizibox.de&sz=%size%",
-        "apiVersion": 1,
-        "language": "tr"
-    },
-    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziMag.cs3",
         "status": 1,
         "version": 260327,
@@ -144,7 +125,7 @@
             "kreastream"
         ],
         "description": "Dizilla tüm yabancı dizileri ücretsiz olarak Türkçe Dublaj ve altyazılı seçenekleri ile 1080P kalite izleyebileceğiniz yeni nesil yabancı dizi izleme siteniz.",
-        "fileSize": 59920,
+        "fileSize": 60313,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -201,7 +182,7 @@
             "kreastream"
         ],
         "description": "Türkiye'nin en hızlı hd film izleme sitesi",
-        "fileSize": 45652,
+        "fileSize": 45654,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
@@ -221,7 +202,7 @@
             "kreastream"
         ],
         "description": "HDFilmizle.nl",
-        "fileSize": 33075,
+        "fileSize": 33507,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
@@ -299,7 +280,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 242887,
+        "fileSize": 275472,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
