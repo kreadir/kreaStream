@@ -1,5 +1,25 @@
 [
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/CanliDizi.cs3",
+        "status": 1,
+        "version": 260208,
+        "name": "CanliDizi",
+        "internalName": "CanliDizi",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Canlı Dizi için Cloudstream eklentisi",
+        "fileSize": 0,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "iconUrl": "https://www.canlidizi14.com/favicon.ico",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Ddizi.cs3",
         "status": 1,
         "version": 260321,
