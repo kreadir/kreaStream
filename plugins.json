@@ -9,7 +9,7 @@
             "kreastream"
         ],
         "description": "Canlı Dizi için Cloudstream eklentisi",
-        "fileSize": 0,
+        "fileSize": 35094,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -293,14 +293,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260327,
+        "version": 260329,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 282151,
+        "fileSize": 282988,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -453,14 +453,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/TurkTV.cs3",
         "status": 1,
-        "version": 260312,
+        "version": 260329,
         "name": "TurkTV",
         "internalName": "TurkTV",
         "authors": [
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 142111,
+        "fileSize": 143591,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
