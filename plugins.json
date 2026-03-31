@@ -1,5 +1,30 @@
 [
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Aio.cs3",
+        "status": 1,
+        "version": 260329,
+        "name": "Aio",
+        "internalName": "Aio",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "AIO - Türk TV Dizi ve Kanalları (Aggregated)",
+        "fileSize": 152308,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Movie",
+            "Live",
+            "Anime",
+            "Documentary",
+            "Cartoon",
+            "Music"
+        ],
+        "iconUrl": "https://m.media-amazon.com/images/I/41fJO1NxFxL.png",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/CanliDizi.cs3",
         "status": 1,
         "version": 260208,
@@ -408,6 +433,26 @@
             "Cartoon"
         ],
         "iconUrl": "https://play-lh.googleusercontent.com/brwGNmr7IjA_MKk_TTPs0va10hdKE_bD_a1lnKoiMuCayW98EHpRv55edA6aEoJlmwfX=w240-h480",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/StarTV.cs3",
+        "status": 1,
+        "version": 260331,
+        "name": "StarTV",
+        "internalName": "StarTV",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Star Tv Dizi ve Canlı Yayınları",
+        "fileSize": 23051,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries",
+            "Live"
+        ],
+        "iconUrl": "https://media.startv.com.tr/star-tv/images/android-icon-192x192.png",
         "apiVersion": 1,
         "language": "tr"
     },
