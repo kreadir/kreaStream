@@ -2,14 +2,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Aio.cs3",
         "status": 1,
-        "version": 260329,
+        "version": 260402,
         "name": "Aio",
         "internalName": "Aio",
         "authors": [
             "kreastream"
         ],
-        "description": "AIO - Türk TV Dizi ve Kanalları (Aggregated)",
-        "fileSize": 152308,
+        "description": "AIO - Türk TV Dizi ve Kanalları",
+        "fileSize": 61677,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -34,7 +34,7 @@
             "kreastream"
         ],
         "description": "Canlı Dizi için Cloudstream eklentisi",
-        "fileSize": 35094,
+        "fileSize": 33496,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -446,7 +446,7 @@
             "kreastream"
         ],
         "description": "Star Tv Dizi ve Canlı Yayınları",
-        "fileSize": 23051,
+        "fileSize": 22800,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
