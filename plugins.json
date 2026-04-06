@@ -1,16 +1,16 @@
 [
     {
-        "url": "http://192.168.1.110/kreastream/builds/Aio.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Aio.cs3",
         "status": 1,
-        "version": 260403,
+        "version": 260402,
         "name": "Aio",
         "internalName": "Aio",
         "authors": [
             "kreastream"
         ],
         "description": "AIO - Türk TV Dizi ve Kanalları",
-        "fileSize": 209411,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "fileSize": 174696,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
             "Movie",
@@ -25,7 +25,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/Ddizi.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Ddizi.cs3",
         "status": 1,
         "version": 260321,
         "name": "Ddizi",
@@ -35,7 +35,7 @@
         ],
         "description": "DDizi.im için Cloudstream eklentisi",
         "fileSize": 21900,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
         ],
@@ -44,7 +44,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/DiziMag.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziMag.cs3",
         "status": 1,
         "version": 260327,
         "name": "DiziMag",
@@ -54,7 +54,7 @@
         ],
         "description": "En son çıkan yabancı dizi ve filmleri DiziMag farkıyla full hd 1080p kalitede izle. Dizimag Geniş ve güncel arşiviyle dizi ve filmlerin tadını çıkartın.",
         "fileSize": 33976,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
         ],
@@ -63,7 +63,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/DiziPal.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziPal.cs3",
         "status": 1,
         "version": 260322,
         "name": "DiziPal",
@@ -73,7 +73,7 @@
         ],
         "description": "en yeni dizileri güvenli ve hızlı şekilde sunar.",
         "fileSize": 29360,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
             "Movie"
@@ -83,7 +83,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/DiziPalOrijinal.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziPalOrijinal.cs3",
         "status": 1,
         "version": 260322,
         "name": "DiziPalOrijinal",
@@ -93,7 +93,7 @@
         ],
         "description": "DiziPal Orijinal.",
         "fileSize": 54248,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
         ],
@@ -102,7 +102,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/DiziYou.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziYou.cs3",
         "status": 1,
         "version": 260327,
         "name": "DiziYou",
@@ -112,7 +112,7 @@
         ],
         "description": "Diziyou en kaliteli Türkçe dublaj ve altyazılı yabancı dizi izleme sitesidir. Güncel ve efsanevi dizileri 1080p Full HD kalitede izlemek için hemen tıkla!",
         "fileSize": 15419,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
         ],
@@ -121,7 +121,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/Dizilla.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Dizilla.cs3",
         "status": 1,
         "version": 260321,
         "name": "Dizilla",
@@ -131,7 +131,7 @@
         ],
         "description": "Dizilla tüm yabancı dizileri ücretsiz olarak Türkçe Dublaj ve altyazılı seçenekleri ile 1080P kalite izleyebileceğiniz yeni nesil yabancı dizi izleme siteniz.",
         "fileSize": 60311,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
         ],
@@ -140,7 +140,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/FilmEkseni.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/FilmEkseni.cs3",
         "status": 1,
         "version": 260327,
         "name": "FilmEkseni",
@@ -150,7 +150,7 @@
         ],
         "description": "Film Ekseni ⚡ Vizyonda ki, en güncel ve en yeni filmleri full hd kalitesinde türkçe dublaj ve altyazı seçenekleriyle 1080p olarak izleyebileceğiniz adresiniz.",
         "fileSize": 25539,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie"
         ],
@@ -159,7 +159,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/FilmMakinesi.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/FilmMakinesi.cs3",
         "status": 1,
         "version": 260324,
         "name": "FilmMakinesi",
@@ -169,7 +169,7 @@
         ],
         "description": "Film Makinesi, en yeni ve en güncel filmleri sitemizde full HD kalite farkı ile izleyebilirsiniz. HD film izle denildiğinde akla gelen en kaliteli film izleme sitesi.",
         "fileSize": 31154,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie"
         ],
@@ -178,7 +178,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/HDFilmCehennemi.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/HDFilmCehennemi.cs3",
         "status": 1,
         "version": 260324,
         "name": "HDFilmCehennemi",
@@ -188,7 +188,7 @@
         ],
         "description": "Türkiye'nin en hızlı hd film izleme sitesi",
         "fileSize": 45654,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
             "TvSeries"
@@ -198,7 +198,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/HDFilmIzle.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/HDFilmIzle.cs3",
         "status": 1,
         "version": 260321,
         "name": "HDFilmIzle",
@@ -208,7 +208,7 @@
         ],
         "description": "HDFilmizle.nl",
         "fileSize": 33509,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
             "TvSeries"
@@ -218,7 +218,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/IPTV.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/IPTV.cs3",
         "status": 1,
         "version": 251226,
         "name": "IPTV",
@@ -228,7 +228,7 @@
         ],
         "description": "General IPTV player. Add a list in the settings and you'll see it in the plugins list in the home",
         "fileSize": 53475,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
         ],
@@ -236,7 +236,7 @@
         "apiVersion": 1
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/InatBox.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/InatBox.cs3",
         "status": 3,
         "version": 260306,
         "name": "InatBox",
@@ -246,7 +246,7 @@
         ],
         "description": "İnatBox cloudstream eklentisidir. Sevdiğiniz yayın platformlarını ve canlı maçları burada bulabilirsiniz.",
         "fileSize": 32975,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
             "TvSeries",
@@ -257,7 +257,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/JetFilmizle.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/JetFilmizle.cs3",
         "status": 1,
         "version": 260323,
         "name": "JetFilmizle",
@@ -267,7 +267,7 @@
         ],
         "description": "Binlerce Film İzleme Seçeneğiyle En İyi Film İzleme Sitesi",
         "fileSize": 48083,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie"
         ],
@@ -276,7 +276,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/KreaStream.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
         "version": 260329,
         "name": "KreaStream",
@@ -286,7 +286,7 @@
         ],
         "description": "Film, Dizi, Canlı TV",
         "fileSize": 285826,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
             "Movie",
@@ -298,7 +298,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/KreaTube.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaTube.cs3",
         "status": 1,
         "version": 260114,
         "name": "KreaTube",
@@ -308,7 +308,7 @@
         ],
         "description": "Videos, playlists and channels from YouTube",
         "fileSize": 49499,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Others"
         ],
@@ -316,7 +316,7 @@
         "apiVersion": 1
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/NeonSpor.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/NeonSpor.cs3",
         "status": 1,
         "version": 9,
         "name": "NeonSpor",
@@ -326,7 +326,7 @@
         ],
         "description": "(Açılmayan Spor Kanallar İçin VPN Gerekebilir.) NeonSpor eklentisinde BeIN Sports, Tabii Spor, S Sports, Exxen Spor, Smart Spor, Tivibu Spor ve Diğer kanallar mevcuttur.",
         "fileSize": 19671,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
         ],
@@ -335,7 +335,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/SetFilmIzle.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/SetFilmIzle.cs3",
         "status": 1,
         "version": 260321,
         "name": "SetFilmIzle",
@@ -345,7 +345,7 @@
         ],
         "description": "Setfilmizle sitemizde, donma yaşamadan Türkçe dublaj ve altyazılı filmleri ile dizileri muhteşem 1080p full HD kalitesinde izleyebilirsiniz.",
         "fileSize": 28238,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
             "TvSeries"
@@ -355,7 +355,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/SezonlukDizi.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/SezonlukDizi.cs3",
         "status": 1,
         "version": 260327,
         "name": "SezonlukDizi",
@@ -365,7 +365,7 @@
         ],
         "description": "Güncel ve eski dizileri en iyi görüntü kalitesiyle bulabileceğiniz yabancı dizi izleme siteniz.",
         "fileSize": 34694,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
         ],
@@ -374,7 +374,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/Tabii.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Tabii.cs3",
         "status": 1,
         "version": 260328,
         "name": "Tabii",
@@ -384,7 +384,7 @@
         ],
         "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
         "fileSize": 52946,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
             "Live"
@@ -394,7 +394,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/TrtDinle.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/TrtDinle.cs3",
         "status": 1,
         "version": 260216,
         "name": "TrtDinle",
@@ -404,7 +404,7 @@
         ],
         "description": "TRT Dinle: Müzik, Radyo ve Sesli Kitap.",
         "fileSize": 31155,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
         ],
@@ -413,7 +413,7 @@
         "language": "tr"
     },
     {
-        "url": "http://192.168.1.110/kreastream/builds/TurkTV.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/TurkTV.cs3",
         "status": 1,
         "version": 260329,
         "name": "TurkTV",
@@ -423,7 +423,7 @@
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
         "fileSize": 146130,
-        "repositoryUrl": "http://192.168.1.110/kreastream/",
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
             "Live"
