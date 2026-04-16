@@ -102,6 +102,25 @@
         "language": "tr"
     },
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziYo.cs3",
+        "status": 1,
+        "version": 260416,
+        "name": "DiziYo",
+        "internalName": "DiziYo",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Diziyou en kaliteli Türkçe dublaj ve altyazılı yabancı dizi izleme sitesidir. Güncel ve efsanevi dizileri 1080p Full HD kalitede izlemek için hemen tıkla!",
+        "fileSize": 24898,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.diziyo.so",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziYou.cs3",
         "status": 1,
         "version": 260327,
@@ -227,7 +246,7 @@
             "kreastream"
         ],
         "description": "General IPTV player. Add a list in the settings and you'll see it in the plugins list in the home",
-        "fileSize": 53286,
+        "fileSize": 54129,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
