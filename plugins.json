@@ -304,7 +304,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 296412,
+        "fileSize": 296736,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -356,40 +356,20 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/SelcukFlix.cs3",
         "status": 1,
-        "version": 260413,
+        "version": 260417,
         "name": "SelcukFlix",
         "internalName": "SelcukFlix",
         "authors": [
             "kreastream"
         ],
         "description": "Selcukflix'te her türden en yeni ve en popüler dizi ve filmleri izlemenin keyfini çıkarın. Aksiyondan romantiğe, bilim kurgudan dramaya, geniş kütüphanemizde herkes için bir şey var.",
-        "fileSize": 62836,
+        "fileSize": 62740,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
             "TvSeries"
         ],
         "iconUrl": "https://www.google.com/s2/favicons?domain=selcukflix.com&sz=%size%",
-        "apiVersion": 1,
-        "language": "tr"
-    },
-    {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/SetFilmIzle.cs3",
-        "status": 1,
-        "version": 260321,
-        "name": "SetFilmIzle",
-        "internalName": "SetFilmIzle",
-        "authors": [
-            "kreastream"
-        ],
-        "description": "Setfilmizle sitemizde, donma yaşamadan Türkçe dublaj ve altyazılı filmleri ile dizileri muhteşem 1080p full HD kalitesinde izleyebilirsiniz.",
-        "fileSize": 27982,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "Movie",
-            "TvSeries"
-        ],
-        "iconUrl": "https://www.setfilmizle.uk/wp-content/uploads/2017/05/set-touch.webp",
         "apiVersion": 1,
         "language": "tr"
     },
