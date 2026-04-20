@@ -9,7 +9,7 @@
             "kreastream"
         ],
         "description": "AIO - Türk TV Dizi ve Kanalları",
-        "fileSize": 276268,
+        "fileSize": 276901,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -40,6 +40,26 @@
             "TvSeries"
         ],
         "iconUrl": "https://www.ddizi.im/favicon.ico",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziFilm.cs3",
+        "status": 1,
+        "version": 260419,
+        "name": "DiziFilm",
+        "internalName": "DiziFilm",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "HDFilm",
+        "fileSize": 53488,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilm.to",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -92,7 +112,7 @@
             "kreastream"
         ],
         "description": "DiziPal Orijinal.",
-        "fileSize": 53972,
+        "fileSize": 54553,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -111,7 +131,7 @@
             "kreastream"
         ],
         "description": "Diziyou en kaliteli Türkçe dublaj ve altyazılı yabancı dizi izleme sitesidir. Güncel ve efsanevi dizileri 1080p Full HD kalitede izlemek için hemen tıkla!",
-        "fileSize": 24898,
+        "fileSize": 25524,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -149,7 +169,7 @@
             "kreastream"
         ],
         "description": "Dizilla tüm yabancı dizileri ücretsiz olarak Türkçe Dublaj ve altyazılı seçenekleri ile 1080P kalite izleyebileceğiniz yeni nesil yabancı dizi izleme siteniz.",
-        "fileSize": 60071,
+        "fileSize": 60651,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -297,14 +317,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260417,
+        "version": 260420,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 308856,
+        "fileSize": 372971,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -363,7 +383,7 @@
             "kreastream"
         ],
         "description": "Selcukflix'te her türden en yeni ve en popüler dizi ve filmleri izlemenin keyfini çıkarın. Aksiyondan romantiğe, bilim kurgudan dramaya, geniş kütüphanemizde herkes için bir şey var.",
-        "fileSize": 62740,
+        "fileSize": 63338,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
