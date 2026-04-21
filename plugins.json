@@ -53,13 +53,13 @@
             "kreastream"
         ],
         "description": "HDFilm",
-        "fileSize": 53488,
+        "fileSize": 56385,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
             "TvSeries"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilm.to",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=dizifilm.to",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -324,7 +324,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 372971,
+        "fileSize": 374245,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
