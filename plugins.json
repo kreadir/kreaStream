@@ -324,7 +324,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 385419,
+        "fileSize": 393764,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -403,7 +403,7 @@
             "kreastream"
         ],
         "description": "Güncel ve eski dizileri en iyi görüntü kalitesiyle bulabileceğiniz yabancı dizi izleme siteniz.",
-        "fileSize": 34427,
+        "fileSize": 0,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -422,7 +422,7 @@
             "kreastream"
         ],
         "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
-        "fileSize": 52320,
+        "fileSize": 0,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -442,7 +442,7 @@
             "kreastream"
         ],
         "description": "TRT Dinle: Müzik, Radyo ve Sesli Kitap.",
-        "fileSize": 31007,
+        "fileSize": 0,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
@@ -461,7 +461,7 @@
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 145588,
+        "fileSize": 0,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
