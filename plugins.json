@@ -9,7 +9,7 @@
             "kreastream"
         ],
         "description": "AIO - Türk TV Dizi ve Kanalları",
-        "fileSize": 276901,
+        "fileSize": 278827,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -66,14 +66,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziMag.cs3",
         "status": 1,
-        "version": 260327,
+        "version": 260422,
         "name": "DiziMag",
         "internalName": "DiziMag",
         "authors": [
             "kreastream"
         ],
         "description": "En son çıkan yabancı dizi ve filmleri DiziMag farkıyla full hd 1080p kalitede izle. Dizimag Geniş ve güncel arşiviyle dizi ve filmlerin tadını çıkartın.",
-        "fileSize": 33868,
+        "fileSize": 32201,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -169,7 +169,7 @@
             "kreastream"
         ],
         "description": "Dizilla tüm yabancı dizileri ücretsiz olarak Türkçe Dublaj ve altyazılı seçenekleri ile 1080P kalite izleyebileceğiniz yeni nesil yabancı dizi izleme siteniz.",
-        "fileSize": 60651,
+        "fileSize": 65330,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -324,7 +324,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 384570,
+        "fileSize": 385419,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
