@@ -2,7 +2,7 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Aio.cs3",
         "status": 1,
-        "version": 260411,
+        "version": 260422,
         "name": "Aio",
         "internalName": "Aio",
         "authors": [
@@ -317,7 +317,7 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260420,
+        "version": 260422,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
