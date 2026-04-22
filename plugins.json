@@ -25,6 +25,26 @@
         "language": "tr"
     },
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/CizgiDizi.cs3",
+        "status": 1,
+        "version": 260422,
+        "name": "CizgiDizi",
+        "internalName": "CizgiDizi",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Çizgi ve Dizi",
+        "fileSize": 27835,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=cizgivedizi.com",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Ddizi.cs3",
         "status": 1,
         "version": 260321,
@@ -324,7 +344,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 393764,
+        "fileSize": 393743,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -403,7 +423,7 @@
             "kreastream"
         ],
         "description": "Güncel ve eski dizileri en iyi görüntü kalitesiyle bulabileceğiniz yabancı dizi izleme siteniz.",
-        "fileSize": 0,
+        "fileSize": 34427,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries"
@@ -422,7 +442,7 @@
             "kreastream"
         ],
         "description": "Tabii TV, Radyo, Diziler ve Programlar - TRT içerikleri için en iyi çözüm. Tüm TRT kanallarını ve programlarını tek bir uygulamada izleyin.",
-        "fileSize": 0,
+        "fileSize": 52320,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -442,7 +462,7 @@
             "kreastream"
         ],
         "description": "TRT Dinle: Müzik, Radyo ve Sesli Kitap.",
-        "fileSize": 0,
+        "fileSize": 31007,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
@@ -461,7 +481,7 @@
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 0,
+        "fileSize": 145588,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -470,5 +490,25 @@
         "iconUrl": "https://m.media-amazon.com/images/I/41fJO1NxFxL.png",
         "apiVersion": 1,
         "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/YTS.cs3",
+        "status": 1,
+        "version": 260422,
+        "name": "YTS",
+        "internalName": "YTS",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "YTS Movies 4K Support (Torrent)",
+        "fileSize": 16368,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "Torrent"
+        ],
+        "iconUrl": "https://raw.githubusercontent.com/phisher98/TVVVV/refs/heads/main/Icons/yts.png",
+        "apiVersion": 1,
+        "language": "en"
     }
 ]
