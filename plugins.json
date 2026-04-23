@@ -73,7 +73,7 @@
             "kreastream"
         ],
         "description": "HDFilm",
-        "fileSize": 56385,
+        "fileSize": 59202,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
@@ -344,7 +344,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 393743,
+        "fileSize": 397522,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -490,25 +490,5 @@
         "iconUrl": "https://m.media-amazon.com/images/I/41fJO1NxFxL.png",
         "apiVersion": 1,
         "language": "tr"
-    },
-    {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/YTS.cs3",
-        "status": 1,
-        "version": 260422,
-        "name": "YTS",
-        "internalName": "YTS",
-        "authors": [
-            "kreastream"
-        ],
-        "description": "YTS Movies 4K Support (Torrent)",
-        "fileSize": 16368,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "Movie",
-            "Torrent"
-        ],
-        "iconUrl": "https://raw.githubusercontent.com/phisher98/TVVVV/refs/heads/main/Icons/yts.png",
-        "apiVersion": 1,
-        "language": "en"
     }
 ]
