@@ -34,7 +34,7 @@
             "kreastream"
         ],
         "description": "Canlı Dizi için Cloudstream eklentisi",
-        "fileSize": 44636,
+        "fileSize": 45109,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -273,6 +273,26 @@
             "Movie"
         ],
         "iconUrl": "https://www.google.com/s2/favicons?domain=filmmakinesi.to",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/HDFC25.cs3",
+        "status": 1,
+        "version": 260419,
+        "name": "HDFC25",
+        "internalName": "HDFC25",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "HDFilm Cehennemi 25",
+        "fileSize": 60477,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi25.com",
         "apiVersion": 1,
         "language": "tr"
     },
