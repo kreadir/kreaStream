@@ -279,14 +279,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/HDFC25.cs3",
         "status": 1,
-        "version": 260419,
+        "version": 260507,
         "name": "HDFC25",
         "internalName": "HDFC25",
         "authors": [
             "kreastream"
         ],
         "description": "HDFilm Cehennemi 25",
-        "fileSize": 60477,
+        "fileSize": 84343,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
