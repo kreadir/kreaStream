@@ -43,46 +43,6 @@
         "apiVersion": 1
     },
     {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/InatBox.cs3",
-        "status": 3,
-        "version": 260306,
-        "name": "InatBox",
-        "internalName": "InatBox",
-        "authors": [
-            "kreastream"
-        ],
-        "description": "İnatBox cloudstream eklentisidir. Sevdiğiniz yayın platformlarını ve canlı maçları burada bulabilirsiniz.",
-        "fileSize": 32622,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "Movie",
-            "TvSeries",
-            "Live"
-        ],
-        "iconUrl": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh3vCp6N1K4bECoYRQD-cisJF2_6V_Hk01ZhDmoPR2JuM8O5qr4MqrPO1munM9cRlleBBSK6odYhLtDBWv4E3vhPhynlmS5hVVtJZShHoGA5REQ8_3v8SIlccTEqzVQu2UJyNYQdJNrKIfWy66RQeT0D-CcmFCbHPz5023H6p2v5fv4NVloZ5Rqo_yGrIY/s320/iNat-Box-App.png",
-        "apiVersion": 1,
-        "language": "tr"
-    },
-    {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/JetFilmizle.cs3",
-        "status": 1,
-        "version": 260323,
-        "name": "JetFilmizle",
-        "internalName": "JetFilmizle",
-        "authors": [
-            "kreastream"
-        ],
-        "description": "Binlerce Film İzleme Seçeneğiyle En İyi Film İzleme Sitesi",
-        "fileSize": 47859,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "Movie"
-        ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=https://jetfilmizle.net&sz=128",
-        "apiVersion": 1,
-        "language": "tr"
-    },
-    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
         "version": 260511,
@@ -92,7 +52,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 447103,
+        "fileSize": 443326,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -138,25 +98,6 @@
             "Live"
         ],
         "iconUrl": "https://www.google.com/s2/favicons?domain=colorhunt.co&sz=%size%",
-        "apiVersion": 1,
-        "language": "tr"
-    },
-    {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/SezonlukDizi.cs3",
-        "status": 1,
-        "version": 260327,
-        "name": "SezonlukDizi",
-        "internalName": "SezonlukDizi",
-        "authors": [
-            "kreastream"
-        ],
-        "description": "Güncel ve eski dizileri en iyi görüntü kalitesiyle bulabileceğiniz yabancı dizi izleme siteniz.",
-        "fileSize": 34427,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "TvSeries"
-        ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=sezonlukdizi8.com&sz=%size%",
         "apiVersion": 1,
         "language": "tr"
     },
