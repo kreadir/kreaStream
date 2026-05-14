@@ -9,7 +9,7 @@
             "kreastream"
         ],
         "description": "AIO - Türk TV Dizi ve Kanalları",
-        "fileSize": 278827,
+        "fileSize": 280808,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -52,7 +52,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 490457,
+        "fileSize": 483519,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -137,26 +137,6 @@
             "Live"
         ],
         "iconUrl": "https://www.trtdinle.com/icon-192x192.png",
-        "apiVersion": 1,
-        "language": "tr"
-    },
-    {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/TurkTV.cs3",
-        "status": 1,
-        "version": 260329,
-        "name": "TurkTV",
-        "internalName": "TurkTV",
-        "authors": [
-            "kreastream"
-        ],
-        "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 145588,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "TvSeries",
-            "Live"
-        ],
-        "iconUrl": "https://m.media-amazon.com/images/I/41fJO1NxFxL.png",
         "apiVersion": 1,
         "language": "tr"
     }
