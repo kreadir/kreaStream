@@ -51,8 +51,8 @@
         "authors": [
             "kreastream"
         ],
-        "description": "Film, Dizi, Canlı TV",
-        "fileSize": 493520,
+        "description": "Film, Dizi, Canlı TV, Torrent",
+        "fileSize": 493335,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
