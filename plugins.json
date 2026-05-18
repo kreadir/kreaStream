@@ -52,7 +52,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV, Torrent",
-        "fileSize": 506949,
+        "fileSize": 517429,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -60,7 +60,7 @@
             "Live",
             "Torrent"
         ],
-        "iconUrl": "https://files.catbox.moe/ol63rm.png",
+        "iconUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/main/images/kreastreamLogo1.png",
         "apiVersion": 1,
         "language": "tr"
     },
