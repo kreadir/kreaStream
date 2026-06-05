@@ -45,20 +45,19 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260601,
+        "version": 260603,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV, Torrent",
-        "fileSize": 506284,
+        "fileSize": 524143,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
             "Movie",
-            "Live",
-            "Torrent"
+            "Live"
         ],
         "iconUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/main/images/kreastreamLogo1.png",
         "apiVersion": 1,
