@@ -45,14 +45,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260605,
+        "version": 260606,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV, Torrent",
-        "fileSize": 0,
+        "fileSize": 541241,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
