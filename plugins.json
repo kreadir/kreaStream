@@ -25,6 +25,25 @@
         "language": "tr"
     },
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Ddizi.cs3",
+        "status": 1,
+        "version": 260321,
+        "name": "Ddizi",
+        "internalName": "Ddizi",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "DDizi.im için Cloudstream eklentisi",
+        "fileSize": 21806,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.ddizi.im/favicon.ico",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/IPTV.cs3",
         "status": 1,
         "version": 251226,
@@ -52,7 +71,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 551578,
+        "fileSize": 566172,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
