@@ -27,14 +27,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/IPTV.cs3",
         "status": 1,
-        "version": 251226,
+        "version": 260603,
         "name": "IPTV",
         "internalName": "IPTV",
         "authors": [
             "kreastream"
         ],
         "description": "General IPTV player. Add a list in the settings and you'll see it in the plugins list in the home",
-        "fileSize": 54130,
+        "fileSize": 55775,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
