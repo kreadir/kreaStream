@@ -64,14 +64,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260617,
+        "version": 260621,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 566777,
+        "fileSize": 566638,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
