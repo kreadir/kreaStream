@@ -91,7 +91,7 @@
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 581798,
+        "fileSize": 583178,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -121,6 +121,28 @@
         "apiVersion": 1
     },
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/NuvioExtra.cs3",
+        "status": 1,
+        "version": 260701,
+        "name": "NuvioExtra",
+        "internalName": "NuvioExtra",
+        "authors": [
+            "kreadir"
+        ],
+        "description": "TMDB kataloglari uzerinden Nuvio provider streamlerini cozen eklenti.",
+        "fileSize": 42398,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Anime",
+            "AsianDrama"
+        ],
+        "iconUrl": "",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Tabii.cs3",
         "status": 1,
         "version": 260328,
@@ -143,14 +165,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/TrtDinle.cs3",
         "status": 1,
-        "version": 260216,
+        "version": 260701,
         "name": "TrtDinle",
         "internalName": "TrtDinle",
         "authors": [
             "kreastream"
         ],
         "description": "TRT Dinle: Müzik, Radyo ve Sesli Kitap.",
-        "fileSize": 28757,
+        "fileSize": 29248,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
