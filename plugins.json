@@ -25,6 +25,26 @@
         "language": "tr"
     },
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziFilm.cs3",
+        "status": 1,
+        "version": 260419,
+        "name": "DiziFilm",
+        "internalName": "DiziFilm",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "HDFilm",
+        "fileSize": 62358,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=dizifilm.to",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziYou.cs3",
         "status": 1,
         "version": 260618,
@@ -64,14 +84,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260624,
+        "version": 260701,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 581913,
+        "fileSize": 581798,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
