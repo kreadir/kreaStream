@@ -25,22 +25,21 @@
         "language": "tr"
     },
     {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/DiziFilm.cs3",
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/FullHDFilmizlesene.cs3",
         "status": 1,
-        "version": 260419,
-        "name": "DiziFilm",
-        "internalName": "DiziFilm",
+        "version": 30,
+        "name": "FullHDFilmizlesene",
+        "internalName": "FullHDFilmizlesene",
         "authors": [
-            "kreastream"
+            "keyiflerolsun"
         ],
-        "description": "HDFilm",
-        "fileSize": 62358,
+        "description": "Sinema zevkini evinize kadar getirdik. Türkiye'nin lider Film sitesinde, en yeni filmleri Full HD izleyin.",
+        "fileSize": 0,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
-            "Movie",
-            "TvSeries"
+            "Movie"
         ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=dizifilm.to",
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.fullhdfilmizlesene.de&sz=%size%",
         "apiVersion": 1,
         "language": "tr"
     },
@@ -65,14 +64,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260712,
+        "version": 260713,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 589894,
+        "fileSize": 599108,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
