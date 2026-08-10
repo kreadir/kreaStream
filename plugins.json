@@ -2,14 +2,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Aio.cs3",
         "status": 1,
-        "version": 260422,
+        "version": 260801,
         "name": "Aio",
         "internalName": "Aio",
         "authors": [
             "kreastream"
         ],
         "description": "AIO - Türk TV Dizi ve Kanalları",
-        "fileSize": 280808,
+        "fileSize": 280183,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -85,14 +85,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260801,
+        "version": 260802,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 564207,
+        "fileSize": 560966,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
