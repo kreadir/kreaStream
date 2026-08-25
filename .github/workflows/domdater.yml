@@ -13,7 +13,7 @@ env:
   
 
 jobs:
-  domain-kontrolu:
+  Domain_Check:
     runs-on: ubuntu-latest
 
     steps:
