@@ -9,7 +9,7 @@
             "kreastream"
         ],
         "description": "AIO - Türk TV Dizi ve Kanalları",
-        "fileSize": 280183,
+        "fileSize": 281479,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -44,27 +44,6 @@
         "language": "tr"
     },
     {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/HDFilmCehennemi.cs3",
-        "status": 1,
-        "version": 48,
-        "name": "HDFilmCehennemi",
-        "internalName": "HDFilmCehennemi",
-        "authors": [
-            "hexated",
-            "keyiflerolsun"
-        ],
-        "description": "Türkiye'nin en hızlı hd film izleme sitesi",
-        "fileSize": 30470,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "Movie",
-            "TvSeries"
-        ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=hdfilmcehennemi.com&sz=%size%",
-        "apiVersion": 1,
-        "language": "tr"
-    },
-    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/IPTV.cs3",
         "status": 1,
         "version": 260603,
@@ -74,7 +53,7 @@
             "kreastream"
         ],
         "description": "General IPTV player. Add a list in the settings and you'll see it in the plugins list in the home",
-        "fileSize": 55775,
+        "fileSize": 60859,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Live"
@@ -85,14 +64,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260809,
+        "version": 260810,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 565726,
+        "fileSize": 567714,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -113,32 +92,13 @@
             "kreastream"
         ],
         "description": "Videos, playlists and channels from YouTube",
-        "fileSize": 49168,
+        "fileSize": 51303,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Others"
         ],
         "iconUrl": "https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_144x144.png",
         "apiVersion": 1
-    },
-    {
-        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/NeonSpor.cs3",
-        "status": 1,
-        "version": 9,
-        "name": "NeonSpor",
-        "internalName": "NeonSpor",
-        "authors": [
-            "sarapcanagii"
-        ],
-        "description": "(Açılmayan Spor Kanallar İçin VPN Gerekebilir.) NeonSpor eklentisinde BeIN Sports, Tabii Spor, S Sports, Exxen Spor, Smart Spor, Tivibu Spor ve Diğer kanallar mevcuttur.",
-        "fileSize": 19646,
-        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
-        "tvTypes": [
-            "Live"
-        ],
-        "iconUrl": "https://www.google.com/s2/favicons?domain=colorhunt.co&sz=%size%",
-        "apiVersion": 1,
-        "language": "tr"
     },
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Tabii.cs3",
@@ -189,7 +149,7 @@
             "kreastream"
         ],
         "description": "Türk Tv Dizi ve Canlı TV Radyo Yayınları",
-        "fileSize": 145588,
+        "fileSize": 146562,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
