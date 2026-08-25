@@ -140,7 +140,7 @@ jobs:
           lines = content.splitlines()
           
           for i, line in enumerate(lines):
-              if not line.strip() or not line.strip().startswith('|'):
+              if not line.strip():
                   continue
           
               name, original_url = parse_line(line)
@@ -156,7 +156,7 @@ jobs:
               if final_url and final_url != original_url:
                   print(f"  ✓ New URL found: {final_url}")
                   old_line = line
-                  new_line = f"|{name}:{final_url}"
+                  new_line = f"{name}={final_url}"
                   content = content.replace(old_line, new_line, 1)
                   changes_made = True
               else:
