@@ -1,34 +1,36 @@
-name: Domain Updater
+name: Domain Checker & Updater
 
 on:
   schedule:
-    - cron: '0/45 * * * *'
+    - cron: '0/59 * * * *'
   workflow_dispatch:
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   FILE_PATH: domain_test
   BLACKLIST_PATH: domain_direct
   TZ: Europe/Istanbul
+  
 
 jobs:
   domain-kontrolu:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Depoyu klonla
+      - name: Clone repo
         uses: actions/checkout@v4
 
-      - name: Python kurulumu
+      - name: Python installation
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Gerekli paketleri yükle
+      - name: install needed packages
         run: |
           python -m pip install --upgrade pip
           pip install requests cloudscraper
 
-      - name: Domainleri kontrol et ve güncelle
+      - name: Check domains and update
         run: |
           python - <<'EOF'
           import re
@@ -42,8 +44,8 @@ jobs:
               blacklist = set()
               
               if not os.path.exists(file_path):
-                  print(f"Kara liste dosyası bulunamadı: {file_path}")
-                  print("Kara liste olmadan devam ediliyor...")
+                  print(f"Directing file not found: {file_path}")
+                  print("Continuing without directing file...")
                   return blacklist
               
               try:
@@ -55,11 +57,11 @@ jobs:
                           
                           domain = line.replace('https://', '').replace('http://', '').replace('www.', '').strip('/')
                           blacklist.add(domain)
-                          print(f"  Kara listeye eklendi: {domain}")
+                          print(f"  Added to Redirect list: {domain}")
               
               except Exception as e:
-                  print(f"Kara liste dosyası okuma hatası: {e}")
-                  print("Kara liste olmadan devam ediliyor...")
+                  print(f"Blacklist file read error: {e}")
+                  print("Continuing without blacklist...")
               
               return blacklist
 
@@ -79,7 +81,7 @@ jobs:
                   url = url.strip().rstrip('/')
                   
                   if blacklist and is_blacklisted(url, blacklist):
-                      print(f"  ⛔ Kara listede, atlanıyor: {url}")
+                      print(f"  ⛔ Blacklisted, skipping: {url}")
                       return None
                   
                   response = scraper.get(
@@ -92,8 +94,8 @@ jobs:
                   final_url = response.url.rstrip('/')
                   
                   if blacklist and is_blacklisted(final_url, blacklist):
-                      print(f"  ⛔ Redirect sonucu kara listede: {final_url}")
-                      print(f"  ✓ Mevcut URL korunuyor")
+                      print(f"  ⛔ Redirect result is in blacklist: {final_url}")
+                      print(f"  ✓ Keeping current URL")
                       return url
                   
                   parsed = urlparse(final_url)
@@ -106,7 +108,7 @@ jobs:
                   return None
 
           def parse_line(line):
-              match = re.match(r'\|([^:]+):(https?://[^\s]+)', line.strip())
+              match = re.match(r'\|([^:]+)=(https?://[^\s]+)', line.strip())
               if match:
                   name = match.group(1)
                   url = match.group(2).rstrip('/')
@@ -116,24 +118,24 @@ jobs:
           file_path = '${{ env.FILE_PATH }}'
           blacklist_path = '${{ env.BLACKLIST_PATH }}'
           
-          print("Kara liste kontrol ediliyor...")
+          print("Blacklist, liste kontrol ediliyor...")
           blacklist = load_blacklist(blacklist_path)
           if blacklist:
-              print(f"Toplam {len(blacklist)} domain kara listede.\n")
+              print(f"Totally {len(blacklist)} domain blacklisted.\n")
           else:
-              print("Kara liste bulunamadı veya boş.\n")
+              print("Blacklist not found or empty.\n")
           
           try:
               with open(file_path, 'r', encoding='utf-8') as f:
                   content = f.read()
           except FileNotFoundError:
-              print(f"Dosya bulunamadı: {file_path}")
+              print(f"File not found: {file_path}")
               exit(1)
 
           original_content = content
           changes_made = False
 
-          print("Domain kontrolleri başlıyor...\n")
+          print("Starting domain checks...\n")
 
           lines = content.splitlines()
           
@@ -146,35 +148,35 @@ jobs:
               if not name or not original_url:
                   continue
           
-              print(f"Kontrol ediliyor: {name}")
-              print(f"  Mevcut URL: {original_url}")
+              print(f"Checking: {name}")
+              print(f"  Current URL: {original_url}")
               
               final_url = get_final_url(original_url, blacklist)
           
               if final_url and final_url != original_url:
-                  print(f"  ✓ Yeni URL bulundu: {final_url}")
+                  print(f"  ✓ New URL found: {final_url}")
                   old_line = line
                   new_line = f"|{name}:{final_url}"
                   content = content.replace(old_line, new_line, 1)
                   changes_made = True
               else:
                   if final_url:
-                      print(f"  → Değişiklik yok")
+                      print(f"  → No changes")
                   else:
-                      print(f"  ✗ Erişilemedi veya kara listede, mevcut URL korunuyor")
+                      print(f"  ✗ Not accessible or in blacklist, current URL preserved")
           
               print()
 
           if changes_made and content != original_content:
               with open(file_path, 'w', encoding='utf-8') as f:
                   f.write(content)
-              print("✓ Dosya güncellendi!")
+              print("✓ File updated!")
           else:
-              print("→ Güncelleme gerekmedi.")
+              print("→ No changes needed.")
 
           EOF
 
-      - name: Değişiklikleri kaydet
+      - name: Save changes
         run: |
           git config user.name 'Domain Updater'
           git config user.email 'bot@github-actions'
@@ -182,7 +184,7 @@ jobs:
           git add ${{ env.FILE_PATH }}
 
           if git diff --staged --quiet; then
-            echo "Değişiklik yok, commit atlanıyor"
+            echo "No changes, skipping commit"
             exit 0
           fi
 
