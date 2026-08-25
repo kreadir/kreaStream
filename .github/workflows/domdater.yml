@@ -108,7 +108,7 @@ jobs:
                   return None
 
           def parse_line(line):
-              match = re.match(r'\|([^:]+)=(https?://[^\s]+)', line.strip())
+              match = re.match(r'\([^:]+)=(https?://[^\s]+)', line.strip())
               if match:
                   name = match.group(1)
                   url = match.group(2).rstrip('/')
