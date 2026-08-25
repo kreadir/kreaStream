@@ -1,4 +1,4 @@
-name: Domain Kontrol ve Güncelleme
+name: Domain Updater
 
 on:
   schedule:
