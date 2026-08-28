@@ -2,7 +2,7 @@ name: Domain Checker & Updater
 
 on:
   schedule:
-    - cron: '0/59 * * * *'
+    - cron: '0 */12 * * *'
   workflow_dispatch:
 
 env:
