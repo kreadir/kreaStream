@@ -64,14 +64,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260810,
+        "version": 260820,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 567714,
+        "fileSize": 567893,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -99,6 +99,26 @@
         ],
         "iconUrl": "https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_144x144.png",
         "apiVersion": 1
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/SetFilmIzle.cs3",
+        "status": 1,
+        "version": 260821,
+        "name": "SetFilmIzle",
+        "internalName": "SetFilmIzle",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Setfilmizle sitemizde, donma yaşamadan Türkçe dublaj ve altyazılı filmleri ile dizileri muhteşem 1080p full HD kalitesinde izleyebilirsiniz.",
+        "fileSize": 24239,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://www.google.com/s2/favicons?domain=www.setfilmizle.ltd&sz=%size%",
+        "apiVersion": 1,
+        "language": "tr"
     },
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Tabii.cs3",
