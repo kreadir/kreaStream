@@ -190,5 +190,5 @@ jobs:
           fi
 
           CURRENT_TIME=$(date +'%Y-%m-%d %H:%M')
-          git commit -m "🔄 Domain updated - $CURRENT_TIME"
+          git commit -m "♻️ Domain updated - $CURRENT_TIME"
           git push
