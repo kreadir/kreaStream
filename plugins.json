@@ -64,14 +64,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
-        "version": 260906,
+        "version": 260911,
         "name": "KreaStream",
         "internalName": "KreaStream",
         "authors": [
             "kreastream"
         ],
         "description": "Film, Dizi, Canlı TV",
-        "fileSize": 568898,
+        "fileSize": 566101,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "TvSeries",
@@ -99,6 +99,48 @@
         ],
         "iconUrl": "https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_144x144.png",
         "apiVersion": 1
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/RecTV.cs3",
+        "status": 1,
+        "version": 260911,
+        "name": "RecTV",
+        "internalName": "RecTV",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "RecTv APK, Türkiye’deki en popüler Çevrimiçi Medya Akış platformlarından biridir. Filmlerin, Canlı Sporların, Web Dizilerinin ve çok daha fazlasının keyfini ücretsiz çıkarın.",
+        "fileSize": 28625,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "Live",
+            "TvSeries"
+        ],
+        "iconUrl": "https://rectv.org.tr/wp-content/uploads/2024/11/rectv-modified.webp",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Sinewix.cs3",
+        "status": 1,
+        "version": 260911,
+        "name": "Sinewix",
+        "internalName": "Sinewix",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "Sinewix | Ücretsiz Film - Dizi - Anime İzleme Uygulaması",
+        "fileSize": 26267,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Anime"
+        ],
+        "iconUrl": "https://play-lh.googleusercontent.com/brwGNmr7IjA_MKk_TTPs0va10hdKE_bD_a1lnKoiMuCayW98EHpRv55edA6aEoJlmwfX",
+        "apiVersion": 1,
+        "language": "tr"
     },
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Tabii.cs3",
