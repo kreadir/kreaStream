@@ -62,6 +62,27 @@
         "apiVersion": 1
     },
     {
+        "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/Inatbox.cs3",
+        "status": 1,
+        "version": 260915,
+        "name": "Inatbox",
+        "internalName": "Inatbox",
+        "authors": [
+            "kreastream"
+        ],
+        "description": "İnatBox BronzeCloud Edition - Canlı kanallar, spor ve diziler burada.",
+        "fileSize": 48688,
+        "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
+        "tvTypes": [
+            "Movie",
+            "TvSeries",
+            "Live"
+        ],
+        "iconUrl": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh3vCp6N1K4bECoYRQD-cisJF2_6V_Hk01ZhDmoPR2JuM8O5qr4MqrPO1munM9cRlleBBSK6odYhLtDBWv4E3vhPhynlmS5hVVtJZShHoGA5REQ8_3v8SIlccTEqzVQu2UJyNYQdJNrKIfWy66RQeT0D-CcmFCbHPz5023H6p2v5fv4NVloZ5Rqo_yGrIY/s320/iNat-Box-App.png",
+        "apiVersion": 1,
+        "language": "tr"
+    },
+    {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/KreaStream.cs3",
         "status": 1,
         "version": 260911,
@@ -103,14 +124,14 @@
     {
         "url": "https://raw.githubusercontent.com/kreadir/kreaStream/main/RecTV.cs3",
         "status": 1,
-        "version": 260912,
+        "version": 260913,
         "name": "RecTV",
         "internalName": "RecTV",
         "authors": [
             "kreastream"
         ],
         "description": "RecTv APK, Türkiye’deki en popüler Çevrimiçi Medya Akış platformlarından biridir. Filmlerin, Canlı Sporların, Web Dizilerinin ve çok daha fazlasının keyfini ücretsiz çıkarın.",
-        "fileSize": 28625,
+        "fileSize": 43034,
         "repositoryUrl": "https://raw.githubusercontent.com/kreadir/kreaStream/",
         "tvTypes": [
             "Movie",
